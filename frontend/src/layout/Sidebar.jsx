@@ -8,6 +8,7 @@ import { PiWaveformBold } from "react-icons/pi";
 import { IoSettingsOutline } from "react-icons/io5";
 
 //데이터 구조 모릅니다. 더미입니다.
+//추후 데이터 구조에 따른, 퍼블수정예정
 const dummyMenu = [
   {
     title: "타입캐스트",
@@ -41,7 +42,7 @@ const dummyMenu = [
       { name: "점포그룹", path: "/manager/store-group" },
       { name: "장비통계", path: "/manager/equipment-stats" },
       { name: "광고통계", path: "/manager/ad-stats" },
-      { name: "광고업체등록", path: "/manager/ad-company-resiter" },
+      { name: "광고계약 관리", path: "/manager/ad-company-resiter" },
       { name: "광고승인", path: "/manager/ad-approval" },
     ],
   },
@@ -52,7 +53,7 @@ const Sidebar = () => {
 
   return (
     <aside className="w-[210px] bg-[#484c56] fixed top-[60px] left-0 h-full z-10">
-      <nav className="px-6 py-8 h-full overflow-y-auto">
+      <nav className="px-6 pt-8 pb-20 h-full overflow-y-auto">
         <ul className="flex flex-col gap-5 text-white">
           {dummyMenu.map((menu, idx) => (
             <li key={idx}>
@@ -81,7 +82,7 @@ const Sidebar = () => {
           ))}
         </ul>
         {/* 기존 코딩 START*/}
-        <ul className="menu text-white">
+        {/* <ul className="menu text-white">
           {menu.map((item) =>
             item.children === undefined ? (
               <li key={item.code}>
@@ -111,7 +112,7 @@ const Sidebar = () => {
               </li>
             )
           )}
-        </ul>
+        </ul> */}
         {/* 기존 코딩 END */}
       </nav>
     </aside>
