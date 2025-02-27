@@ -2,17 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body {
-  font-family: "Pretendard", sans-serif;
-  font-size:16px;
+@layer base {
+  html, body {
+    @apply text-base font-sans;
+  }
 }
 
-body {min-width:1400px;}
-
-.rbc-timeslot-group {
-  min-height: 150px !important
-}
-
-.rbc-time-header {
-  display: none ; /* 상단 시간 숨기기 */
-}
+body {min-width:1680px;}

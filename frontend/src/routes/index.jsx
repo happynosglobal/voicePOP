@@ -4,7 +4,7 @@ import Login from "../features/Login/Login";
 import SignUp from "../features/SignUp/SignUp";
 import DefaultLayout from "../layout/DefaultLayout";
 import UserManagementPage from "../features/UserManagement/UserManagementPage";
-import AdApprovalPage from "../features/AdApproval/AdApprovalPage"
+import AdApprovalPage from "../features/AdApproval/AdApprovalPage";
 import AdCompanyRegisterPage from "../features/AdCompanyRegister/AdCompanyRegisterPage";
 import AdRegisterPage from "../features/AdRegister/AdRegisterPage";
 import AdSchedulePage from "../features/AdSchedule/AdSchedulePage";
@@ -40,23 +40,24 @@ import useLayout from "../layout/hooks/useLayout";
  * [광고승인] - AdApprovalPage.jsx
  */
 function Root() {
-    const { routes } = useLayout();
-    return (
-        <Routes>
-            <Route index path={"/login"} element={<Login />} />
-            <Route path={"/signup"} element={<SignUp />} />
-            <Route path="/" element={<DefaultLayout />}>
-                {routes.map(({ path, element }) => (
-                    <Route key={path} path={path} element={element} />
-                ))}
-            </Route>
-        </Routes>
-    );
+  const { routes } = useLayout();
+  return (
+    <Routes>
+      <Route index path={"/login"} element={<Login />} />
+      <Route path={"/signup"} element={<SignUp />} />
+      <Route path="/" element={<DefaultLayout />}>
+        {routes.map(({ path, element }) => (
+          <Route key={path} path={path} element={element} />
+        ))}
+      </Route>
+    </Routes>
+  );
 }
 
 export default Root;
 
-{/* <Routes>
+{
+  /* <Routes>
 <Route index path={"/login"} element={<Login />} />
 <Route path={"/signup"} element={<SignUp />} />
 <Route path="/" element={<DefaultLayout />}>
@@ -123,5 +124,5 @@ export default Root;
         element={<AdApprovalPage />}
     />
 </Route>
-</Routes> */}
-
+</Routes> */
+}
