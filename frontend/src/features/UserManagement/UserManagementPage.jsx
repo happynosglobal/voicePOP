@@ -6,37 +6,36 @@ import LoadingSpinner from "../../components/loading/LoadingSpinner";
 import SearchBar from "./components/SearchBar";
 import UserTable from "./components/UserTable";
 import AddUserModal from "./components/AddUserModal";
+import ContentLayout from "../../layout/ContentLayout";
+import Title from "../../components/title/Title";
 
 const UserManagementPage = () => {
-	const modalRef = useRef();
-	const { user } = useUserStore();
-	const [isLoading, setIsLoading] = useState(false);
+  const modalRef = useRef();
+  const { user } = useUserStore();
+  const [isLoading, setIsLoading] = useState(false);
 
-	const openModal = () => {
-		if (modalRef.current) {
-			modalRef.current.showModal();
-		}
-	};
+  const openModal = () => {
+    if (modalRef.current) {
+      modalRef.current.showModal();
+    }
+  };
 
-	return (
-		<LoadingSpinner isLoading={isLoading}>
-			<div className="pl-48 pt-16 flex h-screen">
-				<div className="flex-1 p-4 h-full">
-					<div className="bg-white p-6 rounded-lg shadow h-full">
-						<h2 className="text-2xl font-bold mb-4">사용자 관리</h2>
-						{/* <!-- 사용자 검색바 --> */}
-						<SearchBar openModal={openModal} />
+  return (
+    <LoadingSpinner isLoading={isLoading}>
+      <ContentLayout>
+        <Title text="사용자 관리" />
 
-						{/* <!-- 사용자 목록 테이블 --> */}
-						<UserTable openModal={openModal} />
-					</div>
+        {/* <!-- 사용자 검색바 --> */}
+        <SearchBar openModal={openModal} />
 
-					{/* <!-- 모달 --> */}
-					<AddUserModal modalRef={modalRef} />
-				</div>
-			</div>
-		</LoadingSpinner>
-	)
-}
+        {/* <!-- 사용자 목록 테이블 --> */}
+        <UserTable openModal={openModal} />
+
+        {/* <!-- 모달 --> */}
+        <AddUserModal modalRef={modalRef} />
+      </ContentLayout>
+    </LoadingSpinner>
+  );
+};
 
 export default UserManagementPage;

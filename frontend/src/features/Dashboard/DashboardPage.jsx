@@ -1,18 +1,13 @@
-import React from 'react'
+import React from "react";
+import ContentLayout from "../../layout/ContentLayout";
+import Title from "../../components/title/Title";
 
 const DashboardPage = () => {
   return (
-    <>
-      <div className="pl-48 pt-16 flex h-screen">
-        <div className="flex-1 p-4 h-full">
-          <div className="bg-white p-6 rounded-lg shadow h-full">
-            <div>DashboardPage</div>
-          </div>
-        </div>
-      </div>
-    </>
-
-  )
-}
+    <ContentLayout>
+      <Title text="대쉬보드" />
+    </ContentLayout>
+  );
+};
 
 export default DashboardPage;
