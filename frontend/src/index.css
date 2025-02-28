@@ -26,8 +26,8 @@ body {min-width:1680px;}
 .join .join-item.btn:not(.btn-active):hover { border-color:#e9ecef;background-color: #e9ecef;}
 .join .join-item.btn-active { border-color: #D1D5DB;background-color: #D1D5DB; font-weight:600;} 
 
-.btn-accent {color:#fff;}
-.input { border-color: rgb(204, 204, 204);height:38px; border-radius: 5px;}
+
+.input {height:38px; background-color: #fff; border-radius: 5px;}
 .btn {height:38px; border-radius: 5px;}
 
 /* 툴팁 기본 스타일 */

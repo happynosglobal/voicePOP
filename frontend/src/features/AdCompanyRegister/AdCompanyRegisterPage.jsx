@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import ContentLayout from "../../layout/ContentLayout";
 import Title from "../../components/title/Title";
 import Pagination from "../../components/pagination/Pagination";
@@ -7,6 +7,7 @@ import Select from "react-select";
 import EmptyState from "../../components/emptyState/EmptyState";
 import LoadingSpinner from "../../components/loading/LoadingSpinner";
 import Tooltip from "../../components/tooltip/Tooltip";
+import AddCompanyModal from "./components/AddCompanyModal";
 
 const dummyAD = [
   {
@@ -93,11 +94,14 @@ const dummyAD = [
 ];
 
 const AdCompanyRegisterPage = () => {
-  const [activeRow, setActiveRow] = useState(null);
+  const [activeRow, setActiveRow] = useState(null); // 광고계약관리 리스트 선택 상태
 
   const handleRowClick = (id) => {
     setActiveRow(id === activeRow ? null : id);
   };
+
+  const companyModalRef = useRef(null); // 업체 등록 모달 ref
+  const contractModalRef = useRef(null); // 계약 등록 모달 ref
 
   return (
     <ContentLayout>
@@ -131,7 +135,12 @@ const AdCompanyRegisterPage = () => {
               />
             </div>
             <button className="btn btn-sm btn-accent">검색</button>
-            <button className="btn btn-sm btn-primary">업체등록</button>
+            <button
+              className="btn btn-sm btn-primary"
+              onClick={() => companyModalRef.current.showModal()}
+            >
+              업체등록
+            </button>
           </div>
           {/* 검색영역 */}
           <table>
@@ -271,6 +280,7 @@ const AdCompanyRegisterPage = () => {
           )}
         </div>
       </div>
+      <AddCompanyModal modalRef={companyModalRef} /> {/* 업체등록 모달 */}
     </ContentLayout>
   );
 };

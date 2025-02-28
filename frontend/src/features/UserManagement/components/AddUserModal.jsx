@@ -3,12 +3,10 @@ import { IoClose } from "react-icons/io5";
 const AddUserModal = ({ modalRef }) => {
   return (
     <dialog id="my_modal_1" className="modal" ref={modalRef}>
-      <div className="modal-box w-11/12 max-w-5xl relative">
-        <h3 className="text-2xl font-bold text-center mb-4">
-          사용자 수정/삭제
-        </h3>
+      <div className="modal-box w-11/12 max-w-xl relative">
+        <h3 className="mb-5 text-xl font-semibold">사용자 수정/삭제</h3>
 
-        <table className="w-full border-collapse border border-gray-300">
+        <table>
           <tbody>
             <tr>
               <th className="p-2 border border-gray-300 bg-gray-100">성명</th>
