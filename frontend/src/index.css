@@ -3,9 +3,40 @@
 @tailwind utilities;
 
 @layer base {
-  html, body {
-    @apply text-base font-sans;
-  }
+  html, body {@apply text-base font-sans;}
 }
 
+@layer components {
+  /** 기본 테이블 스타일 **/
+  table {@apply w-full table-fixed border-t-2 border-gray-800 border-collapse bg-white;}
+  table thead {@apply border-t-2 border-t-gray-800 border-b border-b-slate-400;}
+  table th, table td {@apply p-2 text-center;}
+  table th {@apply text-gray-800;}
+  table td {@apply border-l border-b border-gray-200 text-gray-600;}
+  table tr td:first-child {@apply border-l-0;}
+  table tr:nth-child(odd) td {@apply bg-gray-50;}
+  table tr.active td {@apply bg-lime-200;}
+  table tr:not(.active):hover td {@apply bg-lime-50;}
+}
+
+
 body {min-width:1680px;}
+
+.join .join-item.btn { border-color: #F3F4F6;background-color: #F3F4F6; font-weight: normal;}
+.join .join-item.btn:not(.btn-active):hover { border-color:#e9ecef;background-color: #e9ecef;}
+.join .join-item.btn-active { border-color: #D1D5DB;background-color: #D1D5DB; font-weight:600;} 
+
+.btn-accent {color:#fff;}
+.input { border-color: rgb(204, 204, 204);height:38px; border-radius: 5px;}
+.btn {height:38px; border-radius: 5px;}
+
+/* 툴팁 기본 스타일 */
+.custom-tooltip {
+  z-index: 9999;
+  max-width: 200px;
+  visibility: visible !important; /* 숨김 방지 */
+  white-space: normal;
+  word-break: break-word;
+  pointer-events: auto; /* 툴팁 내부에서 마우스 이벤트 가능 */
+  user-select: text; /* 텍스트 선택 가능하게 함 */
+}

@@ -23,10 +23,10 @@ export default {
       {
         mytheme: {
           primary: "#3B82F6",
+          "primary-content": "#FFFFFF",
           secondary: "#EC4899",
-          accent: "#FFCF02",
+          accent: "#334155",
           neutral: "#64748B",
-          "base-100": "#FFFFFF",
         },
       },
     ],
