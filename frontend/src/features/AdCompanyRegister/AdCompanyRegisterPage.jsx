@@ -106,29 +106,27 @@ const AdCompanyRegisterPage = () => {
         <div className="relative w-2/5">
           <LoadingSpinner isLoading={false} />
           {/* 검색영역 */}
-          <div className="flex mb-5 gap-1">
-            <div className="w-28">
-              <Select
-                options={[
-                  { value: "EM", label: "EM" },
-                  { value: "ED", label: "ED" },
-                ]}
-                placeholder="전체"
-              />
-            </div>
-            <div className="w-36">
-              <Select
-                options={[
-                  { value: "1", label: "사업자번호" },
-                  { value: "2", label: "사업자명" },
-                ]}
-                defaultValue={{ value: "1", label: "사업자번호" }}
-              />
-            </div>
+          <div className="flex mb-5 gap-1.5">
+            <Select
+              options={[
+                { value: "0", label: "전체 브랜드" },
+                { value: "EM", label: "EM" },
+                { value: "ED", label: "ED" },
+              ]}
+              className="min-w-32"
+              defaultValue={{ value: "0", label: "전체 브랜드" }}
+            />
+            <Select
+              options={[
+                { value: "1", label: "사업자번호" },
+                { value: "2", label: "사업자명" },
+              ]}
+              defaultValue={{ value: "1", label: "사업자번호" }}
+            />
             <div className="flex-1">
               <input
                 type="text"
-                placeholder="검색어를 입력해주세요"
+                placeholder="검색어를 입력해주세요."
                 class="input input-bordered w-full focus:ring-0 focus:outline-none"
               />
             </div>
