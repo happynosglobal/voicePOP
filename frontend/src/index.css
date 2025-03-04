@@ -35,7 +35,7 @@ body {min-width:1680px;}
 :root:has(:is(.modal-open, .modal:target, .modal-toggle:checked + .modal, .modal[open])) {scrollbar-gutter: unset;}
 
 /* 툴팁  */
-.custom-tooltip { z-index: 9999; max-width: 200px; visibility: visible !important; white-space: normal; word-break: break-word; pointer-events: auto; user-select: text;}
+.custom-tooltip { z-index: 9999; max-width: 300px; visibility: visible !important; white-space: normal; word-break: keep-all; pointer-events: auto; user-select: text;}
 
 /* 데이터픽커 */
 .react-datepicker-wrapper {width:100%;}
