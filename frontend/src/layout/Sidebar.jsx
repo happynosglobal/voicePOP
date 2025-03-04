@@ -55,14 +55,14 @@ const Sidebar = () => {
     <aside className="w-[210px] bg-[#484c56] fixed top-[60px] left-0 h-full z-10">
       <nav className="px-6 pt-8 pb-20 h-full overflow-y-auto">
         <ul className="flex flex-col gap-5 text-white">
-          {dummyMenu.map((menu, idx) => (
-            <li key={idx}>
+          {dummyMenu.map((menu, index) => (
+            <li key={index}>
               <h2 className="flex items-center gap-1 font-semibold text-lg mb-1">
                 <span className="w-7">{menu.icon}</span> {menu.title}
               </h2>
               <ul className="w-full">
-                {menu.items.map((item, idx) => (
-                  <li key={idx} className="w-full">
+                {menu.items.map((item, index) => (
+                  <li key={index} className="w-full">
                     <NavLink
                       to={item.path}
                       className={({ isActive }) =>

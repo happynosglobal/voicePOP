@@ -23,10 +23,14 @@ export default {
       {
         mytheme: {
           primary: "#3B82F6",
+          "primary-content": "#FFFFFF",
           secondary: "#EC4899",
-          accent: "#FFCF02",
-          neutral: "#64748B",
-          "base-100": "#FFFFFF",
+          accent: "#334155",
+          neutral: "#9ca3af",
+          "neutral-content": "#FFFFFF",
+          "base-100": "#F3F4F6",
+          // "base-200": "#E5E7EB",
+          // "base-300": "#D1D5DB",
         },
       },
     ],
