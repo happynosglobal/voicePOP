@@ -1,133 +1,118 @@
 import { IoClose } from "react-icons/io5";
+import Select from "react-select";
 
 const AddUserModal = ({ modalRef }) => {
   return (
     <dialog id="my_modal_1" className="modal" ref={modalRef}>
-      <div className="modal-box w-11/12 max-w-xl relative">
-        <h3 className="mb-5 text-xl font-semibold">사용자 수정/삭제</h3>
+      <div className="modal-box bg-white max-w-xl">
+        <h3 className="mb-6 pb-6 font-semibold text-lg border-b">
+          사용자 등록
+        </h3>
+        <form method="dialog">
+          <div className="flex flex-col gap-6">
+            <div className="flex items-center justify-between">
+              <label className="font-semibold w-1/4 shrink-0">성명</label>
+              <input
+                type="text"
+                class="input w-full"
+                value=""
+                placeholder="성명을 입력하세요"
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <label className="font-semibold w-1/4 shrink-0">아이디</label>
+              <input
+                type="text"
+                class="input w-full"
+                value=""
+                placeholder="아이디를 입력하세요"
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <label className="font-semibold w-1/4 shrink-0">패스워드</label>
+              <input
+                type="text"
+                class="input w-full"
+                value=""
+                placeholder="패스워드를 입력하세요"
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <label className="font-semibold w-1/4 shrink-0">권한</label>
+              <Select
+                options={[
+                  { value: "0", label: "전체 관리자" },
+                  { value: "1", label: "브랜드 관리자" },
+                  { value: "2", label: "광고 관리자" },
+                  { value: "3", label: "점포 관리자" },
+                ]}
+                className="w-full"
+                placeholder="권한을 선택하세요"
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <label className="font-semibold w-1/4 shrink-0">관리브랜드</label>
+              <Select
+                isMulti
+                name="colors"
+                options={[
+                  { value: "EM", label: "이마트(EM)" },
+                  { value: "ED", label: "에브리데이(ED)" },
+                  { value: "TR", label: "트레이더스(TR)" },
+                ]}
+                className="w-full"
+                classNamePrefix="select"
+                placeholder="브랜드를 선택하세요"
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <label className="font-semibold w-1/4 shrink-0">관리점포</label>
+              <Select
+                options={[
+                  { value: "0", label: "행당점" },
+                  { value: "1", label: "점포A" },
+                  { value: "2", label: "점포B" },
+                  { value: "3", label: "점포C" },
+                  { value: "4", label: "점포D" },
+                ]}
+                className="w-full"
+                placeholder="관리점포를 선택하세요"
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <label className="font-semibold w-1/4 shrink-0">이메일</label>
+              <input
+                type="email"
+                class="input w-full"
+                value=""
+                placeholder="이메일을 입력하세요"
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <label className="font-semibold w-1/4 shrink-0">상태</label>
+              <div className="flex gap-10 w-full">
+                <label className="flex items-center gap-2 cursor-pointer text-base">
+                  <input type="radio" name="status" className="radio" />
+                  미승인
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer text-base">
+                  <input type="radio" name="status" className="radio" checked />
+                  승인
+                </label>
+              </div>
+            </div>
+          </div>
 
-        <table>
-          <tbody>
-            <tr>
-              <th className="p-2 border border-gray-300 bg-gray-100">성명</th>
-              <td className="p-2 border border-gray-300">
-                <input
-                  type="text"
-                  className="input input-bordered w-full"
-                  value="홍길동"
-                />
-              </td>
-            </tr>
-            <tr>
-              <th className="p-2 border border-gray-300 bg-gray-100">ID</th>
-              <td className="p-2 border border-gray-300">
-                <input
-                  type="text"
-                  className="input input-bordered w-full"
-                  value="12345"
-                />
-              </td>
-            </tr>
-            <tr>
-              <th className="p-2 border border-gray-300 bg-gray-100">
-                패스워드
-              </th>
-              <td className="p-2 border border-gray-300">
-                <input
-                  type="text"
-                  className="input input-bordered w-full"
-                  value="1234564"
-                />
-              </td>
-            </tr>
-            <tr>
-              <th className="p-2 border border-gray-300 bg-gray-100">권한</th>
-              <td className="p-2 border border-gray-300">
-                <select className="select select-bordered w-full">
-                  <option>점포관리자</option>
-                  <option>일반 관리자</option>
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <th className="p-2 border border-gray-300 bg-gray-100">
-                관리 브랜드
-              </th>
-              <td className="p-2 border border-gray-300">
-                <div className="flex gap-4">
-                  <label className="flex items-center gap-2 cursor-pointer text-base">
-                    <input
-                      type="radio"
-                      name="brand"
-                      className="radio"
-                      checked
-                    />
-                    이마트(EM)
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer text-base">
-                    <input type="radio" name="brand" className="radio" />
-                    에브리데이(ED)
-                  </label>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <th className="p-2 border border-gray-300 bg-gray-100">
-                관리 점포
-              </th>
-              <td className="p-2 border border-gray-300">
-                <select className="select select-bordered w-full">
-                  <option selected>행당점</option>
-                  <option>점포 B</option>
-                  <option>점포 C</option>
-                  <option>점포 D</option>
-                  <option>점포 E</option>
-                  <option>점포 F</option>
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <th className="p-2 border border-gray-300 bg-gray-100">이메일</th>
-              <td className="p-2 border border-gray-300 text-blue-500 underline">
-                <input
-                  type="email"
-                  className="input input-bordered w-full"
-                  value="abc@naver.com"
-                />
-              </td>
-            </tr>
-            <tr>
-              <th className="p-2 border border-gray-300 bg-gray-100">상태</th>
-              <td className="p-2 border border-gray-300">
-                <div className="flex gap-4">
-                  <label className="flex items-center gap-2 cursor-pointer text-base">
-                    <input type="radio" name="status" className="radio" />
-                    미승인
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer text-base">
-                    <input
-                      type="radio"
-                      name="status"
-                      className="radio"
-                      checked
-                    />
-                    승인
-                  </label>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div className="flex justify-between gap-2 mt-6">
-          <button className="btn w-1/2">삭제</button>
-          <button className="btn btn-primary w-1/2">수정</button>
-        </div>
-
-        <form method="dialog" className="absolute top-2 right-2">
-          <button className="btn btn-circle">
-            <IoClose size={24} />
-          </button>
+          <div className="flex w-full items-center justify-center gap-2.5 mt-12">
+            <button className="absolute right-3 top-4 w-10 h-10 text-2xl">
+              ✕
+            </button>
+            <button className="btn min-w-24">취소</button>
+            {/* <button className="btn btn-error min-w-24">삭제</button> */}
+            <button type="submit" className="btn btn-primary min-w-24">
+              등록
+            </button>
+          </div>
         </form>
       </div>
     </dialog>

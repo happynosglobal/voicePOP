@@ -8,6 +8,7 @@ import EmptyState from "../../components/emptyState/EmptyState";
 import LoadingSpinner from "../../components/loading/LoadingSpinner";
 import Tooltip from "../../components/tooltip/Tooltip";
 import AddCompanyModal from "./components/AddCompanyModal";
+import AddContractModal from "./components/AddContractModal";
 
 const dummyAD = [
   {
@@ -193,7 +194,12 @@ const AdCompanyRegisterPage = () => {
                     123-12-12345
                   </p>
                 </div>
-                <button className="btn btn-sm btn-primary ">계약추가</button>
+                <button
+                  className="btn btn-sm btn-primary"
+                  onClick={() => contractModalRef.current.showModal()}
+                >
+                  계약추가
+                </button>
               </div>
               <table>
                 <thead>
@@ -281,6 +287,7 @@ const AdCompanyRegisterPage = () => {
         </div>
       </div>
       <AddCompanyModal modalRef={companyModalRef} /> {/* 업체등록 모달 */}
+      <AddContractModal modalRef={contractModalRef} /> {/* 계약추가 모달 */}
     </ContentLayout>
   );
 };
