@@ -14,7 +14,7 @@ const AddCompanyModal = ({ modalRef }) => {
               <input
                 type="text"
                 placeholder="사업자명을 입력하세요"
-                class="input input-bordered w-full"
+                class="input w-full"
               />
             </div>
             <div className="flex items-center justify-between">
@@ -22,7 +22,7 @@ const AddCompanyModal = ({ modalRef }) => {
               <input
                 type="text"
                 placeholder="-없이 숫자만 입력하세요"
-                class="input input-neutral input-bordered w-full"
+                class="input w-full"
               />
             </div>
             <div className="flex items-center justify-between">
@@ -35,7 +35,7 @@ const AddCompanyModal = ({ modalRef }) => {
                   { value: "ED", label: "에브리데이(ED)" },
                   { value: "TR", label: "트레이더스(TR)" },
                 ]}
-                className="basic-multi-select w-full"
+                className="w-full"
                 classNamePrefix="select"
                 placeholder="브랜드를 선택하세요"
               />
@@ -45,7 +45,7 @@ const AddCompanyModal = ({ modalRef }) => {
               <input
                 type="text"
                 placeholder="내용을 입력하세요"
-                class="input input-neutral input-bordered w-full"
+                class="input w-full"
               />
             </div>
           </div>

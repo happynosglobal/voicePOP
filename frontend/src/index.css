@@ -22,21 +22,23 @@
 
 body {min-width:1680px;}
 
+/* 데이지 유아이 커스텀 */
 .join .join-item.btn { border-color: #F3F4F6;background-color: #F3F4F6; font-weight: normal;}
 .join .join-item.btn:not(.btn-active):hover { border-color:#e9ecef;background-color: #e9ecef;}
 .join .join-item.btn-active { border-color: #D1D5DB;background-color: #D1D5DB; font-weight:600;} 
 
-
-.input {height:38px; background-color: #fff; border-radius: 5px;}
+.input { border:1px solid hsl(0, 0%, 80%); height:38px; background-color: #fff; border-radius: 5px;}
 .btn {height:38px; border-radius: 5px;}
 
-/* 툴팁 기본 스타일 */
-.custom-tooltip {
-  z-index: 9999;
-  max-width: 200px;
-  visibility: visible !important; /* 숨김 방지 */
-  white-space: normal;
-  word-break: break-word;
-  pointer-events: auto; /* 툴팁 내부에서 마우스 이벤트 가능 */
-  user-select: text; /* 텍스트 선택 가능하게 함 */
-}
+.modal { overflow-y: scroll ;min-height: 100vh;}
+.modal-box {margin:50px 0; overflow-y: visible; max-height: 100% !important;}
+:root:has(:is(.modal-open, .modal:target, .modal-toggle:checked + .modal, .modal[open])) {scrollbar-gutter: unset;}
+
+/* 툴팁  */
+.custom-tooltip { z-index: 9999; max-width: 200px; visibility: visible !important; white-space: normal; word-break: break-word; pointer-events: auto; user-select: text;}
+
+/* 데이터픽커 */
+.react-datepicker-wrapper {width:100%;}
+.react-datepicker__header__dropdown { display: flex; gap:10px; align-items: center; justify-content: center;padding:6px 16px 0;}
+.react-datepicker__header__dropdown > div {flex:1; margin:0 !important;}
+.react-datepicker__header__dropdown select {width:100%; height:28px;}
