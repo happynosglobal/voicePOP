@@ -8,7 +8,7 @@ const AddCompanyModal = ({ modalRef }) => {
           광고업체 등록
         </h3>
         <form method="dialog">
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-6">
             <div className="flex items-center justify-between">
               <label className="font-semibold w-1/4 shrink-0">사업자명</label>
               <input
@@ -54,7 +54,7 @@ const AddCompanyModal = ({ modalRef }) => {
             <button className="absolute right-3 top-4 w-10 h-10 text-2xl">
               ✕
             </button>
-            <button className="btn btn-neutral min-w-24">취소</button>
+            <button className="btn min-w-24">취소</button>
             <button type="submit" className="btn btn-primary min-w-24">
               등록
             </button>

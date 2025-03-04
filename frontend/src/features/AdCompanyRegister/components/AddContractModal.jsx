@@ -11,7 +11,7 @@ const AddContractModal = ({ modalRef }) => {
       <div className="modal-box bg-white max-w-xl">
         <h3 className="mb-6 pb-6 font-semibold text-lg border-b">계약 추가</h3>
         <form method="dialog">
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-6">
             <div className="flex items-center justify-between">
               <label className="font-semibold w-1/4 shrink-0">광고타입</label>
               <Select
@@ -66,7 +66,7 @@ const AddContractModal = ({ modalRef }) => {
             <button className="absolute right-3 top-4 w-10 h-10 text-2xl">
               ✕
             </button>
-            <button className="btn btn-neutral min-w-24">취소</button>
+            <button className="btn min-w-24">취소</button>
             <button type="submit" className="btn btn-primary min-w-24">
               등록
             </button>

@@ -24,6 +24,8 @@ export default {
         mytheme: {
           primary: "#3B82F6",
           "primary-content": "#FFFFFF",
+          error: "#f87171",
+          "error-content": "#FFFFFF",
           secondary: "#EC4899",
           accent: "#334155",
           "accent-content": "#FFFFFF",
