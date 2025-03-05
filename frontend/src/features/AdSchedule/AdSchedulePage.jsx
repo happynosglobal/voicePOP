@@ -1,11 +1,13 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
 import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import { format, parse, startOfWeek, getDay, addMinutes } from "date-fns";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { enUS } from "date-fns/locale";
+import ContentLayout from "../../layout/ContentLayout";
+import Title from "../../components/title/Title";
 
 const locales = {
-  "en-US": enUS
+  "en-US": enUS,
 };
 const localizer = dateFnsLocalizer({
   format,
@@ -91,28 +93,21 @@ const AdSchedulePage = () => {
     },
   ]);
   return (
-    <>
-      <div className="pl-48 pt-16 flex h-screen">
-        <div className="flex-1 p-4 h-full">
-          <div className="bg-white p-6 rounded-lg shadow h-full">
-
-            <Calendar
-              localizer={localizer}
-              events={events}
-              defaultView="day"
-              views={["day"]}
-              step={1} // 1초 단위로 표시
-              timeslots={60} // 1분을 60개로 나눔 (10분 단위)
-              min={new Date(2024, 1, 27, 8, 0)} // 시작 시간 (08:00)
-              max={new Date(2024, 1, 27, 21, 0)} // 종료 시간 (20:00)
-              style={{ height: "100%" }}
-            />
-
-          </div>
-        </div>
-      </div>
-    </>
-  )
-}
+    <ContentLayout>
+      <Title text="광고스케줄" />
+      <Calendar
+        localizer={localizer}
+        events={events}
+        defaultView="day"
+        views={["day"]}
+        step={1} // 1초 단위로 표시
+        timeslots={60} // 1분을 60개로 나눔 (10분 단위)
+        min={new Date(2024, 1, 27, 8, 0)} // 시작 시간 (08:00)
+        max={new Date(2024, 1, 27, 21, 0)} // 종료 시간 (20:00)
+        style={{ height: "100%" }}
+      />
+    </ContentLayout>
+  );
+};
 
 export default AdSchedulePage;

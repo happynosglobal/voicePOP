@@ -1,56 +1,73 @@
+import Select from "react-select";
 
 const SearchBar = ({ openModal }) => {
-    return (
-        <div className="flex justify-between items-center mb-4">
-            <div className="flex flex-wrap gap-4">
-                <div className="flex items-center gap-2">
-                    <label className="font-semibold">권한</label>
-                    <select className="select select-bordered">
-                        <option selected>전체</option>
-                        <option>브랜드 관리자</option>
-                        <option>광고 관리자</option>
-                        <option>점포 관리자</option>
-                    </select>
-                </div>
-                <div className="flex items-center gap-2">
-                    <label className="font-semibold">브랜드</label>
-                    <select className="select select-bordered">
-                        <option selected>전체</option>
-                        <option>이마트(EM)</option>
-                        <option>에브리데이(ED)</option>
-                    </select>
-                </div>
-                <div className="flex items-center gap-2">
-                    <label className="font-semibold">검색</label>
-                    <select className="select select-bordered">
-                        <option selected>ID</option>
-                        <option>성명</option>
-                    </select>
-                </div>
-                <div className="flex items-center gap-2">
-                    <input
-                        type="text"
-                        placeholder="검색어를 입력해주세요."
-                        className="input input-bordered input-md w-full max-w-xs"
-                    />
-                </div>
+  return (
+    <div className="flex mb-5 gap-1">
+      <div className="flex justify-between w-full">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <Select
+            options={[
+              { value: "0", label: "전체 관리자" },
+              { value: "1", label: "브랜드 관리자" },
+              { value: "2", label: "광고 관리자" },
+              { value: "3", label: "점포 관리자" },
+            ]}
+            className="min-w-32"
+            defaultValue={{ value: "0", label: "전체 관리자" }}
+          />
 
-                <div className="flex items-center gap-2">
-                    <label className="font-semibold">상태</label>
-                    <select className="select select-bordered">
-                        <option selected>전체</option>
-                        <option>승인</option>
-                        <option>미승인</option>
-                    </select>
-                </div>
-                <button className="btn btn-neutral">검색</button>
-            </div>
-            {/* <!-- 사용자 등록 버튼 --> */}
-            <div className="text-right">
-                <button className="btn btn-primary" onClick={openModal}>사용자 등록</button>
-            </div>
+          <Select
+            options={[
+              { value: "0", label: "전체 브랜드" },
+              { value: "1", label: "이마트(EM)" },
+              { value: "2", label: "에브리데이(ED)" },
+            ]}
+            className="min-w-32"
+            defaultValue={{ value: "0", label: "전체 브랜드" }}
+          />
+          <Select
+            options={[
+              { value: "0", label: "전체 상태" },
+              { value: "1", label: "승인" },
+              { value: "2", label: "미승인" },
+            ]}
+            className="min-w-32"
+            defaultValue={{ value: "0", label: "전체 상태" }}
+          />
+
+          <div className="mx-5 h-5 w-px bg-gray-300"></div>
+          <div className="flex items-center gap-2">
+            <label className="font-semibold">검색 조건</label>
+            <Select
+              options={[
+                { value: "1", label: "ID" },
+                { value: "2", label: "성명" },
+              ]}
+              isClearable={false}
+              className="min-w-32"
+              defaultValue={{ value: "1", label: "ID" }}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              placeholder="검색어를 입력해주세요."
+              class="input input-bordered w-full focus:ring-0 focus:outline-none"
+            />
+          </div>
+
+          <button className="btn btn-accent btn-sm">검색</button>
         </div>
-    )
-}
+
+        {/* <!-- 사용자 등록 버튼 --> */}
+        <div className="text-right">
+          <button className="btn btn-primary btn-sm" onClick={openModal}>
+            사용자 등록
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default SearchBar;
