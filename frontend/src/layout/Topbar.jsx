@@ -11,7 +11,7 @@ const Topbar = () => {
     logout();
   };
   return (
-    <header className="min:fixed top-0 left-0 right-0 h-[60px] bg-white px-5 flex justify-between items-center border-b z-10 w-full">
+    <header className="wide:fixed top-0 left-0 right-0 h-[60px] bg-white px-5 flex justify-between items-center border-b z-10 w-full">
       <h1 className="text-black text-2xl font-bold leading-none">
         <Link to="/dashboard">VoicePOP</Link>
       </h1>

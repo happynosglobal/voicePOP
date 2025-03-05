@@ -53,7 +53,7 @@ const Sidebar = () => {
 
   return (
     <aside
-      className="min:w-[210px] w-[160px] bg-[#484c56] min:fixed absolute top-[60px] left-0 bottom-0 min:h-full min:z-10"
+      className="wide:w-[210px] w-[160px] bg-[#484c56] wide:fixed absolute top-[60px] left-0 bottom-0 wide:h-full custom:z-10"
       style={{ height: "calc(100% - 60px)" }}
     >
       <nav className="min:px-6 px-4 pt-8 pb-20 h-full overflow-y-auto">

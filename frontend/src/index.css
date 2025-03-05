@@ -3,12 +3,14 @@
 @tailwind utilities;
 
 @layer base {
-  html, body {@apply text-base font-sans;}
+  html, body {
+    @apply text-[15px]; 
+  }
 }
 
-@media screen and (max-width:1440px){ 
-  @layer base {
-    html, body {@apply text-[15px];}
+@media (min-width: 1441px) {
+  html, body {
+    @apply text-base;
   }
 }
 

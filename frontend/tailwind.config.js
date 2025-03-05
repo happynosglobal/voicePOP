@@ -14,7 +14,7 @@ export default {
         },
       },
       screens: {
-        min: "1400px",
+        wide: "1400px",
       },
     },
   },
