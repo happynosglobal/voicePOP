@@ -7,14 +7,14 @@ import { FaCalendarAlt } from "react-icons/fa";
 registerLocale("ko", ko);
 
 const CustomInput = memo(
-  forwardRef(({ value, onClick }, ref) => (
+  forwardRef(({ value, onClick, placeholder }, ref) => (
     <div className="relative w-full">
       <input
         ref={ref}
         value={value}
         onClick={onClick}
         readOnly
-        placeholder="날짜 선택"
+        placeholder={placeholder}
         className="input w-full cursor-pointer"
       />
       <FaCalendarAlt
@@ -26,13 +26,18 @@ const CustomInput = memo(
 );
 
 const getDayClassName = (date) => {
-  const day = date.getDay(); // 0: 일요일, 6: 토요일
-  if (day === 0) return "!text-red-500 "; // 일요일 (빨간색)
-  if (day === 6) return "!text-blue-500"; // 토요일 (파란색)
-  return "";
+  const dayColors = {
+    0: "!text-red-500", // 일요일
+    6: "!text-blue-500", // 토요일
+  };
+  return dayColors[date.getDay()] || "";
 };
 
-const CustomDatePicker = ({ selectedDate, onChange }) => (
+const CustomDatePicker = ({
+  selectedDate,
+  onChange,
+  placeholder = "날짜 선택",
+}) => (
   <DatePicker
     selected={selectedDate}
     onChange={onChange}
@@ -41,8 +46,9 @@ const CustomDatePicker = ({ selectedDate, onChange }) => (
     showMonthDropdown
     showYearDropdown
     dropdownMode="select"
-    customInput={<CustomInput />}
+    customInput={<CustomInput placeholder={placeholder} />}
     dayClassName={getDayClassName}
+    placeholderText={placeholder}
   />
 );
 

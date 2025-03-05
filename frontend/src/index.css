@@ -2,15 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 레이아웃 */
+
+body {min-width:1400px;}
+
 @layer base {
   html, body {
-    @apply text-[15px]; 
+    @apply text-[15px] font-sans; 
   }
 }
 
 @media (min-width: 1441px) {
   html, body {
-    @apply text-base;
+    @apply text-base font-sans;
   }
 }
 
@@ -27,12 +31,25 @@
   table tr:nth-child(odd) td {@apply bg-gray-50;}
   table tr.active td {@apply bg-lime-200;}
   table tr:not(.active):hover td {@apply bg-lime-50;}
+
+
+  /** 기본 작성 폼 **/
+  .form-container {@apply bg-white max-w-3xl wide:mx-auto;}
+  .form-group {@apply flex py-3.5 border-b last-of-type:border-none;}
+  .form-label {@apply font-semibold w-32 shrink-0 leading-9;}
+
+  .form-input-group {@apply flex gap-6 items-center;}
+  .input-label {@apply flex items-center gap-2 shrink-0 mr-2 flex items-center gap-2 cursor-pointer font-semibold;}
+
+
 }
 
 
-body {min-width:1400px;}
 
-/* 데이지 유아이 커스텀 */
+
+
+
+/* daisy UI 커스텀 */
 .join .join-item.btn { border-color: #F3F4F6;background-color: #F3F4F6; font-weight: normal;}
 .join .join-item.btn:not(.btn-active):hover { border-color:#e9ecef;background-color: #e9ecef;}
 .join .join-item.btn-active { border-color: #D1D5DB;background-color: #D1D5DB; font-weight:600;} 
@@ -44,11 +61,14 @@ body {min-width:1400px;}
 .modal-box {margin:50px 0; overflow-y: visible; max-height: 100% !important;}
 :root:has(:is(.modal-open, .modal:target, .modal-toggle:checked + .modal, .modal[open])) {scrollbar-gutter: unset;}
 
-/* 툴팁  */
+/* react-tooltip 커스텀 */
 .custom-tooltip { z-index: 9999; max-width: 300px; visibility: visible !important; white-space: normal; word-break: keep-all; pointer-events: auto; user-select: text;}
 
-/* 데이터픽커 */
+/* react-datepicker 커스텀 */
 .react-datepicker-wrapper {width:100%;}
 .react-datepicker__header__dropdown { display: flex; gap:10px; align-items: center; justify-content: center;padding:6px 16px 0;}
 .react-datepicker__header__dropdown > div {flex:1; margin:0 !important;}
 .react-datepicker__header__dropdown select {width:100%; height:28px;}
+
+
+
