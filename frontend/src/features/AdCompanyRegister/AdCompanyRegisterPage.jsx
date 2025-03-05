@@ -108,7 +108,11 @@ const AdCompanyRegisterPage = () => {
     <ContentLayout>
       <Title text="광고계약 관리" />
       <div className=" flex gap-6">
+<<<<<<< HEAD
         <div className="relative wide:w-2/5 w-1/2">
+=======
+        <div className="relative min:w-2/5 w-1/2">
+>>>>>>> 643bd89cc8b88db23856c9263e165d69b259ad56
           <LoadingSpinner isLoading={false} />
           {/* 검색영역 */}
           <div className="flex mb-5 gap-1.5">
