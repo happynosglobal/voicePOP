@@ -77,12 +77,20 @@ const Login = () => {
               <button
                 className="btn btn-primary w-full"
                 onClick={() => {
-                  // handleLogin(); 잠시 주석하겠습니다
+                  // handleLogin(); //잠시 주석하겠습니다.
                   navigate("/login/select"); // api연동 전 임시 라우팅
                 }}
               >
                 로그인
               </button>
+            </div>
+            <div className="flex align-center justify-between mt-4 text-sm">
+              <a href="/signup" className="text-gray-500">
+                사용자 등록 신청
+              </a>
+              <a href="#" className="text-gray-500">
+                Password 분실
+              </a>
             </div>
           </div>
         </div>
