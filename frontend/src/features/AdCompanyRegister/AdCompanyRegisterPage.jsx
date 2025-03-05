@@ -108,7 +108,7 @@ const AdCompanyRegisterPage = () => {
     <ContentLayout>
       <Title text="광고계약 관리" />
       <div className=" flex gap-6">
-        <div className="relative w-2/5">
+        <div className="relative min:w-2/5 w-1/2">
           <LoadingSpinner isLoading={false} />
           {/* 검색영역 */}
           <div className="flex mb-5 gap-1.5">
@@ -217,7 +217,7 @@ const AdCompanyRegisterPage = () => {
                     <td>일반</td>
                     <td>211,100,000</td>
                     <td>120,000</td>
-                    <td>2025.01.01~2025.12.31</td>
+                    <td>2025.01.01 ~ 2025.12.31</td>
                     <td>
                       <span className="text-green-600 font-semibold">승인</span>
                     </td>
@@ -227,7 +227,7 @@ const AdCompanyRegisterPage = () => {
                     <td>스탠다드</td>
                     <td>10,000</td>
                     <td>2,000</td>
-                    <td>2025.01.01~2025.12.31</td>
+                    <td>2025.01.01 ~ 2025.12.31</td>
                     <td>
                       <span className="text-red-600 font-semibold">미승인</span>
                     </td>
@@ -244,7 +244,7 @@ const AdCompanyRegisterPage = () => {
                     <td>프리미엄</td>
                     <td>10,000</td>
                     <td>2,000</td>
-                    <td>2025.01.01~2025.12.31</td>
+                    <td>2025.01.01 ~ 2025.12.31</td>
                     <td>
                       <span className="text-blue-600 font-semibold">
                         미등록
@@ -256,7 +256,7 @@ const AdCompanyRegisterPage = () => {
                     <td>프리미엄</td>
                     <td>10,000</td>
                     <td>2,000</td>
-                    <td>2025.01.01~2025.12.31</td>
+                    <td>2025.01.01 ~ 2025.12.31</td>
                     <td>
                       <span className="text-blue-600 font-semibold">
                         미등록
@@ -268,7 +268,7 @@ const AdCompanyRegisterPage = () => {
                     <td>프리미엄</td>
                     <td>10,000</td>
                     <td>2,000</td>
-                    <td>2025.01.01~2025.12.31</td>
+                    <td>2025.01.01 ~ 2025.12.31</td>
                     <td>
                       <span className="text-blue-600 font-semibold">
                         미등록

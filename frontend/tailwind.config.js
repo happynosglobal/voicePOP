@@ -14,7 +14,7 @@ export default {
         },
       },
       screens: {
-        "3xl": "1680px",
+        wide: "1400px",
       },
     },
   },
@@ -32,11 +32,19 @@ export default {
           neutral: "#9ca3af",
           "neutral-content": "#FFFFFF",
           "base-100": "#F3F4F6",
-          // "base-200": "#E5E7EB",
-          // "base-300": "#D1D5DB",
         },
       },
     ],
   },
-  plugins: [require("daisyui")],
+  plugins: [
+    require("daisyui"),
+    function ({ addComponents }) {
+      addComponents({
+        ".btn-sm": {
+          height: "38px",
+          "border-radius": "5px",
+        },
+      });
+    },
+  ],
 };
