@@ -22,7 +22,7 @@ const DefaultLayout = () => {
   return (
     <>
       {mounted && (
-        <div className="min-h-screen bg-[#5d6372]">
+        <div className="relative min-h-screen bg-[#5d6372]">
           <Topbar />
           <Sidebar />
           <Outlet />

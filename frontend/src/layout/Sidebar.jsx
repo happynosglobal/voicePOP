@@ -52,8 +52,11 @@ const Sidebar = () => {
   const { menu, handleNavigation, location } = useSidebar();
 
   return (
-    <aside className="w-[210px] bg-[#484c56] fixed top-[60px] left-0 h-full z-10">
-      <nav className="px-6 pt-8 pb-20 h-full overflow-y-auto">
+    <aside
+      className="min:w-[210px] w-[160px] bg-[#484c56] min:fixed absolute top-[60px] left-0 bottom-0 min:h-full min:z-10"
+      style={{ height: "calc(100% - 60px)" }}
+    >
+      <nav className="min:px-6 px-4 pt-8 pb-20 h-full overflow-y-auto">
         <ul className="flex flex-col gap-5 text-white">
           {dummyMenu.map((menu, index) => (
             <li key={index}>

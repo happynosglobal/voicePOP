@@ -6,6 +6,14 @@
   html, body {@apply text-base font-sans;}
 }
 
+@media screen and (max-width:1440px){ 
+  @layer base {
+    html, body {@apply text-[15px];}
+  }
+}
+
+
+
 @layer components {
   /** 기본 테이블 스타일 **/
   table {@apply w-full table-fixed border-t-2 border-gray-800 border-collapse bg-white;}
@@ -20,7 +28,7 @@
 }
 
 
-body {min-width:1680px;}
+body {min-width:1400px;}
 
 /* 데이지 유아이 커스텀 */
 .join .join-item.btn { border-color: #F3F4F6;background-color: #F3F4F6; font-weight: normal;}
@@ -28,7 +36,7 @@ body {min-width:1680px;}
 .join .join-item.btn-active { border-color: #D1D5DB;background-color: #D1D5DB; font-weight:600;} 
 
 .input { border:1px solid hsl(0, 0%, 80%); height:38px; background-color: #fff; border-radius: 5px;}
-.btn {height:38px; border-radius: 5px;}
+::placeholder {color:#747474 !important}
 
 .modal { overflow-y: scroll ;min-height: 100vh;}
 .modal-box {margin:50px 0; overflow-y: visible; max-height: 100% !important;}
