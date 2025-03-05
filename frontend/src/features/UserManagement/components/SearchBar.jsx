@@ -7,32 +7,32 @@ const SearchBar = ({ openModal }) => {
         <div className="flex flex-wrap items-center gap-1.5">
           <Select
             options={[
-              { value: "0", label: "전체 관리자" },
               { value: "1", label: "브랜드 관리자" },
               { value: "2", label: "광고 관리자" },
               { value: "3", label: "점포 관리자" },
             ]}
             className="min-w-32"
-            defaultValue={{ value: "0", label: "전체 관리자" }}
+            isClearable
+            placeholder="모든 관리자"
           />
 
           <Select
             options={[
-              { value: "0", label: "전체 브랜드" },
               { value: "1", label: "이마트(EM)" },
               { value: "2", label: "에브리데이(ED)" },
             ]}
             className="min-w-32"
-            defaultValue={{ value: "0", label: "전체 브랜드" }}
+            isClearable
+            placeholder="모든 브랜드"
           />
           <Select
             options={[
-              { value: "0", label: "전체 상태" },
               { value: "1", label: "승인" },
               { value: "2", label: "미승인" },
             ]}
             className="min-w-32"
-            defaultValue={{ value: "0", label: "전체 상태" }}
+            isClearable
+            placeholder="모든 상태"
           />
 
           <div className="mx-5 h-5 w-px bg-gray-300"></div>

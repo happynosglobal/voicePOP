@@ -1,16 +1,19 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import ContentLayout from "../../layout/ContentLayout";
 import Title from "../../components/title/Title";
 import Select from "react-select";
 import CustomDatePicker from "../../components/customDatePicker/CustomDatePicker";
 import { useDropzone } from "react-dropzone";
+import StoreSelectModal from "./components/StoreSelectModal";
 
 const BroadcastRegisterPage = () => {
+  const storeModalRef = useRef(null); // 점포 선택 모달 ref
+
   const [selectedStartDate, setSelectedStartDate] = useState(null); //임시 날짜선택 STATE
   const [selectedEndDate, setSelectedEndDate] = useState(null); //임시 날짜선택 STATE
   const [isGapChecked, setIsGapChecked] = useState(false); //임시 GAP STATE
 
-  const [uploadedFile, setUploadedFile] = useState(null);
+  const [uploadedFile, setUploadedFile] = useState(null); // dropzone STATE
 
   const onDrop = (acceptedFiles) => {
     if (acceptedFiles.length > 0) {
@@ -32,7 +35,6 @@ const BroadcastRegisterPage = () => {
   return (
     <ContentLayout>
       <Title text="방송등록" />
-
       <div className="form-container">
         <div className="form-group">
           <label className="form-label">방송명</label>
@@ -69,10 +71,15 @@ const BroadcastRegisterPage = () => {
             <div className="mb-2 flex justify-between items-center gap-2">
               <div className="space-x-2">
                 <button className="btn btn-sm btn-accent">전점</button>
-                <button className="btn btn-sm btn-accent">점포선택</button>
+                <button
+                  className="btn btn-sm btn-accent"
+                  onClick={() => storeModalRef.current.showModal()}
+                >
+                  점포선택
+                </button>
               </div>
-              <p className="text-gray-600 text-right font-medium leading-tight">
-                103개
+              <p className="text-gray-500 text-right leading-tight">
+                선택된 점포 수 : <b className="text-gray-900">103</b>개
               </p>
             </div>
             <div className="p-4 border rounded-[10px] text-sm break-keep">
@@ -270,6 +277,7 @@ const BroadcastRegisterPage = () => {
           </button>
         </div>
       </div>
+      <StoreSelectModal modalRef={storeModalRef} /> {/* 점포선택 모달 */}
     </ContentLayout>
   );
 };

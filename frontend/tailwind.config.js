@@ -31,6 +31,7 @@ export default {
           "accent-content": "#FFFFFF",
           neutral: "#9ca3af",
           "neutral-content": "#FFFFFF",
+          "success-content": "#FFFFFF",
           "base-100": "#F3F4F6",
         },
       },
