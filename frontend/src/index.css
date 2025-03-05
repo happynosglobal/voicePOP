@@ -39,11 +39,7 @@ body {min-width:1400px;}
   .form-label {@apply font-semibold w-32 shrink-0 leading-9;}
 
   .form-input-group {@apply flex gap-6 items-center;}
-<<<<<<< HEAD
   .input-label {@apply flex items-center gap-2 shrink-0 mr-2 cursor-pointer font-semibold;}
-=======
-  .input-label {@apply flex items-center gap-2 shrink-0 mr-2 flex items-center gap-2 cursor-pointer font-semibold;}
->>>>>>> 643bd89cc8b88db23856c9263e165d69b259ad56
 
 
 }
