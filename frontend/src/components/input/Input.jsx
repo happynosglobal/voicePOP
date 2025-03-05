@@ -1,25 +1,13 @@
-import Joi from "joi";
 import { useEffect, useState } from "react";
-import { passwordRegex } from "../../utils/validation";
 
-
-const Input = ({
-    value,
-    onChange,
-    validation,
-    ...rest
-}) => {
-    const [error, setError] = useState('');
-
-    const validatValue = (value) => {
-        const { error } = passwordRegex.validate(value);
-        return error ? error.details[0].message : null;
-    };
+const Input = ({ value, onChange, validation, errorMessage, ...rest }) => {
+    const [validationError, setValidationError] = useState("");
     useEffect(() => {
-        if(validation && value) {
-            setError(validatValue(value))
+        if (validation && value) {
+            const { error } = validation.validate(value);
+            setValidationError(error ? error.details[0].message : "");
         }
-    },[value])
+    }, [value, validation]);
     return (
         <>
             <input
@@ -27,9 +15,10 @@ const Input = ({
                 onChange={onChange}
                 {...rest}
             />
-            {error && <p className="mt-2 text-error text-sm">{error}</p>}
+            {(errorMessage || validationError) && <p className="mt-2 text-error text-sm">{errorMessage || validationError}</p>}
         </>
-    )
-}
+
+    );
+};
 
 export default Input;

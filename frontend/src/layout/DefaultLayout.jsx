@@ -1,23 +1,21 @@
 import { useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
-import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
+import { Outlet, useNavigate } from "react-router-dom";
 import useUserStore from "../stores/user";
 
-//DefaultLayout.jsx
 const DefaultLayout = () => {
   const navigate = useNavigate();
+  const { user, isAuthenticated } = useUserStore();
   const [mounted, setMounted] = useState(false);
-  const { user } = useUserStore();
 
   useEffect(() => {
-    if (user) {
+    if (isAuthenticated && user) {
       setMounted(true);
-    } else if (!user) {
+    } else if (!isAuthenticated && !user) {
       navigate("/login");
     }
-  }, [user]);
+  }, [isAuthenticated, user]);
 
   return (
     <>
