@@ -130,7 +130,7 @@ const BroadcastRegisterPage = () => {
           </div>
         </div>
         <div className="form-group">
-          <label className="form-label">기간설정</label>
+          <label className="form-label">기간 설정</label>
           <div className="flex items-center">
             <CustomDatePicker
               selectedDate={selectedStartDate}
