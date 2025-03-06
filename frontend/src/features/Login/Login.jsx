@@ -10,38 +10,51 @@ const Login = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      navigate(user.dashboard_url);
-    } else {
-      setIsLoading(false);
-    }
-  }, [isAuthenticated, user]);
-
   const [formData, setFormData] = useState({
     user_id: "",
     password: "",
-    brand_code: "",
   });
 
   const [error, setError] = useState("");
 
-  const handleLogin = async () => {
-    login(userData); // api 연결 전까지 임시로 store에 userData 저장
+  /* 로그인 된 상태일 경우 기본url로 라우팅*/
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate(user.dashboard_url);
+    } else {
+      setIsLoading(false);
+    }
+  }, [isAuthenticated]);
 
-    /* 추후 연동 예상 로그인 api */
-    // try {
-    //   const response = await postLogin(formData);
-    //   const { status_code, data } = response.data;
-    //   if (status_code === 200) {
-    //     login(data); //Zustand store에 저장
-    //     navigate(data.dashboard_url); // 응답데이터의 기본 url로 이동
-    //   } else {
-    //     setError("로그인 실패"); // 추후 로그인 실패 메시지 정해서 추가
-    //   }
-    // } catch (err) {
-    //   setError("로그인 요청 중 오류가 발생했습니다.");
-    // }
+
+  /* 로그인 폼 작성 검사 */
+  const isFormfilled = () => {
+    return formData.user_id?.trim() && formData.password?.trim();
+  }
+
+  const handleLogin = async () => {
+    if (!isFormfilled()) return;
+    const multipleBrandCode = true; //brand_code 응답데이터 변경 가능성 높아 추후 로직적용
+    try {
+      login(userData, multipleBrandCode); // multipleBrandCode true면 브랜드 선택으로 false면 바로 접속
+      if (multipleBrandCode) {
+        navigate("/login/select");
+      } else {
+        navigate(userData.dashboard_url);
+      }
+
+      /* 추후 연동 예상 로그인 api */
+      // const response = await postLogin(formData);
+      // const { status_code, data } = response.data;
+      // if (status_code === 200) {
+      //   login(data); //Zustand store에 저장
+      //   navigate(data.dashboard_url); // 응답데이터의 기본 url로 이동
+      // } else {
+      //   setError("로그인 실패"); // 추후 로그인 실패 메시지 정해서 추가
+      // }
+    } catch (err) {
+      setError("로그인 요청 중 오류가 발생했습니다.");
+    }
   };
 
   return (
@@ -58,6 +71,17 @@ const Login = () => {
                 type="text"
                 placeholder="아이디를 입력해주세요."
                 className="input input-bordered w-full"
+                onChange={(e) => {
+                  setFormData({
+                    ...formData,
+                    user_id: e.target.value
+                  });
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleLogin();
+                  }
+                }}
               />
             </div>
             <div className="form-control mt-4">
@@ -68,6 +92,17 @@ const Login = () => {
                 type="password"
                 placeholder="비밀번호를 입력해주세요."
                 className="input input-bordered w-full"
+                onChange={(e) => {
+                  setFormData({
+                    ...formData,
+                    password: e.target.value
+                  });
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleLogin();
+                  }
+                }}
               />
               <p className="mt-2 text-error text-sm">
                 비밀번호가 일치하지 않습니다.
@@ -77,9 +112,9 @@ const Login = () => {
               <button
                 className="btn btn-primary w-full"
                 onClick={() => {
-                  // handleLogin(); //잠시 주석하겠습니다.
-                  navigate("/login/select"); // api연동 전 임시 라우팅
+                  handleLogin();
                 }}
+                disabled={!isFormfilled()}
               >
                 로그인
               </button>
@@ -100,3 +135,4 @@ const Login = () => {
 };
 
 export default Login;
+

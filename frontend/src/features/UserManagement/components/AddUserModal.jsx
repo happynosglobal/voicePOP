@@ -14,7 +14,7 @@ const AddUserModal = ({ modalRef }) => {
               <label className="font-semibold w-1/4 shrink-0">성명</label>
               <input
                 type="text"
-                class="input w-full"
+                className="input w-full"
                 value=""
                 placeholder="성명을 입력하세요"
               />
@@ -23,7 +23,7 @@ const AddUserModal = ({ modalRef }) => {
               <label className="font-semibold w-1/4 shrink-0">아이디</label>
               <input
                 type="text"
-                class="input w-full"
+                className="input w-full"
                 value=""
                 placeholder="아이디를 입력하세요"
               />
@@ -32,7 +32,7 @@ const AddUserModal = ({ modalRef }) => {
               <label className="font-semibold w-1/4 shrink-0">패스워드</label>
               <input
                 type="text"
-                class="input w-full"
+                className="input w-full"
                 value=""
                 placeholder="패스워드를 입력하세요"
               />
@@ -83,7 +83,7 @@ const AddUserModal = ({ modalRef }) => {
               <label className="font-semibold w-1/4 shrink-0">이메일</label>
               <input
                 type="email"
-                class="input w-full"
+                className="input w-full"
                 value=""
                 placeholder="이메일을 입력하세요"
               />

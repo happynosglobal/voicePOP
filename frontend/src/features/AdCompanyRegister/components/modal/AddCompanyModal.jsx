@@ -14,7 +14,7 @@ const AddCompanyModal = ({ modalRef }) => {
               <input
                 type="text"
                 placeholder="사업자명을 입력하세요"
-                class="input w-full"
+                className="input w-full"
               />
             </div>
             <div className="flex items-center justify-between">
@@ -22,7 +22,7 @@ const AddCompanyModal = ({ modalRef }) => {
               <input
                 type="text"
                 placeholder="-없이 숫자만 입력하세요"
-                class="input w-full"
+                className="input w-full"
               />
             </div>
             <div className="flex items-center justify-between">
@@ -45,7 +45,7 @@ const AddCompanyModal = ({ modalRef }) => {
               <input
                 type="text"
                 placeholder="내용을 입력하세요"
-                class="input w-full"
+                className="input w-full"
               />
             </div>
           </div>

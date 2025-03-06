@@ -1,6 +1,6 @@
 export const userData = {
   level: "ADMIN",
-  brand_code: "EM",
+  brand_code: ["EM", "ED", "TR"],
   latest_login_at: "2025-02-05 14:22:21",
   menu: [
     {

@@ -1,6 +1,4 @@
-import { useEffect, useRef, useState } from "react";
-import { IoClose } from "react-icons/io5";
-import Pagination from "../../components/pagination/Pagination";
+import { useRef, useState } from "react";
 import useUserStore from "../../stores/user";
 import LoadingSpinner from "../../components/loading/LoadingSpinner";
 import SearchBar from "./components/SearchBar";

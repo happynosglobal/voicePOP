@@ -10,9 +10,9 @@ const DefaultLayout = () => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (isAuthenticated && user) {
+    if (isAuthenticated) {
       setMounted(true);
-    } else if (!isAuthenticated && !user) {
+    } else if (!isAuthenticated) {
       navigate("/login");
     }
   }, [isAuthenticated, user]);

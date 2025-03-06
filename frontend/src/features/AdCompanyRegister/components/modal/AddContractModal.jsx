@@ -1,4 +1,4 @@
-import CustomDatePicker from "../../../components/customDatePicker/CustomDatePicker";
+import CustomDatePicker from "../../../../components/customDatePicker/CustomDatePicker";
 import Select from "react-select";
 import { useState } from "react";
 
@@ -29,7 +29,7 @@ const AddContractModal = ({ modalRef }) => {
               <input
                 type="text"
                 placeholder="계약금액을 입력하세요"
-                class="input w-full"
+                className="input w-full"
               />
             </div>
             <div className="flex items-center justify-between">
@@ -37,7 +37,7 @@ const AddContractModal = ({ modalRef }) => {
               <input
                 type="text"
                 placeholder="계약구좌를 입력하세요"
-                class="input w-full"
+                className="input w-full"
               />
             </div>
             <div className="flex items-center justify-between">
@@ -58,7 +58,7 @@ const AddContractModal = ({ modalRef }) => {
             </div>
             <div className="flex items-center justify-between">
               <label className="font-semibold w-1/4 shrink-0">비고</label>
-              <input type="text" class="input w-full" />
+              <input type="text" className="input w-full" />
             </div>
           </div>
 

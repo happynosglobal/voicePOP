@@ -52,7 +52,7 @@ const SearchBar = ({ openModal }) => {
             <input
               type="text"
               placeholder="검색어를 입력해주세요."
-              class="input input-bordered w-full focus:ring-0 focus:outline-none"
+              className="input input-bordered w-full focus:ring-0 focus:outline-none"
             />
           </div>
 
