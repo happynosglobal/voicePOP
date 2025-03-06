@@ -13,6 +13,37 @@ const BroadcastRegisterPage = () => {
   const [selectedEndDate, setSelectedEndDate] = useState(null); //임시 날짜선택 STATE
   const [isGapChecked, setIsGapChecked] = useState(false); //임시 GAP STATE
 
+  const dummyStores = [
+    "EM킨텍스점",
+    "EM청주북문로3가점",
+    "EM천안점",
+    "EM아산점",
+    "EM청주점",
+    "EM청주가경점",
+    "EM청주율량점",
+    "EM청주직지점",
+    "EM청주봉명점",
+    "EM대전관저점",
+    "EM대전중리점",
+    "EM킨텍스점",
+    "EM청주북문로3가점",
+    "EM천안점",
+    "EM아산점",
+    "EM청주점",
+    "EM청주가경점",
+    "EM청주율량점",
+    "EM청주봉명점",
+    "EM대전관저점",
+    "EM대전중리점",
+    "EM킨텍스점",
+    "EM청주북문로3가점",
+    "EM천안점",
+    "EM아산점",
+    "EM청주점",
+    "EM청주가경점",
+    "EM청주율량점",
+  ];
+
   const [uploadedFile, setUploadedFile] = useState(null); // dropzone STATE
 
   const onDrop = (acceptedFiles) => {
@@ -82,13 +113,20 @@ const BroadcastRegisterPage = () => {
                 선택된 점포 수 : <b className="text-gray-900">103</b>개
               </p>
             </div>
-            <div className="p-4 border rounded-[10px] text-sm break-keep">
-              대전(둔산), 대전(관저), 대전(중리), 천안(불당), 천안(쌍용),
-              천안(신부), 세종(고운), 세종(나성), 청주(율량), 청주(가경), 충주,
-              아산(탕정), 아산(배방),대전(둔산), 대전(관저), 대전(중리),
-              천안(불당), 천안(쌍용), 천안(신부), 세종(고운), 세종(나성),
-              청주(율량), 청주(가경), 충주, 아산(탕정), 아산(배방)
+            {/* 점포 선택 안했다면 안보임 */}
+            <div className="p-2 border rounded-[10px] max-h-48 min-h-16 overflow-y-auto">
+              <div className="flex flex-wrap gap-1 text-center">
+                {dummyStores.map((store, index) => (
+                  <span
+                    key={index}
+                    className="bg-gray-200 text-gray-700 px-2.5 py-0.5 rounded text-sm"
+                  >
+                    {store}
+                  </span>
+                ))}
+              </div>
             </div>
+            {/* 점포 선택 안했다면 안보임 */}
           </div>
         </div>
         <div className="form-group">
