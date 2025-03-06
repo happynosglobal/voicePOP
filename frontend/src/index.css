@@ -40,8 +40,6 @@ body {min-width:1400px;}
 
   .form-input-group {@apply flex gap-6 items-center;}
   .input-label {@apply flex items-center gap-2 shrink-0 mr-2 cursor-pointer font-semibold;}
-
-
 }
 
 
@@ -66,9 +64,18 @@ body {min-width:1400px;}
 
 /* react-datepicker 커스텀 */
 .react-datepicker-wrapper {width:100%;}
+.react-datepicker__header {background-color:#f4f4f4 !important;}
 .react-datepicker__header__dropdown { display: flex; gap:10px; align-items: center; justify-content: center;padding:6px 16px 0;}
 .react-datepicker__header__dropdown > div {flex:1; margin:0 !important;}
 .react-datepicker__header__dropdown select {width:100%; height:28px;}
 
 
 
+/** react-check-tree 커스텀 **/
+.rct-text {flex:1; padding:2px 0; width:100%;}
+.rct-text label {align-items: center; flex:1;}
+.rct-text > button , .rct-node-leaf .rct-collapse {min-width:20px;}
+.react-checkbox-tree .rct-node ol {margin-bottom:5px;}
+.rct-collapse, .rct-checkbox, .rct-node-icon {padding:0 !important; }
+
+.rct-checkbox {position: relative; top:-1px;}
