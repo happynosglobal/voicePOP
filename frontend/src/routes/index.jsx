@@ -18,6 +18,7 @@ import EquipmentStatusPage from "../features/EquipmentStatus/EquipmentStatusPage
 import ReservationManagementPage from "../features/ReservationManagement/ReservationManagementPage";
 import StoreGroupPage from "../features/StoreGroup/StoreGroupPage";
 import useLayout from "../layout/hooks/useLayout";
+import SelectBrand from "../features/Login/SelectBrand";
 
 //route/index.jsx
 
@@ -44,6 +45,7 @@ function Root() {
   return (
     <Routes>
       <Route index path={"/login"} element={<Login />} />
+      <Route index path={"/login/select"} element={<SelectBrand />} />
       <Route path={"/signup"} element={<SignUp />} />
       <Route path="/" element={<DefaultLayout />}>
         {routes.map(({ path, element }) => (
