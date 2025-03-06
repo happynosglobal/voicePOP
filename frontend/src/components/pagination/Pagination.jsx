@@ -10,6 +10,7 @@ const Pagination = () => {
         <button className="join-item btn btn-sm">3</button>
         <button className="join-item btn btn-sm">4</button>
         <button className="join-item btn btn-sm">5</button>
+        
         <button className="join-item btn btn-sm">›</button>
         <button className="join-item btn btn-sm">»</button>
       </div>
