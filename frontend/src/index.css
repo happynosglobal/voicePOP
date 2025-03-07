@@ -25,8 +25,8 @@ body {min-width:1400px;}
   .table {@apply w-full table-fixed border-t-2 border-gray-800 border-collapse bg-white;}
   .table thead {@apply border-t-2 border-t-gray-800 border-b border-b-slate-400;}
   .table th, .table td {@apply p-2 text-center;}
-  .table th {@apply text-gray-800;}
-  .table td {@apply border-l border-b border-gray-200 text-gray-600;}
+  .table th {@apply text-gray-800  text-base;}
+  .table td {@apply border-l border-b border-gray-200 text-gray-600 text-base;}
   .table tr td:first-child {@apply border-l-0;}
   .table tr:nth-child(odd) td {@apply bg-gray-50;}
   .table tr.active td {@apply bg-lime-200;}

@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useRef } from "react";
 import ContentLayout from "../../layout/ContentLayout";
 import Title from "../../components/title/Title";
 import Tooltip from "../../components/tooltip/Tooltip";
 import Pagination from "../../components/pagination/Pagination";
+import AddGroupModal from "./components/AddGroupModal";
 
 const dummyGroup = [
   {
@@ -97,12 +98,19 @@ const dummyGroup = [
 ];
 
 const StoreGroupPage = () => {
+  const groupModalRef = useRef(null); // 점포 선택 모달 ref
+
   return (
     <ContentLayout>
       <div className="flex items-center justify-between">
         <Title text="점포 그룹 관리" />
 
-        <button className="btn btn-sm btn-primary">그룹 생성</button>
+        <button
+          className="btn btn-sm btn-primary"
+          onClick={() => groupModalRef.current.showModal()}
+        >
+          그룹 생성
+        </button>
       </div>
       <table className="table">
         <thead>
@@ -137,6 +145,7 @@ const StoreGroupPage = () => {
       {/* <EmptyState text="일치하는 검색 결과가 없습니다." /> */}
       {/* <EmptyState text="등록된 리스트가 없습니다." />  */}
       <Pagination />
+      <AddGroupModal modalRef={groupModalRef} /> {/* 점포선택 모달 */}
     </ContentLayout>
   );
 };

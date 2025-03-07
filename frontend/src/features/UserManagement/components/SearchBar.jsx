@@ -1,4 +1,5 @@
 import Select from "react-select";
+import { RiFileExcel2Line } from "react-icons/ri";
 
 const SearchBar = ({ openModal }) => {
   return (
@@ -60,7 +61,10 @@ const SearchBar = ({ openModal }) => {
         </div>
 
         {/* <!-- 사용자 등록 버튼 --> */}
-        <div className="text-right">
+        <div className="flex gap-2">
+          <button className="btn btn-sm btn-success">
+            <RiFileExcel2Line className="text-xl" /> 엑셀다운로드
+          </button>
           <button className="btn btn-primary btn-sm" onClick={openModal}>
             사용자 등록
           </button>
