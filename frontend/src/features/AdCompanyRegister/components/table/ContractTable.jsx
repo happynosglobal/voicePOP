@@ -1,19 +1,13 @@
-import React, { useEffect } from 'react'
-import Tooltip from '../../../../components/tooltip/Tooltip'
-import useHandleContract from '../../hooks/useHandleContract';
+import React, { useEffect } from "react";
+import Tooltip from "../../../../components/tooltip/Tooltip";
+import useHandleContract from "../../hooks/useHandleContract";
 
-const ContractTable = ({
-  activeRow,
-  contractModalRef
-}) => {
-  const {
-    contractList,
-    getContractList
-  } = useHandleContract();
+const ContractTable = ({ activeRow, contractModalRef }) => {
+  const { contractList, getContractList } = useHandleContract();
   // 임시 광고계약 리스트 로드
   useEffect(() => {
     getContractList();
-  }, [activeRow])
+  }, [activeRow]);
 
   return (
     <>
@@ -33,7 +27,7 @@ const ContractTable = ({
           계약추가
         </button>
       </div>
-      <table>
+      <table className="table">
         <thead>
           <tr>
             <th>광고타입</th>
@@ -53,15 +47,12 @@ const ContractTable = ({
                 <td>{item.ad_type_base_price}</td>
                 <td>{`${item.contract_from} ~ ${item.contract_to}`}</td>
                 <td>
-                  <span className="text-green-600 font-semibold">{item.status}</span>
+                  <span className="text-green-600 font-semibold">
+                    {item.status}
+                  </span>
                 </td>
                 <td className="truncate">
-                  <Tooltip
-                    id={1}
-                    content={
-                      item.comment
-                    }
-                  />
+                  <Tooltip id={1} content={item.comment} />
                 </td>
               </tr>
             ))}
@@ -132,7 +123,7 @@ const ContractTable = ({
         )}
       </table>
     </>
-  )
-}
+  );
+};
 
-export default ContractTable
+export default ContractTable;

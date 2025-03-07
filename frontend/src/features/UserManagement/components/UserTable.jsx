@@ -3,7 +3,7 @@ import Pagination from "../../../components/pagination/Pagination";
 const UserTable = ({ openModal }) => {
   return (
     <div className="overflow-x-auto">
-      <table>
+      <table className="table">
         <thead>
           <tr>
             <th>순서</th>

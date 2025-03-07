@@ -104,7 +104,7 @@ const StoreGroupPage = () => {
 
         <button className="btn btn-sm btn-primary">그룹 생성</button>
       </div>
-      <table>
+      <table className="table">
         <thead>
           <tr>
             <th className="w-14">순서</th>

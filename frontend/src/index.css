@@ -22,22 +22,21 @@ body {min-width:1400px;}
 
 @layer components {
   /** 기본 테이블 스타일 **/
-  table {@apply w-full table-fixed border-t-2 border-gray-800 border-collapse bg-white;}
-  table thead {@apply border-t-2 border-t-gray-800 border-b border-b-slate-400;}
-  table th, table td {@apply p-2 text-center;}
-  table th {@apply text-gray-800;}
-  table td {@apply border-l border-b border-gray-200 text-gray-600;}
-  table tr td:first-child {@apply border-l-0;}
-  table tr:nth-child(odd) td {@apply bg-gray-50;}
-  table tr.active td {@apply bg-lime-200;}
-  table tr:not(.active):hover td {@apply bg-lime-50;}
+  .table {@apply w-full table-fixed border-t-2 border-gray-800 border-collapse bg-white;}
+  .table thead {@apply border-t-2 border-t-gray-800 border-b border-b-slate-400;}
+  .table th, .table td {@apply p-2 text-center;}
+  .table th {@apply text-gray-800;}
+  .table td {@apply border-l border-b border-gray-200 text-gray-600;}
+  .table tr td:first-child {@apply border-l-0;}
+  .table tr:nth-child(odd) td {@apply bg-gray-50;}
+  .table tr.active td {@apply bg-lime-200;}
+  .table tr:not(.active):hover td {@apply bg-lime-50;}
 
 
   /** 기본 작성 폼 **/
   .form-container {@apply bg-white max-w-3xl wide:mx-auto;}
   .form-group {@apply flex py-3.5 border-b last-of-type:border-none;}
   .form-label {@apply font-semibold w-32 shrink-0 leading-9;}
-
   .form-input-group {@apply flex gap-6 items-center;}
   .input-label {@apply flex items-center gap-2 shrink-0 mr-2 cursor-pointer font-semibold;}
 }
@@ -77,5 +76,21 @@ body {min-width:1400px;}
 .rct-text > button , .rct-node-leaf .rct-collapse {min-width:20px;}
 .react-checkbox-tree .rct-node ol {margin-bottom:5px;}
 .rct-collapse, .rct-checkbox, .rct-node-icon {padding:0 !important; }
-
 .rct-checkbox {position: relative; top:-1px;}
+
+
+/** react-big-calendar 커스텀 **/
+.rbc-time-view { border:0 none !important; border-color: #E5E7EB !important;}
+.rbc-time-header { display: none !important;}
+.rbc-time-content {border-color:#1F2937 !important;}
+.rbc-timeslot-group .rbc-time-slot {padding:0 5px; position: relative; font-size:14px; font-size:12px; color:#444746; text-align: right;}
+
+.rbc-event {gap:5px;  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);}
+.rbc-event-label { padding-right:0 !important;line-height: 1 !important; }
+.rbc-event-content {font-size:12px;  line-height: 2;}
+
+.rbc-time-gutter {width:60px;}
+.rbc-today {background-color: transparent !important;}
+
+.rbc-current-time-indicator {height:2px !important; background-color: #ff0000 !important;}
+.rbc-current-time-indicator::before { display: block;position: absolute; top:50%; left:-5px; width:10px; height:10px; background-color: #db372d; content: ""; transform: translateY(-50%); border-radius: 100%;}

@@ -21,12 +21,15 @@ const AddUserModal = ({ modalRef }) => {
             </div>
             <div className="flex items-center justify-between">
               <label className="font-semibold w-1/4 shrink-0">아이디</label>
-              <input
-                type="text"
-                className="input w-full"
-                value=""
-                placeholder="아이디를 입력하세요"
-              />
+              <div className="w-full">
+                <input
+                  type="text"
+                  className="input w-full validator"
+                  value=""
+                  placeholder="아이디를 입력하세요"
+                />
+                <p>에러에러</p>
+              </div>
             </div>
             <div className="flex items-center justify-between">
               <label className="font-semibold w-1/4 shrink-0">패스워드</label>
