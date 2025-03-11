@@ -7,7 +7,7 @@ const SearchBar = ({
   searchParams,
   companyModalRef,
   handleInput,
-  handleSelecting,
+  handleSelectBox,
   getCompanyList
 }) => {
   const { brandList, getBrandList } = useBrandCode();
@@ -18,16 +18,16 @@ const SearchBar = ({
         name="brand_code"
         options={brandList}
         className="min-w-32"
-        onChange={handleSelecting}
+        onChange={handleSelectBox}
         defaultValue={brandList[0]}
       />
       <Select
-        name="search_type"
+        name="keyword_type"
         options={[
           { value: "number", label: "사업자번호" },
           { value: "name", label: "사업자명" },
         ]}
-        onChange={handleSelecting}
+        onChange={handleSelectBox}
         defaultValue={{ value: "number", label: "사업자번호" }}
       />
       <div className="flex-1">
@@ -36,7 +36,7 @@ const SearchBar = ({
           name="search"
           placeholder="검색어를 입력해주세요."
           className="input input-bordered w-full focus:ring-0 focus:outline-none"
-          value={searchParams.search}
+          value={searchParams.keyword}
           onChange={handleInput}
         />
       </div>

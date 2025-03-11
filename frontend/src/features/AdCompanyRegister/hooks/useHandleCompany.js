@@ -3,15 +3,18 @@ import { dummyCompanyList } from '../dummy/data';
 import { getAdCompanayList } from '../../../api/advertisement/advertisement';
 
 const useHandleCompany = () => {
-  const [companyList, setCompanyList] = useState([]);
+  const [limit, setLimit] = useState(20);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
   // parameter 미정.. 임시로 적용 추후 수정
-  const [searchType, setSearchType] = useState("number");
   const [searchParams, setSearchParams] = useState({
     brand_code: "",
-    search_type: "number",
-    search: "",
+    keyword_type: "number",
+    keyword: "",
     use_yn: "Y"
   });
+
+  const [companyList, setCompanyList] = useState([]);
 
   const [activeRow, setActiveRow] = useState(null); // 광고계약관리 리스트 선택 상태
 
@@ -20,19 +23,21 @@ const useHandleCompany = () => {
     // const tempParams = {
     //   brand_code: searchParams.brand_code,
     //   use_yn: searchParams.use_yn,
+    //   page: page,
+    //   page_size: limit
     // };
-    // // 선택한 search_type 값에 따라 동적으로 키 설정
-    // if (searchParams.search_type === "number") {
-    //   tempParams.business_number = searchParams.search;
-    // } else if (searchParams.search_type === "name") {
-    //   tempParams.business_name = searchParams.search;
+    // // 선택한 keyword_type 값에 따라 동적으로 키 설정
+    // if (searchParams.keyword_type === "number") {
+    //   tempParams.business_number = searchParams.keyword;
+    // } else if (searchParams.keyword_type === "name") {
+    //   tempParams.business_name = searchParams.keyword;
     // }
     // console.log(tempParams);
     // getAdCompanayList(tempParams)
     //   .then(res => {
     //     const { status_code, data } = res.data;
     //     if (status_code === 200) {
-    //       setCompanyList(data.item);
+    //       setCompanyList(data.items);
     //     }
     //   })
     //   .catch(err => console.error(err));
@@ -50,7 +55,7 @@ const useHandleCompany = () => {
     setSearchParams({ ...searchParams, [name]: value });
   }
 
-  const handleSelecting = (option, option2) => {
+  const handleSelectBox = (option, option2) => {
     const { label, value } = option;
     const { name } = option2;
     setSearchParams({ ...searchParams, [name]: value });
@@ -64,7 +69,7 @@ const useHandleCompany = () => {
     activeRow,
     getCompanyList,
     handleInput,
-    handleSelecting
+    handleSelectBox
   }
 }
 

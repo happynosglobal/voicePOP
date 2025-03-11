@@ -118,7 +118,8 @@ const StoreGroupPage = () => {
         {dummyGroup.length > 0 && (
           <tbody>
             {dummyGroup.map((item, index) => (
-              <tr key={item.id} onClick={() => handleRowClick(item.id)}>
+              // <tr key={item.id} onClick={() => handleRowClick(item.id)}>
+              <tr key={item.id}>
                 <td>{dummyGroup.length - index}</td>
                 <td>{item.group_name}</td>
                 <td>{item.groups.length}</td>

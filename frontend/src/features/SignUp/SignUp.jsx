@@ -124,7 +124,7 @@ console.log(formData)
           <div className="flex gap-4">
             <Select
               isMulti
-              name="colors"
+              name="brand_code"
               options={[
                 { value: "EM", label: "이마트(EM)" },
                 { value: "ED", label: "에브리데이(ED)" },
@@ -144,7 +144,7 @@ console.log(formData)
             <span className="label-text font-semibold">관리 점포</span>
           </label>
           <Select
-            name="mart_code"
+            name="store_code"
             options={[
               { value: "0", label: "행당점" },
               { value: "1", label: "점포A" },
