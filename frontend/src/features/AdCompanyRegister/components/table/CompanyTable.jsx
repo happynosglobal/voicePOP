@@ -20,10 +20,10 @@ const CompanyTable = ({ companyList, activeRow, handleRowClick }) => {
           <tbody>
             {companyList.map((item, index) => (
               <tr
-                key={item.index}
+                key={index}
                 className={`cursor-pointer ${
                   activeRow?.id === item.id ? "active" : ""
-                }`}
+                  }`}
                 onClick={() => handleRowClick(item)}
               >
                 <td>{item.seq}</td>

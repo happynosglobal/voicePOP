@@ -14,7 +14,7 @@ const CompanyList = ({
     companyList,
     getCompanyList,
     handleInput,
-    handleSelecting,
+    handleSelectBox,
   } = useHandleCompany();
   return (
     <div className="relative wide:w-2/5 w-1/2">
@@ -25,7 +25,7 @@ const CompanyList = ({
         searchParams={searchParams}
         companyModalRef={companyModalRef}
         handleInput={handleInput}
-        handleSelecting={handleSelecting}
+        handleSelectBox={handleSelectBox}
       />
 
       <CompanyTable

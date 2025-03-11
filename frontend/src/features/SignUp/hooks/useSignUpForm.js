@@ -10,7 +10,7 @@ const useSignupForm = () => {
         brand_code: [],
         password: '',
         confirm_password: '',
-        mart_code: '',
+        store_code: '',
         email: ''
     });
 
@@ -52,16 +52,9 @@ const useSignupForm = () => {
             formData.password &&
             isPasswordMatched && // 비밀번호 일치 확인
             (formData.level === "0" || formData.brand_code.length > 0) && //전체관리자이거나 브랜드코드가 골라져야
-            (formData.level !== "3" || formData.mart_code) && // 점포관리자가 아니거나 점포가 골라져야
+            (formData.level !== "3" || formData.store_code) && // 점포관리자가 아니거나 점포가 골라져야
             formData.email;
-        // console.log(formData.user_name);
-        // console.log(formData.user_id);
-        // console.log(isIdChecked);
-        // console.log(formData.password);
-        // console.log(isPasswordMatched);
-        // console.log(formData.level !== "0" && formData.brand_code.length > 0);
-        // console.log(formData.level === "3" && formData.mart_code);
-        // console.log(formData.email);
+
         return isValid;
     }
     return {
