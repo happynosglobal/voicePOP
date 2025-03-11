@@ -1,17 +1,12 @@
-import React from 'react'
-import Tooltip from '../../../../components/tooltip/Tooltip';
-import Pagination from '../../../../components/pagination/Pagination';
-import EmptyState from '../../../../components/emptyState/EmptyState';
+import React from "react";
+import Tooltip from "../../../../components/tooltip/Tooltip";
+import Pagination from "../../../../components/pagination/Pagination";
+import EmptyState from "../../../../components/emptyState/EmptyState";
 
-const CompanyTable = ({
-  companyList,
-  activeRow,
-  handleRowClick
-}) => {
-
+const CompanyTable = ({ companyList, activeRow, handleRowClick }) => {
   return (
     <>
-      <table>
+      <table className="table">
         <thead>
           <tr>
             <th className="w-14">순서</th>
@@ -26,7 +21,8 @@ const CompanyTable = ({
             {companyList.map((item, index) => (
               <tr
                 key={index}
-                className={`cursor-pointer ${activeRow?.id === item.id ? "active" : ""
+                className={`cursor-pointer ${
+                  activeRow?.id === item.id ? "active" : ""
                   }`}
                 onClick={() => handleRowClick(item)}
               >
@@ -42,11 +38,13 @@ const CompanyTable = ({
           </tbody>
         )}
       </table>
-      {companyList.length === 0 && <EmptyState text="일치하는 검색 결과가 없습니다." />}
+      {companyList.length === 0 && (
+        <EmptyState text="일치하는 검색 결과가 없습니다." />
+      )}
       {/* <EmptyState text="등록된 리스트가 없습니다." /> */}
       <Pagination />
     </>
-  )
-}
+  );
+};
 
-export default CompanyTable
+export default CompanyTable;

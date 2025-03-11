@@ -16,7 +16,7 @@ const dummyMenu = [
     items: [{ name: "타입캐스트", path: "/dashboard" }],
   },
   {
-    title: "스케줄",
+    title: "방송",
     icon: <MdCalendarToday className="text-xl" />,
     items: [
       { name: "방송/장비현황", path: "/equipment-status" },

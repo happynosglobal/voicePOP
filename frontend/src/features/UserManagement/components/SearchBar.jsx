@@ -1,5 +1,6 @@
 import Select from "react-select";
 import Input from "../../../components/input/Input";
+import { RiFileExcel2Line } from "react-icons/ri";
 
 const SearchBar = ({
   setUserId,
@@ -85,13 +86,16 @@ const SearchBar = ({
         </div>
 
         {/* <!-- 사용자 등록 버튼 --> */}
-        <div className="text-right">
-          <button 
-          className="btn btn-primary btn-sm" 
-          onClick={()=>{
-            setUserId("");
-            openModal();
-          }}
+        <div className="flex gap-2">
+          <button className="btn btn-sm btn-success">
+            <RiFileExcel2Line className="text-xl" /> 엑셀다운로드
+          </button>
+          <button
+            className="btn btn-primary btn-sm"
+            onClick={() => {
+              setUserId("");
+              openModal();
+            }}
           >
             사용자 등록
           </button>

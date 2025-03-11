@@ -143,7 +143,7 @@ const AdStatusPage = () => {
             className={`px-10 py-2 font-medium ${
               activeTab === "점포별 현황"
                 ? "bg-gray-700 text-white"
-                : "border-b-2 border-gray-700 text-gray-700"
+                : "border-b-2 border-gray-700 text-gray-700 hover:bg-gray-100"
             } rounded-t-lg transition`}
             onClick={() => setActiveTab("점포별 현황")}
           >
@@ -176,7 +176,7 @@ const AdStatusPage = () => {
       </div>
       {activeTab === "업체별 현황" ? (
         <>
-          <table>
+          <table className="table">
             <thead>
               <tr>
                 <th className="wide:w-2/12">업체명</th>
@@ -227,7 +227,7 @@ const AdStatusPage = () => {
         </>
       ) : (
         <>
-          <table>
+          <table className="table">
             <thead>
               <tr>
                 <th>점포명</th>

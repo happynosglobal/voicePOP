@@ -30,7 +30,7 @@ const AddUserModal = ({ modalRef, closeModal, userId, setUserId, mode }) => {
 
   useEffect(() => {
   }, [modalRef]);
-  
+
   /* 모달창 닫을 때 수행 할 로직 */
   useEffect(() => {
     const modal = modalRef?.current;
