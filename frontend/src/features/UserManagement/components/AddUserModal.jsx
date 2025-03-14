@@ -152,41 +152,6 @@ const AddUserModal = ({ modalRef, closeModal, userId, setUserId, mode }) => {
             />
 
           </div>
-          <div className="flex items-center justify-between">
-            <label className="font-semibold w-1/4 shrink-0">패스워드 확인</label>
-            <div className="w-full">
-              <Input
-                type="password"
-                name="confirm_password"
-                placeholder="비밀번호를 다시한번 입력해주세요."
-                className="input w-full"
-                value={formData.confirm_password}
-                onChange={handleInput}
-                errorMessage={!isPasswordMatched ? "비밀번호가 일치하지 않습니다." : ""}
-                disabled={mode === "modify" ? true : false}
-              />
-            </div>
-          </div>
-          <div className="flex items-center justify-between">
-            <label className="font-semibold w-1/4 shrink-0">권한</label>
-            <Select
-              name="level"
-              options={[
-                { value: 0, label: "전체 관리자" },
-                { value: 1, label: "브랜드 관리자" },
-                { value: 2, label: "광고 관리자" },
-                { value: 3, label: "점포 관리자" },
-              ]}
-              className="w-full"
-              value={[
-                { value: 0, label: "전체 관리자" },
-                { value: 1, label: "브랜드 관리자" },
-                { value: 2, label: "광고 관리자" },
-                { value: 3, label: "점포 관리자" },
-              ].filter(option => option.value === formData.level)}
-              onChange={handleSelectBox}
-              placeholder="권한을 선택하세요"
-            />
 
           <div className="flex items-center justify-between">
             <label className="font-semibold w-1/4 shrink-0">관리브랜드</label>
