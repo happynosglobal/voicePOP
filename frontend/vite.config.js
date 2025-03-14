@@ -9,11 +9,11 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 5173,
       proxy: {
-        [env.VITE_API_PREFIX]: {
-          target: env.VITE_API_BASE_URL,
-          changeOrigin: false,
-          secure: false,
-        },
+        // [env.VITE_API_PREFIX]: {
+        //   target: env.VITE_API_BASE_URL,
+        //   changeOrigin: false,
+        //   secure: false,
+        // },
       },
     },
   };

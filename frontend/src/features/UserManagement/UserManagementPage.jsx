@@ -25,7 +25,7 @@ const UserManagementPage = () => {
     handleSelectBox
   } = useHandleUserList();
 
-  const [userId, setUserId] = useState("");
+  const [userId, setUserId] = useState(null);
 
   const openModal = () => {
     if (modalRef.current) {

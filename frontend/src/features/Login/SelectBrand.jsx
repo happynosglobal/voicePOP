@@ -1,7 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import useUserStore from "../../stores/user";
 import { useEffect, useState } from "react";
-import { userData } from "./dummy/data";
+import { loginSuccessResponse } from "./dummy/data";
+import useStores from "../../stores/stores";
 
 // 더미 브랜드 데이터
 const dummyBrandData = [
@@ -13,6 +14,7 @@ const dummyBrandData = [
 
 const SelectBrand = () => {
   const { logout, login, selectBrand, user, isAuthenticated } = useUserStore();
+  const { resetStores } = useStores();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [selectedBrand, setSelectedBrand] = useState(null);
@@ -35,6 +37,7 @@ const SelectBrand = () => {
 
   const handleLogout = () => {
     logout();
+    resetStores();
     navigate("/");
   };
 
@@ -50,8 +53,8 @@ const SelectBrand = () => {
               key={brand.id}
               onClick={() => setSelectedBrand(brand.name)}
               className={`w-full py-4 rounded-lg text-lg font-medium transition border border-gray-250 ${selectedBrand === brand.name
-                  ? "bg-[#FFCF02] border-[#FFCF02]"
-                  : "text-gray-800 hover:bg-gray-100"
+                ? "bg-[#FFCF02] border-[#FFCF02]"
+                : "text-gray-800 hover:bg-gray-100"
                 }`}
             >
               {brand.name}

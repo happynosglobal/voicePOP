@@ -37,6 +37,7 @@ const CustomDatePicker = ({
   selectedDate,
   onChange,
   placeholder = "날짜 선택",
+  minDate,
 }) => (
   <DatePicker
     selected={selectedDate}
@@ -49,6 +50,7 @@ const CustomDatePicker = ({
     customInput={<CustomInput placeholder={placeholder} />}
     dayClassName={getDayClassName}
     placeholderText={placeholder}
+    minDate={minDate}
   />
 );
 

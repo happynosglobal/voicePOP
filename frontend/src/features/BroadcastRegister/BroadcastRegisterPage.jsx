@@ -5,6 +5,7 @@ import Select from "react-select";
 import CustomDatePicker from "../../components/customDatePicker/CustomDatePicker";
 import { useDropzone } from "react-dropzone";
 import StoreSelectModal from "./components/StoreSelectModal";
+import GroupSelectModal from "../../components/modal/GroupSelectModal";
 
 const BroadcastRegisterPage = () => {
   const storeModalRef = useRef(null); // 점포 선택 모달 ref
@@ -72,7 +73,7 @@ const BroadcastRegisterPage = () => {
           <input
             type="text"
             placeholder="방송명을 입력하세요"
-            class="input w-full"
+            className="input w-full"
           />
         </div>
         <div className="form-group">
@@ -98,7 +99,7 @@ const BroadcastRegisterPage = () => {
         </div>
         <div className="form-group">
           <label className="form-label">적용점포</label>
-          <div class="w-full">
+          <div className="w-full">
             <div className="mb-2 flex justify-between items-center gap-2">
               <div className="space-x-2">
                 <button className="btn btn-sm btn-accent">전점</button>
@@ -315,7 +316,7 @@ const BroadcastRegisterPage = () => {
           </button>
         </div>
       </div>
-      <StoreSelectModal modalRef={storeModalRef} /> {/* 점포선택 모달 */}
+      <GroupSelectModal modalRef={storeModalRef} label={"점포 생성"} />
     </ContentLayout>
   );
 };

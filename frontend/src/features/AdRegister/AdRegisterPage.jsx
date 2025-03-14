@@ -5,6 +5,19 @@ import StoreSelectModal from "./components/StoreSelectModal";
 import Select from "react-select";
 import CustomDatePicker from "../../components/customDatePicker/CustomDatePicker";
 import { useDropzone } from "react-dropzone";
+import GroupSelectModal from "../../components/modal/GroupSelectModal";
+
+const dummyStores = [
+  "EM청주점",
+  "EM청주가경점",
+  "EM청주율량점",
+  "EM청주직지점",
+  "EM청주봉명점",
+  "EM천안점",
+  "EM아산점",
+  "EM청주점",
+  "EM청주북문로3가점",
+];
 
 const AdRegisterPage = () => {
   const storeModalRef = useRef(null); // 점포 선택 모달 ref
@@ -13,17 +26,6 @@ const AdRegisterPage = () => {
   const [selectedEndDate, setSelectedEndDate] = useState(null); //임시 날짜선택 STATE
   const [isGapChecked, setIsGapChecked] = useState(false); //임시 GAP STATE
 
-  const dummyStores = [
-    "EM청주점",
-    "EM청주가경점",
-    "EM청주율량점",
-    "EM청주직지점",
-    "EM청주봉명점",
-    "EM천안점",
-    "EM아산점",
-    "EM청주점",
-    "EM청주북문로3가점",
-  ];
 
   const [uploadedFile, setUploadedFile] = useState(null); // dropzone STATE
 
@@ -43,6 +45,8 @@ const AdRegisterPage = () => {
     accept: "audio/*", // 오디오 파일만 허용
     maxSize: 5 * 1024 * 1024, // 5MB 제한
   });
+  console.log(uploadedFile)
+
   return (
     <ContentLayout>
       <Title text="광고등록" />
@@ -52,7 +56,7 @@ const AdRegisterPage = () => {
           <input
             type="text"
             placeholder="광고명을 입력하세요"
-            class="input w-full"
+            className="input w-full"
           />
         </div>
         <div className="form-group">
@@ -78,7 +82,7 @@ const AdRegisterPage = () => {
         </div>
         <div className="form-group">
           <label className="form-label">적용점포</label>
-          <div class="w-full">
+          <div className="w-full">
             <div className="mb-2 flex justify-between items-center gap-2">
               <div className="space-x-2">
                 <button className="btn btn-sm btn-accent">전점</button>
@@ -333,7 +337,8 @@ const AdRegisterPage = () => {
           </button>
         </div>
       </div>
-      <StoreSelectModal modalRef={storeModalRef} /> {/* 점포선택 모달 */}
+      {/* <StoreSelectModal modalRef={storeModalRef} /> 점포선택 모달 */}
+      <GroupSelectModal modalRef={storeModalRef} label={"점포 생성"} />
     </ContentLayout>
   );
 };

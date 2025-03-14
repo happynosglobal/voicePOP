@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import useUserStore from "../../stores/user";
 import { useNavigate } from "react-router-dom";
-import { userData } from "./dummy/data";
+import { loginSuccessResponse } from "./dummy/data";
 import apiCall from "../../utils/axiosConfig";
 import { postLogin } from "../../api/user/user";
+import useStores from "../../stores/stores";
 
 const Login = () => {
-  const { logout, login, user, isAuthenticated } = useUserStore();
+  const { logout, requestLogin, user, isAuthenticated } = useUserStore();
+  const { fetchStores } = useStores();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
-
   const [formData, setFormData] = useState({
     user_id: "",
     password: "",
@@ -36,18 +37,19 @@ const Login = () => {
     if (!isFormfilled()) return;
     const multipleBrandCode = true; //brand_code 응답데이터 변경 가능성 높아 추후 로직적용
     try {
-      login(userData, multipleBrandCode); // multipleBrandCode true면 브랜드 선택으로 false면 바로 접속
+      requestLogin(loginSuccessResponse, multipleBrandCode); // multipleBrandCode true면 브랜드 선택으로 false면 바로 접속
+      fetchStores(loginSuccessResponse.brand_code);
       if (multipleBrandCode) {
         navigate("/login/select");
       } else {
-        navigate(userData.dashboard_url);
+        navigate(loginSuccessResponse.dashboard_url);
       }
 
       /* 추후 연동 예상 로그인 api */
       // const response = await postLogin(formData);
       // const { status_code, data } = response.data;
       // if (status_code === 200) {
-      //   login(data); //Zustand store에 저장
+      //   requestLogin(data); //Zustand store에 저장
       //   navigate(data.dashboard_url); // 응답데이터의 기본 url로 이동
       // } else {
       //   setError("로그인 실패"); // 추후 로그인 실패 메시지 정해서 추가
