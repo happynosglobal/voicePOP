@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 import Pagination from "../../../components/pagination/Pagination";
-import { toYYYYMMDD } from "../../../utils/dateFormat";
+import { toYYYYMMDD } from "../../../utils/customFormat";
 import EmptyState from "../../../components/emptyState/EmptyState";
 
 const UserTable = ({

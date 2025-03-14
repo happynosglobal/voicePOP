@@ -1,9 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Input from "../../components/input/Input";
 import Select from "react-select";
 import { passwordRegex, userIdRegex } from "../../utils/validation";
 import useSignupForm from "./hooks/useSignupForm";
+const levelList = [
+  { value: 3, label: "전체 관리자" },
+  { value: 2, label: "브랜드 관리자" },
+  { value: 1, label: "광고 관리자" },
+  { value: 0, label: "점포 관리자" },
+]
 
+const brandList = [
+  { value: "EM", label: "이마트(EM)" },
+  { value: "ED", label: "에브리데이(ED)" },
+];
 const SignUp = () => {
   const {
     formData,
@@ -14,9 +24,11 @@ const SignUp = () => {
     handleInput,
     handleSelectBox,
     handleMultiSelectBox,
-    isFormValid
+    isFormValid,
+    handleClickBrand,
+    storeList
   } = useSignupForm();
-console.log(formData)
+  console.log(formData)
   return (
     <div className="flex items-center justify-center min-h-screen py-10 bg-gray-100">
       <div className="card w-full max-w-md bg-white shadow-xl p-6">
@@ -102,40 +114,44 @@ console.log(formData)
           </label>
           <div className="flex gap-4">
             <Select
-              name="level"
-              options={[
-                { value: "0", label: "전체 관리자" },
-                { value: "1", label: "브랜드 관리자" },
-                { value: "2", label: "광고 관리자" },
-                { value: "3", label: "점포 관리자" },
-              ]}
+              name="required_level"
+              options={levelList}
               className="w-full"
-              // value={formData.level}
+              value={levelList.filter(option => option.value === formData.required_level)}
               onChange={handleSelectBox}
               defaultValue={{ value: "0", label: "전체 관리자" }}
             />
           </div>
         </div>
-
         <div className="form-control mt-4">
           <label className="label">
             <span className="label-text font-semibold">관리 브랜드</span>
           </label>
           <div className="flex gap-4">
-            <Select
-              isMulti
-              name="brand_code"
-              options={[
-                { value: "EM", label: "이마트(EM)" },
-                { value: "ED", label: "에브리데이(ED)" },
-                { value: "TR", label: "트레이더스(TR)" },
-              ]}
-              className="w-full"
-              classNamePrefix="select"
-              onChange={handleMultiSelectBox}
-              placeholder="브랜드를 선택하세요"
-              isDisabled={formData.level === "0" ? true : false} // 전체관리자는 disabled
-            />
+            {formData.required_level !== 0 ? (
+              <Select
+                isMulti
+                name="brand_code"
+                options={brandList}
+                value={brandList.filter(option => formData.brand_code.includes(option.value))}
+                className="w-full"
+                classNamePrefix="select"
+                onChange={handleMultiSelectBox}
+                placeholder="브랜드를 선택하세요"
+                isDisabled={formData.required_level === 3 ? true : false} // 전체관리자는 disabled
+              />
+            ) : (
+              <Select
+                name="brand_code"
+                options={brandList}
+                value={brandList.filter(option => option.value === formData.brand_code[0])}
+                className="w-full"
+                classNamePrefix="select"
+                onChange={(option) => handleClickBrand(option.value)}
+                placeholder="브랜드를 선택하세요"
+                isDisabled={formData.required_level === 3 ? true : false} // 전체관리자는 disabled
+              />
+            )}
           </div>
         </div>
 
@@ -145,17 +161,12 @@ console.log(formData)
           </label>
           <Select
             name="store_code"
-            options={[
-              { value: "0", label: "행당점" },
-              { value: "1", label: "점포A" },
-              { value: "2", label: "점포B" },
-              { value: "3", label: "점포C" },
-              { value: "4", label: "점포D" },
-            ]}
+            options={storeList}
+            value={storeList.filter(option => option.value === formData.store_code)}
             className="w-full"
             onChange={handleSelectBox}
             placeholder="관리점포를 선택하세요"
-            isDisabled={formData.level === "3" ? false : true} // 점포관리자만 activated
+            isDisabled={formData.required_level === 0 ? false : true} // 점포관리자만 activated
           />
         </div>
 

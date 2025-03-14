@@ -3,12 +3,15 @@ import { useNavigate } from "react-router-dom";
 import useUserStore from "../stores/user";
 import { Link } from "react-router-dom";
 import { LuLogOut } from "react-icons/lu";
+import useStores from "../stores/stores";
 
 const Topbar = () => {
   const navigate = useNavigate();
   const { logout } = useUserStore();
+  const { resetStores } = useStores();
   const handleLogout = () => {
     logout();
+    resetStores();
   };
   return (
     <header className="wide:fixed top-0 left-0 right-0 h-[60px] bg-white px-5 flex justify-between items-center border-b z-10 w-full">

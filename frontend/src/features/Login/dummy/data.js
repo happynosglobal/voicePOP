@@ -1,6 +1,21 @@
-export const userData = {
-  level: "ADMIN",
-  brand_code: ["EM", "ED", "TR"],
+export const userInfo = {
+  level: 3,
+  brand_code: "EM",
+  uuid: "8a252dc1-0215-4efd-8560-00af3546ca75",
+  user_id: "tester",
+  user_name: "테스터",
+  company_id: "이마트",
+  email: "a@emart.com",
+  store_code: "1234",
+  created_at: "2025-02-05 14:22:21",
+  updated_at: "2025-02-05 14:22:21",
+  creater: "224137",
+  updater: "224137"
+}
+
+export const loginSuccessResponse = {
+  level: 3,
+  brand_code: "EM",
   latest_login_at: "2025-02-05 14:22:21",
   menu: [
     {

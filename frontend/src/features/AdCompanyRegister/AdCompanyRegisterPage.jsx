@@ -8,15 +8,14 @@ import AdContractList from "./components/AdContractList";
 import useHandleContract from "./hooks/useHandleContract";
 
 const AdCompanyRegisterPage = () => {
+  const companyModalRef = useRef(null); // 업체 등록 모달 ref
+  const contractModalRef = useRef(null); // 계약 등록 모달 ref
 
   const [activeRow, setActiveRow] = useState(null); // 광고계약관리 리스트 선택 상태
 
   const handleRowClick = (rowData) => {
     setActiveRow(rowData);
   };
-
-  const companyModalRef = useRef(null); // 업체 등록 모달 ref
-  const contractModalRef = useRef(null); // 계약 등록 모달 ref
 
   return (
     <ContentLayout>
@@ -34,8 +33,10 @@ const AdCompanyRegisterPage = () => {
           contractModalRef={contractModalRef}
         />
       </div>
-      <AddCompanyModal modalRef={companyModalRef} /> {/* 업체등록 모달 */}
-      <AddContractModal modalRef={contractModalRef} /> {/* 계약추가 모달 */}
+      {/* 업체등록 모달 */}
+      {/* <AddCompanyModal modalRef={companyModalRef} /> */}
+      {/* 계약추가 모달 */}
+      {/* <AddContractModal modalRef={contractModalRef} /> */}
     </ContentLayout>
   );
 };
