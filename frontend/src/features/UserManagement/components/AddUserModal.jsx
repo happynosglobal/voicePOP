@@ -1,5 +1,5 @@
 import Select from "react-select";
-import Radio from "../../../components/input/radio";
+import Radio from "../../../components/input/Radio";
 import LoadingSpinner from "../../../components/loading/LoadingSpinner";
 import useAddUser from "../hooks/useAddUser";
 import Input from "../../../components/input/Input";
@@ -43,7 +43,6 @@ const AddUserModal = ({ modalRef, closeModal, userId, setUserId, mode }) => {
   /* 모달창 닫을 때 수행 할 로직 */
   useEffect(() => {
     const modal = modalRef?.current;
-    console.log(modal)
     if (!modal) return;
 
     const handleClose = () => {
@@ -237,19 +236,13 @@ const AddUserModal = ({ modalRef, closeModal, userId, setUserId, mode }) => {
         <div className="flex w-full items-center justify-center gap-2.5 mt-12">
           <button
             className="absolute right-3 top-4 w-10 h-10 text-2xl"
-            onClick={(e) => {
-              setUserInfo(null);
-              closeModal();
-            }}
+            onClick={closeModal}
           >
             ✕
           </button>
           <button
             className="btn min-w-24"
-            onClick={(e) => {
-              setUserInfo(null);
-              closeModal();
-            }}
+            onClick={closeModal}
           >
             취소
           </button>

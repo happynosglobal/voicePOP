@@ -209,7 +209,7 @@ const AdStatusPage = () => {
                   <td>
                     <div className="relative w-full flex wide:gap-0 gap-1 items-center justify-between">
                       <progress
-                        class="progress w-3/4"
+                        className="progress w-3/4"
                         value={item.achievementRate}
                         max="100"
                       ></progress>
@@ -245,7 +245,7 @@ const AdStatusPage = () => {
                 <td>
                   <div className="relative w-full flex wide:gap-0 gap-1 items-center justify-between">
                     <progress
-                      class="progress w-3/4"
+                      className="progress w-3/4"
                       value={20}
                       max="100"
                     ></progress>
@@ -261,7 +261,7 @@ const AdStatusPage = () => {
                 <td>
                   <div className="relative w-full flex wide:gap-0 gap-1 items-center justify-between">
                     <progress
-                      class="progress w-3/4"
+                      className="progress w-3/4"
                       value={67.2}
                       max="100"
                     ></progress>

@@ -16,28 +16,27 @@ const useHandleCompany = () => {
 
   const [companyList, setCompanyList] = useState([]);
 
-  const [activeRow, setActiveRow] = useState(null); // 광고계약관리 리스트 선택 상태
-
   const getCompanyList = () => {
     /* 예상 광고회사 검색 api */
-    // const tempParams = {
-    //   brand_code: searchParams.brand_code,
-    //   use_yn: searchParams.use_yn,
-    //   page: page,
-    //   page_size: limit
-    // };
-    // // 선택한 keyword_type 값에 따라 동적으로 키 설정
-    // if (searchParams.keyword_type === "number") {
-    //   tempParams.business_number = searchParams.keyword;
-    // } else if (searchParams.keyword_type === "name") {
-    //   tempParams.business_name = searchParams.keyword;
-    // }
-    // console.log(tempParams);
+    const tempParams = {
+      brand_code: searchParams.brand_code,
+      use_yn: searchParams.use_yn,
+      page: page,
+      page_size: limit
+    };
+    // 선택한 keyword_type 값에 따라 동적으로 키 설정
+    if (searchParams.keyword_type === "number") {
+      tempParams.business_number = searchParams.keyword;
+    } else if (searchParams.keyword_type === "name") {
+      tempParams.business_name = searchParams.keyword;
+    }
+    console.log(tempParams);
     // getAdCompanayList(tempParams)
     //   .then(res => {
     //     const { status_code, data } = res.data;
     //     if (status_code === 200) {
     //       setCompanyList(data.items);
+    //       setTotal(data.count);
     //     }
     //   })
     //   .catch(err => console.error(err));
@@ -45,10 +44,6 @@ const useHandleCompany = () => {
     //api 추가전 임시로 계약목록 set
     setCompanyList(dummyCompanyList);
   }
-
-  useEffect(() => {
-    getCompanyList();
-  }, []);
 
   const handleInput = (e) => {
     const { name, value } = e.target;
@@ -64,9 +59,14 @@ const useHandleCompany = () => {
   // console.log(searchParams);
 
   return {
+    limit,
+    setLimit,
+    page,
+    setPage,
+    total,
+    setTotal,
     searchParams,
     companyList,
-    activeRow,
     getCompanyList,
     handleInput,
     handleSelectBox

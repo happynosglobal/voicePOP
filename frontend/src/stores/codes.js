@@ -2,29 +2,33 @@ import { create } from "zustand";
 import { persist, devtools } from "zustand/middleware";
 import { getRegionalGroupStores } from "../hooks/useStoreCode";
 
-const useStores = create(
+const useCodes = create(
   persist(
     devtools((set) => ({
-      stores: [],
+      allStore: [],
       regionalGroupData: [],
+      storesforTree: [],
       fetchStores: async (brand_code) => {
         const response = await getRegionalGroupStores(brand_code)
-        // console.log(response)
         try {
-          set({ stores: [...response.regionalGroupData, ...response.stores], regionalGroupData: response.regionalGroupData })
+          set({ allStore: response.allStores, storesforTree: [...response.regionalGroupData, ...response.nonRegionalData], regionalGroupData: response.regionalGroupData })
         } catch (err) {
           console.error(err)
         }
       },
-      resetStores: () => set({ stores: [], regionalGroupData: [], })
+
+      brandList: [],
+      setBrandList: (data) => set({ brandList: data }),
+
+      resetStores: () => set({ allStore: [], regionalGroupData: [], storesforTree: [], brandList: [] }),
     })),
 
     {
-      name: "store-storage",
+      name: "codes-storage",
       // storage: createJSONStorage(() => sessionStorage),
       getStorage: () => localStorage,
     }
   )
 );
 
-export default useStores;
+export default useCodes;

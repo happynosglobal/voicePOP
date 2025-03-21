@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import LoadingSpinner from '../../../components/loading/LoadingSpinner'
 import SearchBar from './SearchBar';
 import CompanyTable from './table/CompanyTable';
@@ -11,18 +11,26 @@ const CompanyList = ({
   handleRowClick,
 }) => {
   const {
+    limit,
+    setLimit,
+    page,
+    setPage,
+    total,
+    setTotal,
     searchParams,
     companyList,
     getCompanyList,
     handleInput,
-    handleSelectBox,
+    handleSelectBox
   } = useHandleCompany();
+
+  useEffect(() => {
+    getCompanyList();
+  }, [page]);
 
   return (
     <>
       <div className="relative wide:w-2/5 w-1/2">
-        <LoadingSpinner isLoading={false} />
-
         <SearchBar
           getCompanyList={getCompanyList}
           searchParams={searchParams}
@@ -32,10 +40,16 @@ const CompanyList = ({
         />
 
         <CompanyTable
+          limit={limit}
+          page={page}
+          setPage={setPage}
+          total={total}
+          getCompanyList={getCompanyList}
           companyList={companyList}
           activeRow={activeRow}
           handleRowClick={handleRowClick}
         />
+        <LoadingSpinner isLoading={false} />
       </div>
       <AddCompanyModal modalRef={companyModalRef} /> {/* 업체등록 모달 */}
     </>

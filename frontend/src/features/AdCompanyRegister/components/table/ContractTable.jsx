@@ -6,7 +6,7 @@ const ContractTable = ({ activeRow, contractModalRef }) => {
   const { contractList, getContractList } = useHandleContract();
   // 임시 광고계약 리스트 로드
   useEffect(() => {
-    getContractList();
+    getContractList(activeRow);
   }, [activeRow]);
 
   return (

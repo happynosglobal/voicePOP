@@ -3,9 +3,8 @@ import ContentLayout from "../../layout/ContentLayout";
 import Title from "../../components/title/Title";
 import Tooltip from "../../components/tooltip/Tooltip";
 import Pagination from "../../components/pagination/Pagination";
-import AddGroupModal from "./components/AddGroupModal";
 import GroupSelectModal from "../../components/modal/GroupSelectModal";
-import apiCall from "../../utils/axiosConfig";
+import useUserStore from "../../stores/user";
 
 const dummyGroup = [
   {
@@ -100,8 +99,18 @@ const dummyGroup = [
 ];
 
 const StoreGroupPage = () => {
-  const groupModalRef = useRef(null); // 점포 선택 모달 ref
+  const {user} = useUserStore();
   
+  const groupModalRef = useRef(null); // 점포 선택 모달 ref
+
+  const handleSubmit = (name, stores) => {
+    const formData = {
+      brand_code: user.brand_code,
+      name: name,
+      user_id: user.user_id,
+    }
+    console.log(formData)
+  }
   return (
     <ContentLayout>
       <div className="flex items-center justify-between">
@@ -149,7 +158,13 @@ const StoreGroupPage = () => {
       {/* <EmptyState text="등록된 리스트가 없습니다." />  */}
       <Pagination />
       {/* <AddGroupModal modalRef={groupModalRef} /> 점포선택 모달 */}
-      <GroupSelectModal modalRef={groupModalRef} label={"그룹 생성"} searchable /> {/* 점포선택 모달 */}
+      {/* 점포선택 모달 */}
+      <GroupSelectModal
+        modalRef={groupModalRef}
+        label={"그룹 생성"}
+        handleSubmit={handleSubmit}
+        addable
+      />
     </ContentLayout>
   );
 };

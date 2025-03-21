@@ -7,14 +7,14 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     server: {
-      port: 5173,
-      proxy: {
-        // [env.VITE_API_PREFIX]: {
-        //   target: env.VITE_API_BASE_URL,
-        //   changeOrigin: false,
-        //   secure: false,
-        // },
-      },
+      // port: 5173,
+      // proxy: {
+      //   "/": {
+      //     target: env.VITE_API_BASE_URL,
+      //     changeOrigin: false,
+      //     secure: false,
+      //   },
+      // },
     },
   };
 });

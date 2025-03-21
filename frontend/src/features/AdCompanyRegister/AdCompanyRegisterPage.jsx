@@ -1,11 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import ContentLayout from "../../layout/ContentLayout";
 import Title from "../../components/title/Title";
-import AddCompanyModal from "./components/modal/AddCompanyModal";
-import AddContractModal from "./components/modal/AddContractModal";
 import AdCompanyList from "./components/AdCompanyList";
 import AdContractList from "./components/AdContractList";
-import useHandleContract from "./hooks/useHandleContract";
 
 const AdCompanyRegisterPage = () => {
   const companyModalRef = useRef(null); // 업체 등록 모달 ref

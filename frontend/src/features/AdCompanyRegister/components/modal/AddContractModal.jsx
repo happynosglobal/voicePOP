@@ -3,15 +3,20 @@ import Select from "react-select";
 import { useEffect, useMemo, useState } from "react";
 import useAddContractForm from "../../hooks/useAddContractForm";
 import { toYYYYMMDD } from "../../../../utils/customFormat";
+import Input from "../../../../components/input/Input";
+import { postAdContract } from "../../../../api/advertisement/advertisement";
 
-const AddContractModal = ({ modalRef }) => {
+const AddContractModal = ({ activeRow, modalRef }) => {
   const {
+    adTypes,
     initialFormData,
     formData,
-    setFormData
+    setFormData,
+    getAdTypes,
+    handleInput,
+    handleSelectBox,
   } = useAddContractForm();
 
-  // const today = new Date();
   const today = useMemo(() => (new Date()), []);
   const [selectedStartDate, setSelectedStartDate] = useState(today); //임시 날짜선택 STATE
   const [selectedEndDate, setSelectedEndDate] = useState(today); //임시 날짜선택 STATE
@@ -20,8 +25,36 @@ const AddContractModal = ({ modalRef }) => {
   useEffect(() => {
     if (selectedStartDate > selectedEndDate) {
       setSelectedEndDate(selectedStartDate);
+      setFormData({
+        ...formData,
+        end_period: toYYYYMMDD(selectedStartDate)
+      });
     }
-  }, [selectedStartDate]);
+  }, [selectedStartDate, selectedEndDate]);
+  /* 선택한 광고업체의 정보로 해당 브랜드의 광고타입 조회 */
+  useEffect(() => {
+    if (activeRow) {
+      getAdTypes(activeRow.brand_code);
+    }
+  }, [activeRow]);
+
+  /* 광고 계약 등록 */
+  const handleSubmit = () => {
+    if (activeRow?.id) {
+      formData.company_id = activeRow.id;
+      console.log(formData)
+      // postAdContract(formData)
+      //   .then(res => {
+      //     const { status_code, data } = res.data;
+      //     if (status_code === 200) {
+      //       // 계약 목록 최신화
+      //       modalRef.current.close();
+      //     }
+      //   })
+      //   .catch(err => console.error(err))
+      modalRef.current.close();
+    }
+  }
 
   /* 모달창 닫을 때 수행 할 로직 */
   useEffect(() => {
@@ -48,11 +81,10 @@ const AddContractModal = ({ modalRef }) => {
           <div className="flex items-center justify-between">
             <label className="font-semibold w-1/4 shrink-0">광고타입</label>
             <Select
-              options={[
-                { value: "0", label: "일반" },
-                { value: "1", label: "스탠다드" },
-                { value: "2", label: "프리미엄" },
-              ]}
+              name="ad_type"
+              options={adTypes}
+              value={adTypes.filter(option => option.value === formData.ad_type)}
+              onChange={handleSelectBox}
               className="w-full"
               placeholder="광고타입을 선택하세요"
             />
@@ -64,7 +96,7 @@ const AddContractModal = ({ modalRef }) => {
               placeholder="계약금액을 입력하세요"
               className="input w-full"
             />
-          </div>
+        </div>
           <div className="flex items-center justify-between">
             <label className="font-semibold w-1/4 shrink-0">계약구좌</label>
             <input
@@ -104,7 +136,13 @@ const AddContractModal = ({ modalRef }) => {
           </div>
           <div className="flex items-center justify-between">
             <label className="font-semibold w-1/4 shrink-0">비고</label>
-            <input type="text" className="input w-full" />
+            <Input
+              type="text"
+              name="comment"
+              className="input w-full"
+              value={formData.comment}
+              onChange={handleInput}
+            />
           </div>
         </div>
 
@@ -113,7 +151,10 @@ const AddContractModal = ({ modalRef }) => {
             ✕
           </button>
           <button className="btn min-w-24" onClick={() => modalRef.current.close()}>취소</button>
-          <button type="submit" className="btn btn-primary min-w-24" onClick={() => modalRef.current.close()}>
+          <button
+            type="submit"
+            className="btn btn-primary min-w-24"
+            onClick={handleSubmit}>
             등록
           </button>
         </div>

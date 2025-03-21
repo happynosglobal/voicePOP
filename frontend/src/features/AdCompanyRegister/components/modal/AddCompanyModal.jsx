@@ -3,7 +3,10 @@ import useAddCompanyForm from "../../hooks/useAddCompanyForm";
 import Input from "../../../../components/input/Input";
 import { toBusinessNumber } from "../../../../utils/customFormat";
 import { useEffect } from "react";
-
+const brandList = [
+  { value: "EM", label: "이마트(EM)" },
+  { value: "ED", label: "에브리데이(ED)" },
+]
 const AddCompanyModal = ({ modalRef }) => {
   const {
     formData,
@@ -61,6 +64,7 @@ const AddCompanyModal = ({ modalRef }) => {
               placeholder="-없이 숫자만 입력하세요"
               className="input w-full"
               value={toBusinessNumber(formData.business_number)}
+              // value={formData.business_number}
               onChange={handleInput}
               maxLength={12}
             />
@@ -70,16 +74,8 @@ const AddCompanyModal = ({ modalRef }) => {
             <Select
               isMulti
               name="brand_code"
-              options={[
-                { value: "EM", label: "이마트(EM)" },
-                { value: "ED", label: "에브리데이(ED)" },
-                { value: "TR", label: "트레이더스(TR)" },
-              ]}
-              value={[
-                { value: "EM", label: "이마트(EM)" },
-                { value: "ED", label: "에브리데이(ED)" },
-                { value: "TR", label: "트레이더스(TR)" },
-              ].filter(option => formData.brand_code.includes(option.value))}
+              options={brandList}
+              value={brandList.filter(option => formData.brand_code.includes(option.value))}
               className="w-full"
               onChange={handleMultiSelectBox}
               classNamePrefix="select"

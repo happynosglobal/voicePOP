@@ -27,14 +27,14 @@ const useAddCompanyForm = () => {
     }
     // setErrors({ ...errors, [name]: '' });
   };
-
+  
   /* MultiSelectBox handler */
   const handleMultiSelectBox = (option) => {
     let tempOption = [];
     option.map(item => tempOption.push(item.value));
     setFormData({ ...formData, brand_code: tempOption });
   }
-  console.log(formData);
+  // console.log(formData);
   return {
     initialFormData,
     formData,

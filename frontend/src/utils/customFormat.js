@@ -5,7 +5,7 @@ export const toYYYYMMDD = (date) => {
 }
 
 export const toBusinessNumber = (value) => {
-  if (!value) return;
+  // if (!value) return;
   let formattedValue = value;
   if (value.length > 5) {
     formattedValue = `${value.slice(0, 3)}-${value.slice(3, 5)}-${value.slice(5)}`;
@@ -13,4 +13,11 @@ export const toBusinessNumber = (value) => {
     formattedValue = `${value.slice(0, 3)}-${value.slice(3)}`;
   }
   return formattedValue;
+}
+
+export const removeEmptyString = (params) => {
+  const filteredParams = Object.fromEntries(
+    Object.entries(params).filter(([_, v]) => v !== "")
+  );
+  return filteredParams;
 }

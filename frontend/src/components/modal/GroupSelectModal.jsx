@@ -5,7 +5,9 @@ import "react-checkbox-tree/lib/react-checkbox-tree.css";
 import { FaArrowRightLong, FaArrowLeftLong } from "react-icons/fa6";
 import { IoIosArrowForward, IoIosArrowDown } from "react-icons/io";
 import { ImCheckboxUnchecked, ImCheckboxChecked } from "react-icons/im";
-import useStores from "../../stores/stores";
+import useCodes from "../../stores/codes";
+import LoadingSpinner from "../loading/LoadingSpinner";
+import Input from "../input/Input";
 
 const iconStyle = {
   width: "18px",
@@ -13,12 +15,13 @@ const iconStyle = {
   display: "inline-block",
 };
 
-const GroupSelectModal = ({ modalRef, label, searchable }) => {
-  const { stores } = useStores();
+const GroupSelectModal = ({ modalRef, label, handleSubmit, addable }) => {
+  const { allStore, storesforTree } = useCodes();
 
+  const [groupName, setGroupName] = useState("");
 
   // 전체 점포 목록 (왼쪽)
-  const [allStores, setAllStores] = useState(stores || []);
+  const [allStores, setAllStores] = useState(storesforTree || []);
   const [checkedAllStores, setCheckedAllStores] = useState([]);
   const [expandedAllStores, setExpandedAllStores] = useState([]);
 
@@ -28,21 +31,24 @@ const GroupSelectModal = ({ modalRef, label, searchable }) => {
   const [expandedChosenStores, setExpandedChosenStores] = useState([]);
 
   const handleMoveToChosenStores = () => {
-    const newChosenStores = new Set([...chosenStores.map(store => store.value)]);
+    // const newChosenStores = new Set([...chosenStores.map(store => store.value)]);
 
-    checkedAllStores.forEach(storeValue => {
-      // 그룹 점포인지 확인 (예: 1001_G1)
-      const isGroupStore = storeValue.includes('_');
-      if (isGroupStore) {
-        const originalStoreId = storeValue.split('_')[0]; // "1001_G1" -> "1001"
-        newChosenStores.add(originalStoreId);
-      } else {
-        newChosenStores.add(storeValue);
-      }
-    });
+    // checkedAllStores.forEach(storeValue => {
+    //   // 그룹 점포인지 확인 (예: 1001_G1)
+    //   const isGroupStore = storeValue.includes('_');
+    //   if (isGroupStore) {
+    //     const originalStoreId = storeValue.split('_')[0]; // "1001_G1" -> "1001"
+    //     newChosenStores.add(originalStoreId);
+    //   } else {
+    //     newChosenStores.add(storeValue);
+    //   }
+    // });
 
     // 기존 선택된 점포 + 새로 선택된 점포
-    setChosenStores(allStores.filter(store => newChosenStores.has(store.value)));
+    setChosenStores([
+      ...chosenStores,
+      ...allStore.filter(store => checkedAllStores.includes(store.value))
+    ]);
     setCheckedAllStores([]);
   };
 
@@ -58,7 +64,7 @@ const GroupSelectModal = ({ modalRef, label, searchable }) => {
     if (!modal) return;
 
     const handleClose = () => {
-      setAllStores(stores);
+      setAllStores(storesforTree);
       setCheckedAllStores([]);
       setExpandedAllStores([]);
       setChosenStores([]);
@@ -74,14 +80,20 @@ const GroupSelectModal = ({ modalRef, label, searchable }) => {
   }, [modalRef]);
   return (
     <>
-      {/* {
-        allStores.length > 0 && ( */}
       <dialog ref={modalRef} className="modal">
         <div className="modal-box bg-white max-w-3xl">
           <h3 className="mb-6 pb-6 font-semibold text-lg border-b">{label}</h3>
-          {searchable && (
+          {addable && (
             <div className="mb-6">
-              <input type="text" className="input w-full" placeholder="그룹명을 입력하세요" />
+              <Input
+                type="text"
+                className="input w-full"
+                placeholder="그룹명을 입력하세요"
+                value={groupName}
+                onChange={(e) => {
+                  setGroupName(e.target.value)
+                }}
+              />
             </div>
           )}
 
@@ -146,17 +158,20 @@ const GroupSelectModal = ({ modalRef, label, searchable }) => {
           </div>
 
           {/* 모달 버튼 */}
-          <form method="dialog">
-            <div className="flex w-full items-center justify-center gap-2.5 mt-12">
-              <button className="absolute right-3 top-4 w-10 h-10 text-2xl">✕</button>
-              <button className="btn min-w-24">취소</button>
-              <button type="submit" className="btn btn-primary min-w-24">선택</button>
-            </div>
-          </form>
+          <div className="flex w-full items-center justify-center gap-2.5 mt-12">
+            <button className="absolute right-3 top-4 w-10 h-10 text-2xl" onClick={() => modalRef.current.close()}>✕</button>
+            <button className="btn min-w-24" onClick={() => modalRef.current.close()}>취소</button>
+            <button
+              type="submit"
+              className="btn btn-primary min-w-24"
+              onClick={() => handleSubmit(groupName, chosenStores)}
+            >
+              선택
+            </button>
+          </div>
+
         </div>
       </dialog>
-      {/* )
-      } */}
     </>
   );
 };

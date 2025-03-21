@@ -94,3 +94,8 @@ body {min-width:1400px;}
 
 .rbc-current-time-indicator {height:2px !important; background-color: #ff0000 !important;}
 .rbc-current-time-indicator::before { display: block;position: absolute; top:50%; left:-5px; width:10px; height:10px; background-color: #db372d; content: ""; transform: translateY(-50%); border-radius: 100%;}
+
+/** react-time-picker 커스텀 **/
+.react-time-picker__inputGroup__divider {margin-right: 16px}
+.react-time-picker__inputGroup__hour {width: 35px !important;}
+.react-time-picker__inputGroup__minute {width:35px !important;}

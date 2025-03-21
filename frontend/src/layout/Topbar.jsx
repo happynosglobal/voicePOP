@@ -3,16 +3,47 @@ import { useNavigate } from "react-router-dom";
 import useUserStore from "../stores/user";
 import { Link } from "react-router-dom";
 import { LuLogOut } from "react-icons/lu";
-import useStores from "../stores/stores";
+import useCodes from "../stores/codes";
+import { getStoreCodes } from "../api/storeGroup/storeGroup";
+import { useEffect, useState } from "react";
 
 const Topbar = () => {
   const navigate = useNavigate();
-  const { logout } = useUserStore();
-  const { resetStores } = useStores();
+  const { user, setStoreName, logout } = useUserStore();
+  const { resetStores } = useCodes();
+
   const handleLogout = () => {
     logout();
     resetStores();
   };
+  const getLevelName = (level) => {
+    return level === 3
+      ? "전체 관리자"
+      : level === 2
+        ? "브랜드 관리자"
+        : level === 1
+          ? "광고 관리자"
+          : "점포 관리자"
+  }
+  const getStoreName = (store_code) => {
+    const params = {
+      store_type: user.brand_code,
+      storeId: store_code
+    }
+    getStoreCodes(params)
+      .then(res => {
+        const { code, data } = res.data;
+        if (code === "0000") {
+          setStoreName(data[0].name);
+        }
+      })
+      .catch(err => {
+        console.error(err)
+      });     
+  };
+  useEffect(()=>{
+    getStoreName(user?.store_code);
+  },[user?.store_code, user.brand_code])
   return (
     <header className="wide:fixed top-0 left-0 right-0 h-[60px] bg-white px-5 flex justify-between items-center border-b z-10 w-full">
       <h1 className="text-black text-2xl font-bold leading-none">
@@ -24,9 +55,9 @@ const Topbar = () => {
             <IoPersonSharp className="text-xl" />
           </div>
           <p className="text-gray-800 font-medium leading-none">
-            홍길동
+            {user?.user_name}
             <span className="text-gray-800 text-sm leading-none">
-              (Emart 관리자)
+              {`(${user?.brand_code} ${user?.store_name || ""} ${getLevelName(user?.level)})`}
             </span>
           </p>
         </div>
