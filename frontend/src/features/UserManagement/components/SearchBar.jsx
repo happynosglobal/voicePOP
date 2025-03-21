@@ -1,6 +1,8 @@
 import Select from "react-select";
 import Input from "../../../components/input/Input";
 import { RiFileExcel2Line } from "react-icons/ri";
+import { levelOptions } from "../../../utils/constant/options";
+import useBrandCode from "../../../hooks/useBrandCode";
 
 const SearchBar = ({
   setUserId,
@@ -15,10 +17,12 @@ const SearchBar = ({
   handleSelectBox,
   handleGetUsers,
 }) => {
+  const { brandOptions } = useBrandCode();
   const handleOnClick = () => {
     handleGetUsers();
     setPage(1);
   }
+
   return (
     <div className="flex mb-5 gap-1">
       <div className="flex justify-between w-full">
@@ -26,34 +30,34 @@ const SearchBar = ({
           <Select
             name="level"
             options={[
-              { value: "1", label: "브랜드 관리자" },
-              { value: "2", label: "광고 관리자" },
-              { value: "3", label: "점포 관리자" },
+              { value: "", label: "모든 관리자" },
+              ...levelOptions
             ]}
             className="min-w-32"
             onChange={handleSelectBox}
-            placeholder="모든 관리자"
+            defaultValue={{ value: "", label: "모든 관리자" }}
           />
 
           <Select
             name="brand_code"
             options={[
-              { value: "1", label: "이마트(EM)" },
-              { value: "2", label: "에브리데이(ED)" },
+              { value: "", label: "모든 브랜드" },
+              ...brandOptions
             ]}
             className="min-w-32"
             onChange={handleSelectBox}
-            placeholder="모든 브랜드"
+            defaultValue={{ value: "", label: "모든 브랜드" }}
           />
           <Select
             name="status"
             options={[
+              { value: "", label: "모든 상태" },
               { value: "1", label: "승인" },
               { value: "2", label: "미승인" },
             ]}
             className="min-w-32"
             onChange={handleSelectBox}
-            placeholder="모든 상태"
+            defaultValue={{ value: "", label: "모든 상태" }}
           />
 
           <div className="mx-5 h-5 w-px bg-gray-300"></div>
@@ -62,8 +66,8 @@ const SearchBar = ({
             <Select
               name="keyword_type"
               options={[
-                { value: "1", label: "ID" },
-                { value: "2", label: "성명" },
+                { value: "user_id", label: "ID" },
+                { value: "user_name", label: "성명" },
               ]}
               isClearable={false}
               className="min-w-32"

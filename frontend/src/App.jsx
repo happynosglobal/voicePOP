@@ -1,6 +1,7 @@
 import { BrowserRouter } from 'react-router-dom'
 import Root from './routes'
-// App.jsx
+import { useEffect, useState } from 'react';
+
 function App() {
 
   return (
@@ -12,4 +13,4 @@ function App() {
   )
 }
 
-export default App
+export default App;

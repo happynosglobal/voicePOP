@@ -3,10 +3,11 @@ import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import { Outlet, useNavigate } from "react-router-dom";
 import useUserStore from "../stores/user";
+import { loginSuccessResponse } from "../features/Login/dummy/data";
 
 const DefaultLayout = () => {
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useUserStore();
+  const { user, isAuthenticated, setUser } = useUserStore();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {

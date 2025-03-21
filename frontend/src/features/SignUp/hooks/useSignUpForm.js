@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { passwordRegex } from '../../../utils/validation';
 import apiCall from '../../../utils/axiosConfig';
-import { getStoreCodes } from '../../../api/brand/brand';
+import { getStoreCodes } from '../../../api/storeGroup/storeGroup';
 
-const useSignupForm = () => {
+const useSignUpForm = () => {
   const [formData, setFormData] = useState({
     user_id: '',
     user_name: '',
@@ -52,6 +52,7 @@ const useSignupForm = () => {
   }
   /* 점포 관리자일 경우 점포 목록 세팅 */
   const handleClickBrand = async (brand_code) => {
+    console.log(brand_code)
     setStoreList([]);
     setFormData({ ...formData, brand_code: [brand_code], store_code: null });
     const params = { store_type: brand_code }
@@ -70,7 +71,7 @@ const useSignupForm = () => {
     const tempStores = [];
     if (data.length !== 0) {
       data.map(item => tempStores.push({ value: item.id, label: item.name }))
-      setStoreList(tempStores)
+      setStoreList(tempStores);
     }
   }
 
@@ -104,4 +105,4 @@ const useSignupForm = () => {
   }
 }
 
-export default useSignupForm;
+export default useSignUpForm;

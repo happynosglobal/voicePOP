@@ -2,8 +2,18 @@ import React from "react";
 import Tooltip from "../../../../components/tooltip/Tooltip";
 import Pagination from "../../../../components/pagination/Pagination";
 import EmptyState from "../../../../components/emptyState/EmptyState";
+import { toBusinessNumber } from "../../../../utils/customFormat";
 
-const CompanyTable = ({ companyList, activeRow, handleRowClick }) => {
+const CompanyTable = ({
+  limit,
+  page,
+  setPage,
+  total,
+  getCompanyList,
+  companyList,
+  activeRow,
+  handleRowClick
+}) => {
   return (
     <>
       <table className="table">
@@ -21,14 +31,13 @@ const CompanyTable = ({ companyList, activeRow, handleRowClick }) => {
             {companyList.map((item, index) => (
               <tr
                 key={index}
-                className={`cursor-pointer ${
-                  activeRow?.id === item.id ? "active" : ""
+                className={`cursor-pointer ${activeRow?.id === item.id ? "active" : ""
                   }`}
                 onClick={() => handleRowClick(item)}
               >
                 <td>{item.seq}</td>
                 <td>{item.business_name}</td>
-                <td>{item.business_number}</td>
+                <td>{toBusinessNumber(item.business_number)}</td>
                 <td>{item.brand_code}</td>
                 <td>
                   <Tooltip id={item.id} content={item.comment} />
@@ -42,7 +51,12 @@ const CompanyTable = ({ companyList, activeRow, handleRowClick }) => {
         <EmptyState text="일치하는 검색 결과가 없습니다." />
       )}
       {/* <EmptyState text="등록된 리스트가 없습니다." /> */}
-      <Pagination />
+      <Pagination
+        limit={limit}
+        page={page}
+        setPage={setPage}
+        total={total}
+      />
     </>
   );
 };

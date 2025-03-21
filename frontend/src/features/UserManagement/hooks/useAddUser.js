@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { dummyUserInfo } from '../dummy/data';
-import { getStoreCodes } from '../../../api/brand/brand';
+import { getStoreCodes } from '../../../api/storeGroup/storeGroup';
 
 const useAddUser = () => {
 
@@ -108,7 +108,7 @@ const useAddUser = () => {
       status: dummyUserInfo.status || '미승인'
     });
   }
-  console.log(formData)
+  // console.log(formData)
   // console.log(userInfo)
   return {
     formData,

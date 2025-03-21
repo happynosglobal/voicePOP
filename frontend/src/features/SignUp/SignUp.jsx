@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import Input from "../../components/input/Input";
 import Select from "react-select";
 import { passwordRegex, userIdRegex } from "../../utils/validation";
-import useSignupForm from "./hooks/useSignupForm";
+import useSignUpForm from "./hooks/useSignUpForm";
+
 const levelList = [
   { value: 3, label: "전체 관리자" },
   { value: 2, label: "브랜드 관리자" },
@@ -27,7 +28,7 @@ const SignUp = () => {
     isFormValid,
     handleClickBrand,
     storeList
-  } = useSignupForm();
+  } = useSignUpForm();
   console.log(formData)
   return (
     <div className="flex items-center justify-center min-h-screen py-10 bg-gray-100">

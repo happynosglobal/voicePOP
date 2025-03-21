@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { dummyUserList } from '../dummy/data';
+import { getUsers } from '../../../api/user/user';
+import { removeEmptyString } from '../../../utils/customFormat';
 
 const useHandleUserList = () => {
   const limit = 10;
@@ -24,19 +26,20 @@ const useHandleUserList = () => {
       page_size: limit,
       [searchParams.keyword_type]: searchParams.keyword,
     }
+    const params = removeEmptyString(tempParams)
+    console.log(params)
     setUserList(dummyUserList);
     setTotal(dummyUserList.length);
-    // console.log(tempParams)
 
-    // getUsersApi(tempParams)
-    //   .then((res) => {
-    //     const { status_code, data } = res.data;
-    //     if (status_code === 200) {
-    //       setUserList(data.items);
-    //       setTotal(data.count);
-    //     }
-    //   })
-    //   .catch((err) => console.error(err));
+    getUsers(params)
+      .then((res) => {
+        const { status_code, data } = res.data;
+        if (status_code === 200) {
+          setUserList(data.items);
+          setTotal(data.count);
+        }
+      })
+      .catch((err) => console.error(err));
   };
 
   useEffect(() => {

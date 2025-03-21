@@ -17,8 +17,8 @@ import EquipmentStatsPage from "../features/EquipmentStats/EquipmentStatsPage";
 import EquipmentStatusPage from "../features/EquipmentStatus/EquipmentStatusPage";
 import ReservationManagementPage from "../features/ReservationManagement/ReservationManagementPage";
 import StoreGroupPage from "../features/StoreGroup/StoreGroupPage";
-import useLayout from "../layout/hooks/useLayout";
 import SelectBrand from "../features/Login/SelectBrand";
+import useLayout from "../layout/hooks/useLayout";
 
 //route/index.jsx
 
@@ -79,9 +79,9 @@ export default Root;
         path={URL_MAPPING.reservationManagement}
         element={<ReservationManagementPage />}
     />
-
-
-
+ 
+ 
+ 
     <Route
         path={URL_MAPPING.adRegister}
         element={<AdRegisterPage />}
@@ -94,9 +94,9 @@ export default Root;
         path={URL_MAPPING.adSchedule}
         element={<AdSchedulePage />}
     />
-
-
-
+ 
+ 
+ 
     <Route
         path={URL_MAPPING.userManagement}
         element={<UserManagementPage />}

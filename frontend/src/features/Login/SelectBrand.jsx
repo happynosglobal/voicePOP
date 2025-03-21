@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import useUserStore from "../../stores/user";
 import { useEffect, useState } from "react";
 import { loginSuccessResponse } from "./dummy/data";
-import useStores from "../../stores/stores";
+import useCodes from "../../stores/codes";
 
 // 더미 브랜드 데이터
 const dummyBrandData = [
@@ -14,7 +14,7 @@ const dummyBrandData = [
 
 const SelectBrand = () => {
   const { logout, login, selectBrand, user, isAuthenticated } = useUserStore();
-  const { resetStores } = useStores();
+  const { resetStores } = useCodes();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [selectedBrand, setSelectedBrand] = useState(null);

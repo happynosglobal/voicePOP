@@ -10,16 +10,19 @@ const SearchBar = ({
   handleSelectBox,
   getCompanyList
 }) => {
-  const { brandList, getBrandList } = useBrandCode();
-
+  const { brandOptions } = useBrandCode();
+  // console.log(searchParams)
   return (
     <div className="flex mb-5 gap-1.5">
       <Select
         name="brand_code"
-        options={brandList}
+        options={[
+          { value: "", label: "모든 브랜드" },
+          ...brandOptions
+        ]}
         className="min-w-32"
         onChange={handleSelectBox}
-        defaultValue={brandList[0]}
+        defaultValue={{ value: "", label: "모든 브랜드" }}
       />
       <Select
         name="keyword_type"
@@ -33,7 +36,7 @@ const SearchBar = ({
       <div className="flex-1">
         <Input
           type="text"
-          name="search"
+          name="keyword"
           placeholder="검색어를 입력해주세요."
           className="input input-bordered w-full focus:ring-0 focus:outline-none"
           value={searchParams.keyword}

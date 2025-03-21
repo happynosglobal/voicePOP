@@ -23,7 +23,7 @@ const ContractList = ({ activeRow, contractModalRef }) => {
         )}
       </div>
       {/* 계약추가 모달 */}
-      <AddContractModal modalRef={contractModalRef} />
+      <AddContractModal activeRow={activeRow} modalRef={contractModalRef} />
     </>
   )
 }
