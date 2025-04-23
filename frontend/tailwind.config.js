@@ -5,6 +5,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ["Pretendard", "sans-serif"],
+        poppins: ["Poppins", "sans-serif"],
       },
       colors: {
         accent: {
@@ -44,6 +45,12 @@ export default {
         ".btn-sm": {
           height: "38px",
           "border-radius": "5px",
+        },
+        ".btn-xs": {
+          height: "32px",
+          "border-radius": "8px",
+          "font-size": "0.875rem",
+          "font-weight": "600",
         },
       });
     },

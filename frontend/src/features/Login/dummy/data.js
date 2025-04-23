@@ -1,6 +1,6 @@
 export const loginSuccessResponse = {
   user_id: "tester",
-  user_name : "홍길동",
+  user_name : "ADMIN",
   level: 3, // "ADMIN"
   brand_code: "EM",
   latest_login_at: "2025-02-05 14:22:21",

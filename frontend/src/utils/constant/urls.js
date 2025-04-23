@@ -7,6 +7,7 @@ import AdStatusPage from "../../features/AdStatus/AdStatusPage";
 import BroadcastRegisterPage from "../../features/BroadcastRegister/BroadcastRegisterPage";
 import DashboardPage from "../../features/Dashboard/DashboardPage";
 import EquipmentManagementPage from "../../features/EquipmentManagement/EquipmentManagementPage";
+import EquipmentSettingPage from "../../features/EquipmentSetting/EquipmentSettingPage";
 import EquipmentStatsPage from "../../features/EquipmentStats/EquipmentStatsPage";
 import EquipmentStatusPage from "../../features/EquipmentStatus/EquipmentStatusPage";
 import ReservationManagementPage from "../../features/ReservationManagement/ReservationManagementPage";
@@ -14,39 +15,42 @@ import StoreGroupPage from "../../features/StoreGroup/StoreGroupPage";
 import UserManagementPage from "../../features/UserManagement/UserManagementPage";
 
 export const URL_MAPPING = {
-    login: '/login',
+  login: "/login",
 
-    dashboard: '/dashboard',
-    equipmentStatus: '/equipment-status',
-    broadCastRegister: '/broadcast-register',
-    reservationManagement: '/reservation-management',
+  dashboard: "/status",
+  equipmentStatus: "/equipment-status",
+  broadCastRegister: "/broadcast-register",
+  reservationManagement: "/reservation-management",
 
-    adRegister: '/advertisement/resiter',
-    adstatus: '/advertisement/status',
-    adSchedule: '/advertisement/schedule',
+  adRegister: "/advertisement/resiter",
+  adstatus: "/advertisement/status",
+  adSchedule: "/advertisement/schedule",
 
-    userManagement: '/manager/user-management',
-    equipmentManagement: '/manager/equipment-management',
-    storeGroup: '/manager/store-group',
-    equipmentStats: '/manager/equipment-stats',
-    adstats: '/manager/ad-stats',
-    adCompanyRegister: '/manager/ad-company-resiter',
-    adApproval: '/manager/ad-approval',
+  userManagement: "/manager/user-management",
+  equipmentManagement: "/manager/equipment-management",
+  storeGroup: "/manager/store-group",
+  equipmentStats: "/manager/equipment-stats",
+  adstats: "/manager/ad-stats",
+  adCompanyRegister: "/manager/ad-company-resiter",
+  adApproval: "/manager/ad-approval",
+
+  equipmentSetting: "equipment-setting",
 };
 
 export const ROUTE_COMPONENTS = {
-    "/dashboard": DashboardPage,
-    "/equipment-status": EquipmentStatusPage,
-    "/broadcast-register": BroadcastRegisterPage,
-    "/reservation-management": ReservationManagementPage,
-    "/advertisement/resiter": AdRegisterPage,
-    "/advertisement/status": AdStatusPage,
-    "/advertisement/schedule": AdSchedulePage,
-    "/manager/user-management": UserManagementPage,
-    "/manager/equipment-management": EquipmentManagementPage,
-    "/manager/store-group": StoreGroupPage,
-    "/manager/equipment-stats": EquipmentStatsPage,
-    "/manager/ad-stats": AdStatsPage,
-    "/manager/ad-company-resiter": AdCompanyRegisterPage,
-    "/manager/ad-approval": AdApprovalPage,
+  "/status": DashboardPage,
+  "/equipment-status": EquipmentStatusPage,
+  "/broadcast-register": BroadcastRegisterPage,
+  "/reservation-management": ReservationManagementPage,
+  "/advertisement/resiter": AdRegisterPage,
+  "/advertisement/status": AdStatusPage,
+  "/advertisement/schedule": AdSchedulePage,
+  "/manager/user-management": UserManagementPage,
+  "/manager/equipment-management": EquipmentManagementPage,
+  "/manager/store-group": StoreGroupPage,
+  "/manager/equipment-stats": EquipmentStatsPage,
+  "/manager/ad-stats": AdStatsPage,
+  "/manager/ad-company-resiter": AdCompanyRegisterPage,
+  "/manager/ad-approval": AdApprovalPage,
+  "/equipment-setting": EquipmentSettingPage,
 };

@@ -19,6 +19,8 @@ import ReservationManagementPage from "../features/ReservationManagement/Reserva
 import StoreGroupPage from "../features/StoreGroup/StoreGroupPage";
 import SelectBrand from "../features/Login/SelectBrand";
 import useLayout from "../layout/hooks/useLayout";
+import EquipmentSettingPage from "../features/EquipmentSetting/EquipmentSettingPage";
+import NotFoundPage from "../features/NotFound/NotFoundPage";
 
 //route/index.jsx
 
@@ -47,10 +49,52 @@ function Root() {
       <Route index path={"/login"} element={<Login />} />
       <Route index path={"/login/select"} element={<SelectBrand />} />
       <Route path={"/signup"} element={<SignUp />} />
+      <Route
+        path={URL_MAPPING.equipmentSetting}
+        element={<EquipmentSettingPage />}
+      />
+      <Route path="*" element={<NotFoundPage />} />
       <Route path="/" element={<DefaultLayout />}>
-        {routes.map(({ path, element }) => (
+        {/* {routes.map(({ path, element }) => (
           <Route key={path} path={path} element={element} />
-        ))}
+        ))} */}
+        <Route path={URL_MAPPING.dashboard} element={<DashboardPage />} />
+        <Route
+          path={URL_MAPPING.equipmentStatus}
+          element={<EquipmentStatusPage />}
+        />
+        <Route
+          path={URL_MAPPING.broadCastRegister}
+          element={<BroadcastRegisterPage />}
+        />
+        <Route
+          path={URL_MAPPING.reservationManagement}
+          element={<ReservationManagementPage />}
+        />
+
+        <Route path={URL_MAPPING.adRegister} element={<AdRegisterPage />} />
+        <Route path={URL_MAPPING.adstatus} element={<AdStatusPage />} />
+        <Route path={URL_MAPPING.adSchedule} element={<AdSchedulePage />} />
+
+        <Route
+          path={URL_MAPPING.userManagement}
+          element={<UserManagementPage />}
+        />
+        <Route
+          path={URL_MAPPING.equipmentManagement}
+          element={<EquipmentManagementPage />}
+        />
+        <Route path={URL_MAPPING.storeGroup} element={<StoreGroupPage />} />
+        <Route
+          path={URL_MAPPING.equipmentStats}
+          element={<EquipmentStatsPage />}
+        />
+        <Route path={URL_MAPPING.adstats} element={<AdStatsPage />} />
+        <Route
+          path={URL_MAPPING.adCompanyRegister}
+          element={<AdCompanyRegisterPage />}
+        />
+        <Route path={URL_MAPPING.adApproval} element={<AdApprovalPage />} />
       </Route>
     </Routes>
   );
@@ -59,7 +103,8 @@ function Root() {
 export default Root;
 
 {
-  /* <Routes>
+  {
+    /* <Routes>
 <Route index path={"/login"} element={<Login />} />
 <Route path={"/signup"} element={<SignUp />} />
 <Route path="/" element={<DefaultLayout />}>
@@ -127,4 +172,5 @@ export default Root;
     />
 </Route>
 </Routes> */
+  }
 }

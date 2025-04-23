@@ -1,95 +1,172 @@
-import React, { useState } from 'react'
-import { passwordRegex } from '../../../utils/validation';
-import apiCall from '../../../utils/axiosConfig';
-import { getStoreCodes } from '../../../api/storeGroup/storeGroup';
+import React, { useState } from "react";
+import { getStoreCodes } from "../../../api/storeGroup/storeGroup";
+import { checkUser, requestUser } from "../../../api/user/user";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import { useLoadingStore } from "../../../stores/loading";
 
 const useSignUpForm = () => {
-  const [formData, setFormData] = useState({
-    user_id: '',
-    user_name: '',
-    company_id: '',
-    required_level: 3,
-    brand_code: ["EM","ED"],
-    password: '',
-    confirm_password: '',
+  const navigate = useNavigate();
+  const initialFormData = {
+    user_id: "",
+    user_name: "",
+    company_id: "",
+    required_level: "ADMIN",
+    brand_code: ["EM", "ED", "NB"],
+    // password: '',
+    // confirm_password: '',
     store_code: null,
-    email: ''
-  });
-  const [storeList, setStoreList] = useState([]);
+    email: "",
+  };
+  const [formData, setFormData] = useState(initialFormData);
   const [errors, setErrors] = useState({});
+  const [storeList, setStoreList] = useState([]);
   const [isIdChecked, setIsIdChecked] = useState(false); // ID 중복 확인 여부
 
   const isPasswordMatched = formData.password === formData.confirm_password;
   /* 신청ID 중복확인 */
-  const checkIdDuplicate = () => {
-    // ..api 추가
-    setIsIdChecked(!isIdChecked); // 임시로 중복확인 상태 toggle로 추후 api연결
+  const checkIdDuplicate = async () => {
+    if (!formData.user_id) return;
+    const body = {
+      user_id: formData.user_id,
+    };
+    checkUser(body)
+      .then((res) => {
+        const { status_code } = res.data;
+        if (status_code === 200) {
+          setIsIdChecked(false);
+          setErrors({ ...errors, user_id: "사용자가 존재 합니다" });
+        } else if (status_code === 404) {
+          setIsIdChecked(true);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        toast.error("중복체크 중 오류가 발생했습니다.");
+        setIsIdChecked(false);
+      });
   };
 
   /* Input handler */
   const handleInput = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-    setErrors({ ...errors, [name]: '' });
+    //id 변경시마다 중복체크확인 상태 false
+    if (name === "user_id") {
+      setIsIdChecked(false);
+      setErrors((prev) => ({ ...prev, user_id: "" }));
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
+  /* Error handler */
+  const handleError = (name, errorMessage) => {
+    setErrors((prev) => ({ ...prev, [name]: errorMessage }));
+  };
+
   /* SelectBox handler */
   const handleSelectBox = (option, option2) => {
     const { label, value } = option;
     const { name } = option2;
-    if (name === "required_level" && value !== 3) {
-      setFormData({ ...formData, [name]: value, brand_code: [], store_code: null });
-    } else if (name === "required_level" && value === 3) {
-      setFormData({ ...formData, [name]: value, brand_code: ["EM","ED"], store_code: null });
+
+    if (name === "required_level" && value !== "ADMIN") {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+        brand_code: [],
+        store_code: null,
+      }));
+    } else if (name === "required_level" && value === "ADMIN") {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+        brand_code: ["EM", "ED", "NB"],
+        store_code: null,
+      }));
     } else {
-      setFormData({ ...formData, [name]: value });
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
-  }
+  };
+
   /* MultiSelectBox handler */
   const handleMultiSelectBox = (option) => {
     let tempOption = [];
-    option.map(item => tempOption.push(item.value));
-    setFormData({ ...formData, brand_code: tempOption });
-  }
+    option.map((item) => tempOption.push(item.value));
+    setFormData((prev) => ({ ...prev, brand_code: tempOption }));
+  };
+
   /* 점포 관리자일 경우 점포 목록 세팅 */
   const handleClickBrand = async (brand_code) => {
-    console.log(brand_code)
+    useLoadingStore.getState().setLoading(true);
     setStoreList([]);
-    setFormData({ ...formData, brand_code: [brand_code], store_code: null });
-    const params = { store_type: brand_code }
+    setFormData((prev) => ({
+      ...prev,
+      brand_code: [brand_code],
+      store_code: null,
+    }));
+    const params = { store_type: brand_code };
     try {
       const response = await getStoreCodes(params);
       const { code, data } = response.data;
       if (code === "0000") {
-        setStores(data)
+        setStores(data);
       }
     } catch (err) {
-      console.error(err);
+      toast.error("점포 정보를 불러오는 중 오류가 발생했습니다.");
+    } finally {
+      useLoadingStore.getState().setLoading(false);
     }
-  }
+  };
+
   /* 점포 목록 react-select에 맞게 parsing 후 점포 목록에 set */
   const setStores = (data) => {
     const tempStores = [];
     if (data.length !== 0) {
-      data.map(item => tempStores.push({ value: item.id, label: item.name }))
+      data.map((item) => tempStores.push({ value: item.id, label: item.name }));
       setStoreList(tempStores);
     }
-  }
+  };
+
+  const handleRequestUser = async () => {
+    const body = formData;
+    try {
+      const response = await requestUser(body);
+      const { status_code, data } = response.data;
+      if (status_code === 200) {
+        toast.success(
+          "사용자 등록 신청을 완료했습니다. 관리자에게 문의하세요."
+        );
+        navigate("/");
+      }
+    } catch (error) {
+      toast.error(
+        "사용자 등록 신청 중 오류가 발생했습니다. 관리자에게 문의하세요."
+      );
+    }
+  };
 
   /* 등록신청 유효체크 */
   const isFormValid = () => {
     let isValid = false;
+
+    // 모든 에러 값이 빈 문자열인지 검사
+    const isErrorsEmpty = Object.values(errors).every((error) => error === "");
+
     isValid =
       formData.user_name &&
       formData.user_id &&
       isIdChecked && // ID 중복체크 확인
-      formData.password &&
-      isPasswordMatched && // 비밀번호 일치 확인
-      (formData.required_level === 3 || formData.brand_code.length > 0) && //전체관리자이거나 브랜드코드가 골라져야
-      (formData.required_level !== 0 || formData.store_code) && // 점포관리자가 아니거나 점포가 골라져야
-      formData.email;
+      formData.company_id &&
+      // formData.password &&
+      // isPasswordMatched && // 비밀번호 일치 확인
+      (formData.required_level === "ADMIN" || formData.brand_code.length > 0) && // 전체관리자이거나 브랜드코드가 골라져야 함
+      (formData.required_level !== "STORE" || formData.store_code) && // 점포관리자가 아니거나 점포가 골라져야 함
+      formData.email &&
+      isErrorsEmpty; // 모든 에러가 없어야 함
 
     return isValid;
-  }
+  };
+
   return {
     formData,
     errors,
@@ -101,8 +178,10 @@ const useSignUpForm = () => {
     handleMultiSelectBox,
     isFormValid,
     handleClickBrand,
-    storeList
-  }
-}
+    handleRequestUser,
+    storeList,
+    handleError,
+  };
+};
 
 export default useSignUpForm;

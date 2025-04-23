@@ -17,26 +17,25 @@ const useHandleUserList = () => {
   });
   const [userList, setUserList] = useState([]);
 
-  const handleGetUsers = () => {
+  const handleGetUsers = (pageNumber = page) => {
     const tempParams = {
       level: searchParams.level,
       brand_code: searchParams.brand_code,
       status: searchParams.status,
-      page: page,
+      page: pageNumber,
       page_size: limit,
       [searchParams.keyword_type]: searchParams.keyword,
     }
+
     const params = removeEmptyString(tempParams)
-    console.log(params)
-    setUserList(dummyUserList);
-    setTotal(dummyUserList.length);
 
     getUsers(params)
       .then((res) => {
         const { status_code, data } = res.data;
         if (status_code === 200) {
-          setUserList(data.items);
-          setTotal(data.count);
+          setUserList(data.users);
+          setTotal(data.total);
+          setPage(data.page);
         }
       })
       .catch((err) => console.error(err));

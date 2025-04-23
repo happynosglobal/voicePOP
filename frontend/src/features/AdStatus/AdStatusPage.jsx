@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import ContentLayout from "../../layout/ContentLayout";
-import Title from "../../components/title/Title";
 import Select from "react-select";
 import CustomDatePicker from "../../components/customDatePicker/CustomDatePicker";
 import Tooltip from "../../components/tooltip/Tooltip";
@@ -62,11 +61,10 @@ const AdStatusPage = () => {
   const [selectedStartDate, setSelectedStartDate] = useState(new Date()); //임시 날짜선택 STATE
   const [selectedEndDate, setSelectedEndDate] = useState(new Date()); //임시 날짜선택 STATE
 
-  const [activeTab, setActiveTab] = useState("업체별 현황"); //임시 탭 STATE
-
+  const tabs = ["업체별 현황", "점포별 현황"];
+  const [activeTab, setActiveTab] = useState(tabs[0]); //임시 탭 STATE
   return (
     <ContentLayout>
-      <Title text="광고현황" />
       <div className="flex mb-5 gap-1">
         <div className="flex justify-between w-full">
           <div className="flex flex-wrap items-center gap-1.5">
@@ -127,43 +125,34 @@ const AdStatusPage = () => {
         </div>
       </div>
 
-      <div className="flex justify-between items-end mb-4 border-b">
-        <div className="flex">
-          <button
-            className={`px-10 py-2 font-medium ${
-              activeTab === "업체별 현황"
-                ? "bg-gray-700 text-white"
-                : "border-b-2 border-gray-700 text-gray-700"
-            } rounded-t-lg transition`}
-            onClick={() => setActiveTab("업체별 현황")}
-          >
-            업체별 현황
-          </button>
-          <button
-            className={`px-10 py-2 font-medium ${
-              activeTab === "점포별 현황"
-                ? "bg-gray-700 text-white"
-                : "border-b-2 border-gray-700 text-gray-700 hover:bg-gray-100"
-            } rounded-t-lg transition`}
-            onClick={() => setActiveTab("점포별 현황")}
-          >
-            점포별 현황
-          </button>
+      <div className="tabs-wrapper">
+        <div className="tabs-nav">
+          {tabs.map((tab) => (
+            <button
+              key={tab}
+              className={`tab-btn ${activeTab === tab ? "is-active" : ""}`}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab}
+            </button>
+          ))}
         </div>
-        <div className="flex items-center gap-4 px-4 py-2 mb-2 bg-gray-100 rounded-lg text-gray-700">
+        <div className="search-count">
           {activeTab === "업체별 현황" && (
             <>
-              <p>
-                <span className="font-medium">광고수</span>: <b>124</b>
-              </p>
-              <p>
-                <span className="font-medium">업체수</span>: <b>498</b>
-              </p>
-              <p>
-                <span className="font-medium">광고타입</span>: 일반(
-                <b>211</b>), 스탠다드(<b>10</b>), 프리미엄(
-                <b>19</b>)
-              </p>
+              <div className="count-number">
+                <span>광고수 : </span> <b>124</b>
+              </div>
+              <div className="count-number">
+                <span>업체수 : </span> <b>498</b>
+              </div>
+              <div className="count-number">
+                <span>광고타입 - </span>
+                <span>일반 : </span>
+                <b>211</b>, <span>스탠다드 : </span>
+                <b>10</b>, <span>프리미엄 : </span>
+                <b>19</b>
+              </div>
             </>
           )}
 

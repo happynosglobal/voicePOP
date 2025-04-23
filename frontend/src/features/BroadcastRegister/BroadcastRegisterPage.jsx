@@ -1,100 +1,218 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import ContentLayout from "../../layout/ContentLayout";
-import Title from "../../components/title/Title";
 import Select from "react-select";
 import CustomDatePicker from "../../components/customDatePicker/CustomDatePicker";
-import { useDropzone } from "react-dropzone";
-import StoreSelectModal from "./components/StoreSelectModal";
+import CustomTimePicker from "../../components/customTimePicker/CustomTimePicker";
 import GroupSelectModal from "../../components/modal/GroupSelectModal";
+import Input from "../../components/input/Input";
+import Radio from "../../components/input/Radio";
+import CheckBox from "../../components/input/CheckBox";
+import { toYYYYMMDD } from "../../utils/customFormat";
+import useCodes from "../../stores/codes";
+import {
+  gapOptions,
+  repeatInterval,
+  repeatOptions,
+} from "../../utils/constant/options";
+import FileUploader from "../../components/input/FileUploader";
+import useUserStore from "../../stores/user";
+import {
+  postAudioMapping,
+  postBcMaster,
+  postBcMedia,
+  postBcTargetStore,
+} from "../../api/broadcast/broadcast";
+import { toast } from "react-toastify";
+import useBroadcastRegister from "./hooks/useBroadcastRegister";
+import { useNavigate } from "react-router-dom";
 
 const BroadcastRegisterPage = () => {
+  const { user } = useUserStore();
+  const navigate = useNavigate();
+  const { storeByBrandCode } = useCodes();
+  const {
+    formData,
+    setFormData,
+    selectedStore,
+    setSelectedStore,
+    audioFile,
+    setAudioFile,
+    categoryOptions,
+    handleInput,
+    handleSelectBox,
+    isFormValid,
+  } = useBroadcastRegister();
+
   const storeModalRef = useRef(null); // 점포 선택 모달 ref
 
-  const [selectedStartDate, setSelectedStartDate] = useState(null); //임시 날짜선택 STATE
-  const [selectedEndDate, setSelectedEndDate] = useState(null); //임시 날짜선택 STATE
-  const [isGapChecked, setIsGapChecked] = useState(false); //임시 GAP STATE
+  const today = useMemo(() => new Date(), []);
+  const [selectedStartDate, setSelectedStartDate] = useState(today); // 시작날짜선택 STATE
+  const [selectedEndDate, setSelectedEndDate] = useState(today); // 종료날짜선택 STATE
 
-  const dummyStores = [
-    "EM킨텍스점",
-    "EM청주북문로3가점",
-    "EM천안점",
-    "EM아산점",
-    "EM청주점",
-    "EM청주가경점",
-    "EM청주율량점",
-    "EM청주직지점",
-    "EM청주봉명점",
-    "EM대전관저점",
-    "EM대전중리점",
-    "EM킨텍스점",
-    "EM청주북문로3가점",
-    "EM천안점",
-    "EM아산점",
-    "EM청주점",
-    "EM청주가경점",
-    "EM청주율량점",
-    "EM청주봉명점",
-    "EM대전관저점",
-    "EM대전중리점",
-    "EM킨텍스점",
-    "EM청주북문로3가점",
-    "EM천안점",
-    "EM아산점",
-    "EM청주점",
-    "EM청주가경점",
-    "EM청주율량점",
-  ];
+  /* 계약기간 시작일보다 종료일이 빠르면 시작일로 초기화*/
+  useEffect(() => {
+    if (selectedStartDate > selectedEndDate) {
+      setSelectedEndDate(selectedStartDate);
+      setFormData({
+        ...formData,
+        end_date: toYYYYMMDD(selectedStartDate),
+      });
+    }
+  }, [selectedStartDate, selectedEndDate]);
 
-  const [uploadedFile, setUploadedFile] = useState(null); // dropzone STATE
+  const [isGapChecked, setIsGapChecked] = useState(false); //GAP
+  const [isRepeatCountChecked, setIsRepeatCountChecked] = useState(false); //반복 횟수
+  const [isIntervalChecked, setIsIntervalChecked] = useState(false); //반복 간격
 
-  const onDrop = (acceptedFiles) => {
-    if (acceptedFiles.length > 0) {
-      setUploadedFile(acceptedFiles[0]); // 파일 1개만 저장
+  const [startTime, setStartTime] = useState("09:00"); // 시작 시간
+  const [endTime, setEndTime] = useState("22:00"); // 종료 시간
+
+  // 시간선택 handler
+  const handleTimePicker = (time, name) => {
+    if (name === "start") {
+      setFormData({
+        ...formData,
+        start_time: time.replace(":", ""),
+      });
+      setStartTime(time);
+    } else {
+      setFormData({
+        ...formData,
+        end_time: time.replace(":", ""),
+      });
+      setEndTime(time);
+    }
+  };
+  // 점포 선택 handler
+  const handleStoreGroup = (_, store) => {
+    const formattedStores = store.map(({ value, label }) => ({
+      store_code: value,
+      store_name: label,
+    }));
+    setSelectedStore(formattedStores);
+    storeModalRef.current.close();
+  };
+
+  // 광고 방송 등록 handler
+  const handleSubmit = async () => {
+    // 예상 api
+    try {
+      // // 방송 대상 점포 등록
+      // const targetStoreRes = await postBcTargetStore({
+      //   brand_code: user?.brand_code,
+      //   content_id: "",
+      //   item: selectedStore,
+      // });
+
+      // if (targetStoreRes.status !== 200) {
+      //   throw new Error("방송 대상 점포 등록 실패");
+      // }
+
+      // const targetStoresId = targetStoreRes.data.data.id;
+
+      const body = {
+        type: "normal",
+        title: formData.title,
+        category_type_seq: formData.category_type_seq,
+        start_time: "0900",
+        end_time: "2300",
+        start_date: formData.start_date,
+        end_date: formData.end_date,
+        gap: formData.gap,
+        repeat_count: formData.repeat_count,
+        repeat_interval: formData.repeat_interval,
+        user_id: user?.user_id,
+      };
+
+      // 마스터 방송 등록
+      const broadcastRes = await postBcMaster(body);
+
+      if (broadcastRes.data.status_code !== 200) {
+        throw new Error("마스터 방송 등록 실패");
+      }
+
+      const masterBroadcastId = broadcastRes.data.data.id;
+
+      // 방송 대상 점포 등록
+      const targetStoreRes = await postBcTargetStore({
+        brand_code: user?.brand_code,
+        content_id: masterBroadcastId,
+        item: selectedStore,
+        user_id: user?.user_id,
+      });
+
+      if (targetStoreRes.status !== 200) {
+        throw new Error("방송 대상 점포 등록 실패");
+      }
+
+      const targetStoresId = targetStoreRes.data.data.id;
+
+      // 오디오 파일 업로드
+      const audioFormData = new FormData();
+      audioFormData.append("media_type", "sound");
+      audioFormData.append("media_filename", audioFile);
+      audioFormData.append("media_desc", "시범데이터");
+
+      const audioRes = await postBcMedia(audioFormData);
+
+      if (audioRes.data.status_code !== 200) {
+        throw new Error("오디오 파일 업로드 실패");
+      }
+
+      const audioId = audioRes.data.data.id;
+
+      // 마스터 방송과 오디오 파일 매핑
+      const mappingBody = {
+        mst_medias: [
+          {
+            id: audioId,
+            broad_seq: 1,
+          },
+        ],
+      };
+      const mappingRes = await postAudioMapping(masterBroadcastId, mappingBody);
+
+      if (mappingRes.data.status_code !== 200) {
+        throw new Error("마스터 방송과 오디오 파일 매핑 실패");
+      }
+      toast.success("방송 등록이 완료되었습니다!");
+      navigate("/equipment-status");
+    } catch (error) {
+      console.error("방송 등록 중 오류 발생:", error);
+      toast.error("방송 등록 중 오류가 발생했습니다.");
     }
   };
 
-  const removeFile = () => {
-    setUploadedFile(null); // 파일 삭제 시 다시 업로드 UI 표시
-  };
-
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    maxFiles: 1,
-    onDrop,
-    accept: "audio/*", // 오디오 파일만 허용
-    maxSize: 5 * 1024 * 1024, // 5MB 제한
-  });
-
   return (
     <ContentLayout>
-      <Title text="방송등록" />
       <div className="form-container">
         <div className="form-group">
           <label className="form-label">방송명</label>
-          <input
+          <Input
             type="text"
+            name="title"
             placeholder="방송명을 입력하세요"
             className="input w-full"
+            value={formData.title}
+            onChange={handleInput}
           />
         </div>
         <div className="form-group">
           <label className="form-label">MD</label>
           <div className="form-input-group">
-            <label className="input-label">
-              <input type="radio" name="md" className="radio" checked />
-              농산
-            </label>
-            <label className="input-label">
-              <input type="radio" name="md" className="radio" />
-              수산
-            </label>
-            <label className="input-label">
-              <input type="radio" name="md" className="radio" />
-              축산
-            </label>
-            <label className="input-label">
-              <input type="radio" name="md" className="radio" />
-              델리
-            </label>
+            {categoryOptions.map((item, index) => (
+              <label key={index} htmlFor={item.code} className="input-label">
+                <Radio
+                  id={item.code}
+                  name="category_type_seq"
+                  className="radio"
+                  label={item.name}
+                  value={item.code}
+                  checked={formData.category_type_seq == item.code}
+                  onChange={handleInput}
+                />
+              </label>
+            ))}
           </div>
         </div>
         <div className="form-group">
@@ -102,7 +220,14 @@ const BroadcastRegisterPage = () => {
           <div className="w-full">
             <div className="mb-2 flex justify-between items-center gap-2">
               <div className="space-x-2">
-                <button className="btn btn-sm btn-accent">전점</button>
+                <button
+                  className="btn btn-sm btn-accent"
+                  onClick={() => {
+                    handleStoreGroup("", storeByBrandCode);
+                  }}
+                >
+                  전점
+                </button>
                 <button
                   className="btn btn-sm btn-accent"
                   onClick={() => storeModalRef.current.showModal()}
@@ -111,23 +236,24 @@ const BroadcastRegisterPage = () => {
                 </button>
               </div>
               <p className="text-gray-500 text-right leading-tight">
-                선택된 점포 수 : <b className="text-gray-900">103</b>개
+                선택된 점포 수 :{" "}
+                <b className="text-gray-900">{selectedStore.length}</b>개
               </p>
             </div>
-            {/* 점포 선택 안했다면 안보임 */}
-            <div className="p-2 border rounded-[10px] max-h-48 min-h-16 overflow-y-auto">
-              <div className="flex flex-wrap gap-1 text-center">
-                {dummyStores.map((store, index) => (
-                  <span
-                    key={index}
-                    className="bg-gray-200 text-gray-700 px-2.5 py-0.5 rounded text-sm"
-                  >
-                    {store}
-                  </span>
-                ))}
+            {selectedStore.length !== 0 && (
+              <div className="p-2 border rounded-[10px] max-h-48 min-h-16 overflow-y-auto">
+                <div className="flex flex-wrap gap-1 text-center">
+                  {selectedStore.map((store, index) => (
+                    <span
+                      key={index}
+                      className="bg-gray-200 text-gray-700 px-2.5 py-0.5 rounded text-sm"
+                    >
+                      {store.store_name}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
-            {/* 점포 선택 안했다면 안보임 */}
+            )}
           </div>
         </div>
         <div className="form-group">
@@ -135,87 +261,64 @@ const BroadcastRegisterPage = () => {
           <div className="flex items-center">
             <CustomDatePicker
               selectedDate={selectedStartDate}
-              onChange={(date) => setSelectedStartDate(date)}
-              placeholder="시작일"
+              onChange={(date) => {
+                setFormData({
+                  ...formData,
+                  start_date: toYYYYMMDD(date),
+                });
+                setSelectedStartDate(date);
+              }}
             />
             <div className="w-10 text-center"> - </div>
             <CustomDatePicker
               selectedDate={selectedEndDate}
-              onChange={(date) => setSelectedEndDate(date)}
-              placeholder="종료일"
+              onChange={(date) => {
+                setFormData({
+                  ...formData,
+                  end_date: toYYYYMMDD(date),
+                });
+                setSelectedEndDate(date);
+              }}
+              minDate={selectedStartDate}
             />
           </div>
         </div>
         <div className="form-group">
           <label className="form-label">시간 설정</label>
           <div className="flex items-center">
-            <Select
-              options={[
-                { value: "0", label: "09:00" },
-                { value: "1", label: "10:00" },
-                { value: "2", label: "11:00" },
-                { value: "3", label: "12:00" },
-                { value: "4", label: "13:00" },
-                { value: "5", label: "14:00" },
-                { value: "6", label: "15:00" },
-                { value: "7", label: "16:00" },
-                { value: "8", label: "17:00" },
-                { value: "9", label: "18:00" },
-                { value: "10", label: "19:00" },
-                { value: "11", label: "20:00" },
-                { value: "12", label: "21:00" },
-                { value: "13", label: "22:00" },
-              ]}
-              className="min-w-32"
-              placeholder="시작 시간"
-              defaultValue={{ value: "0", label: "09:00" }}
+            <CustomTimePicker
+              name={"start"}
+              value={startTime}
+              onChange={handleTimePicker}
             />
             <div className="w-14 text-center"> - </div>
-            <Select
-              options={[
-                { value: "0", label: "09:00" },
-                { value: "1", label: "10:00" },
-                { value: "2", label: "11:00" },
-                { value: "3", label: "12:00" },
-                { value: "4", label: "13:00" },
-                { value: "5", label: "14:00" },
-                { value: "6", label: "15:00" },
-                { value: "7", label: "16:00" },
-                { value: "8", label: "17:00" },
-                { value: "9", label: "18:00" },
-                { value: "10", label: "19:00" },
-                { value: "11", label: "20:00" },
-                { value: "12", label: "21:00" },
-                { value: "13", label: "22:00" },
-              ]}
-              className="w-full"
-              placeholder="시작 시간"
-              defaultValue={{ value: "13", label: "22:00" }}
+            <CustomTimePicker
+              name={"end"}
+              value={endTime}
+              onChange={handleTimePicker}
             />
           </div>
           <div className="form-input-group gap-2 ml-10">
             <label className="input-label">
-              GAP
-              <input
-                type="checkbox"
+              <CheckBox
+                name="gap"
+                label="GAP"
                 className="checkbox"
                 checked={isGapChecked}
                 onChange={() => setIsGapChecked(!isGapChecked)}
               />
             </label>
             <Select
-              options={[
-                { value: "0", label: "5" },
-                { value: "1", label: "10" },
-                { value: "2", label: "15" },
-                { value: "3", label: "20" },
-                { value: "4", label: "25" },
-                { value: "5", label: "30" },
-              ]}
+              name="gap"
               className="min-w-32"
-              defaultValue={{ value: "0", label: "5" }}
+              options={gapOptions}
+              value={gapOptions.filter(
+                (option) => option.value === formData.gap
+              )}
+              onChange={handleSelectBox}
               isDisabled={!isGapChecked}
             />
+            초
           </div>
         </div>
 
@@ -223,41 +326,45 @@ const BroadcastRegisterPage = () => {
           <label className="form-label">반복 설정</label>
           <div className="form-input-group gap-2">
             <label className="input-label">
-              횟수
-              <input type="checkbox" className="checkbox" />
+              <CheckBox
+                name="repeat_count"
+                className="checkbox"
+                label="횟수"
+                checked={isRepeatCountChecked}
+                onChange={() => setIsRepeatCountChecked(!isRepeatCountChecked)}
+              />
             </label>
             <Select
-              options={[
-                { value: "0", label: "5" },
-                { value: "1", label: "10" },
-                { value: "2", label: "15" },
-                { value: "3", label: "20" },
-                { value: "4", label: "25" },
-                { value: "5", label: "30" },
-              ]}
+              name="repeat_count"
               className="min-w-24"
-              defaultValue={{ value: "0", label: "5" }}
-              isDisabled={true}
+              options={repeatOptions}
+              value={repeatOptions.filter(
+                (option) => option.value === formData.repeat_count
+              )}
+              onChange={handleSelectBox}
+              isDisabled={!isRepeatCountChecked}
             />
             회
           </div>
           <div className="ml-10 form-input-group gap-2">
             <label className="input-label">
-              간격
-              <input type="checkbox" className="checkbox" />
+              <CheckBox
+                name="repeat_method"
+                className="checkbox"
+                label="간격"
+                checked={isIntervalChecked}
+                onChange={() => setIsIntervalChecked(!isIntervalChecked)}
+              />
             </label>
             <Select
-              options={[
-                { value: "0", label: "5" },
-                { value: "1", label: "10" },
-                { value: "2", label: "15" },
-                { value: "3", label: "20" },
-                { value: "4", label: "25" },
-                { value: "5", label: "30" },
-              ]}
+              name="repeat_interval"
               className="min-w-24"
-              defaultValue={{ value: "0", label: "5" }}
-              isDisabled={true}
+              options={repeatInterval}
+              value={repeatInterval.filter(
+                (option) => option.value === formData.repeat_interval
+              )}
+              onChange={handleSelectBox}
+              isDisabled={!isIntervalChecked}
             />
             분
           </div>
@@ -268,55 +375,31 @@ const BroadcastRegisterPage = () => {
           <label className="font-semibold w-32 shrink-0 leading-9">
             방송파일
           </label>
-
-          <div className="w-full overflow-hidden">
-            {/* 파일이 없을 때만 업로드 UI 표시 */}
-            {!uploadedFile ? (
-              <div
-                {...getRootProps()}
-                className="p-4 border-2 border-dashed rounded-[10px] cursor-pointer text-center transition hover:border-primary"
-              >
-                <input {...getInputProps()} />
-                {isDragActive ? (
-                  <p className="text-primary text-sm">
-                    여기에 파일을 놓으세요.
-                  </p>
-                ) : (
-                  <p className="text-gray-400 text-sm">
-                    최대 5MB 이하, 오디오 파일을 업로드 하세요
-                  </p>
-                )}
-                <button className="mt-2 btn btn-sm btn-accent">
-                  파일 가져오기
-                </button>
-              </div>
-            ) : (
-              // 파일이 업로드되면 업로드 UI 숨기고 파일 정보 표시
-
-              <div className="flex items-center justify-between p-4 border rounded-[10px]">
-                <span className="text-gray-700 truncate w-4/5">
-                  {uploadedFile.name} (
-                  {(uploadedFile.size / 1024 / 1024).toFixed(4)}MB)
-                </span>
-                <button onClick={removeFile} className="btn btn-error btn-xs">
-                  삭제
-                </button>
-              </div>
-            )}
-          </div>
+          <FileUploader audioFile={audioFile} setAudioFile={setAudioFile} />
         </div>
 
         <div className="flex w-full items-center justify-center gap-2.5 mt-12">
-          <button className="absolute right-3 top-4 w-10 h-10 text-2xl">
-            ✕
-          </button>
           <button className="btn min-w-24">취소</button>
-          <button type="submit" className="btn btn-primary min-w-24">
+          <button
+            type="submit"
+            className="btn btn-primary min-w-24"
+            onClick={handleSubmit}
+            disabled={!isFormValid()}
+          >
             등록
           </button>
         </div>
       </div>
-      <GroupSelectModal modalRef={storeModalRef} label={"점포 생성"} />
+      <GroupSelectModal
+        modalRef={storeModalRef}
+        label={"점포 생성"}
+        mode={"add"}
+        handleSubmit={handleStoreGroup}
+        initialChosenStores={selectedStore.map((s) => ({
+          value: s.store_code,
+          label: s.store_name,
+        }))}
+      />
     </ContentLayout>
   );
 };

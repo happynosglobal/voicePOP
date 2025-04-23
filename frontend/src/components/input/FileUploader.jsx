@@ -2,23 +2,21 @@ import React, { useState } from 'react'
 import { useDropzone } from 'react-dropzone';
 
 const FileUploader = ({
-  formData,
-  setFormData,
+  audioFile,
+  setAudioFile,
 }) => {
   const [uploadedFile, setUploadedFile] = useState(null); // dropzone STATE
   
   const onDrop = (acceptedFiles) => {
     if (acceptedFiles.length > 0) {
       setUploadedFile(acceptedFiles[0]); // 파일 1개만 저장
-      setFormData({
-        ...formData,
-        file: acceptedFiles[0]
-      });
+      setAudioFile(acceptedFiles[0]);
     }
   };
 
   const removeFile = () => {
     setUploadedFile(null); // 파일 삭제 시 다시 업로드 UI 표시
+    setAudioFile(null)
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({

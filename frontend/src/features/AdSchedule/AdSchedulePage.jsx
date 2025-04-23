@@ -4,12 +4,10 @@ import { format, parse, startOfWeek, getDay, addDays } from "date-fns";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { enUS } from "date-fns/locale";
 import ContentLayout from "../../layout/ContentLayout";
-import Title from "../../components/title/Title";
-import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai"; // 아이콘 추가
+import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 import CustomDatePicker from "../../components/customDatePicker/CustomDatePicker";
 
 const locales = { "en-US": enUS };
-
 const localizer = dateFnsLocalizer({
   format,
   parse,
@@ -23,7 +21,7 @@ const nextDay = addDays(today, 1);
 const year = today.getFullYear();
 const month = today.getMonth();
 const day = today.getDate();
-const nextDayDate = nextDay.getDate(); // 🟢 추가하여 오류 해결
+const nextDayDate = nextDay.getDate();
 
 const categoryColors = {
   농산: "#22C55E",
@@ -119,35 +117,36 @@ const dummyEvents = [
   },
 ];
 
-const CustomToolbar = ({ label, date, onNavigate }) => {
+const CustomToolbar = ({
+  label,
+  date,
+  onNavigate,
+  tabs,
+  activeTab,
+  setActiveTab,
+}) => {
   return (
-    <div className="flex justify-between items-end mb-4 border-b">
-      <div className="flex">
-        <button className="px-10 py-2 font-medium bg-gray-700 text-white rounded-t-lg transition">
-          전체
-        </button>
-        <button className="px-10 py-2 font-medium border-b-2 border-gray-700 text-gray-700 rounded-t-lg transition hover:bg-gray-100">
-          농산
-        </button>
-        <button className="px-10 py-2 font-medium border-b-2 border-gray-700 text-gray-700 rounded-t-lg transition hover:bg-gray-100">
-          축산
-        </button>
-        <button className="px-10 py-2 font-medium border-b-2 border-gray-700 text-gray-700 rounded-t-lg transition hover:bg-gray-100">
-          수산
-        </button>
-        <button className="px-10 py-2 font-medium border-b-2 border-gray-700 text-gray-700 rounded-t-lg transition hover:bg-gray-100">
-          델리
-        </button>
+    <div className="tabs-wrapper">
+      <div className="tabs-nav">
+        {tabs.map((tab) => (
+          <button
+            key={tab}
+            className={`tab-btn ${activeTab === tab ? "is-active" : ""}`}
+            onClick={() => setActiveTab(tab)}
+          >
+            {tab}
+          </button>
+        ))}
       </div>
       <div className="flex items-center gap-4 px-4 py-2 mb-2 bg-gray-100 rounded-lg text-gray-700">
         <button onClick={() => onNavigate("PREV")}>
-          <AiOutlineLeft className="mr-2" />
+          <AiOutlineLeft className="mr-2" />{" "}
         </button>
         <div className="w-40">
           <CustomDatePicker selectedDate={date} />
         </div>
         <button onClick={() => onNavigate("NEXT")}>
-          <AiOutlineRight className="ml-2" />
+          <AiOutlineRight className="ml-2" />{" "}
         </button>
         <button
           onClick={() => onNavigate("TODAY")}
@@ -161,12 +160,12 @@ const CustomToolbar = ({ label, date, onNavigate }) => {
 };
 
 const AdSchedulePage = () => {
-  const [events, setEvents] = useState(dummyEvents);
+  const [events] = useState(dummyEvents);
+  const tabs = ["전체", "농산", "축산", "수산", "델리"];
+  const [activeTab, setActiveTab] = useState(tabs[0]);
 
   return (
     <ContentLayout>
-      <Title text="광고 스케줄" />
-
       <Calendar
         localizer={localizer}
         events={events}
@@ -193,7 +192,14 @@ const AdSchedulePage = () => {
           },
         })}
         components={{
-          toolbar: CustomToolbar, // 🟢 커스텀 내비게이션 추가
+          toolbar: (props) => (
+            <CustomToolbar
+              {...props}
+              tabs={tabs}
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+            />
+          ),
         }}
       />
     </ContentLayout>

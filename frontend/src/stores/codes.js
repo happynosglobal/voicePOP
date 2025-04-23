@@ -1,32 +1,66 @@
 import { create } from "zustand";
-import { persist, devtools } from "zustand/middleware";
-import { getRegionalGroupStores } from "../hooks/useStoreCode";
+import { persist, devtools, createJSONStorage } from "zustand/middleware";
+import { getAllStores } from "../hooks/useStoreCode";
 
 const useCodes = create(
   persist(
-    devtools((set) => ({
-      allStore: [],
-      regionalGroupData: [],
-      storesforTree: [],
-      fetchStores: async (brand_code) => {
-        const response = await getRegionalGroupStores(brand_code)
-        try {
-          set({ allStore: response.allStores, storesforTree: [...response.regionalGroupData, ...response.nonRegionalData], regionalGroupData: response.regionalGroupData })
-        } catch (err) {
-          console.error(err)
-        }
-      },
+    devtools(
+      (set) => ({
+        allStoreCode: [],
+        storeByBrandCode: [],
+        regionalGroupData: [],
+        storesForTree: [],
+        brandOptions: [],
+        brandCodes: [],
 
-      brandList: [],
-      setBrandList: (data) => set({ brandList: data }),
+        // 점포 정보 초기화
+        resetStores: () =>
+          set({
+            allStoreCode: [],
+            storeByBrandCode: [],
+            regionalGroupData: [],
+            storesForTree: [],
+            brandOptions: [],
+            brandCodes: [],
+          }),
 
-      resetStores: () => set({ allStore: [], regionalGroupData: [], storesforTree: [], brandList: [] }),
-    })),
+        // 점포 데이터 fetch
+        fetchStores: async (brandCode) => {
+          if (!brandCode) {
+            console.error("브랜드 코드가 전달되지 않았습니다.");
+            return;
+          }
+
+          try {
+            const response = await getAllStores(brandCode);
+
+            set({
+              allStoreCode: response.allStores,
+              storeByBrandCode: response.storeByBrandCode,
+              regionalGroupData: response.regionalGroupData,
+              storesForTree: [
+                ...response.regionalGroupData,
+                ...response.nonRegionalData,
+              ],
+            });
+          } catch (err) {
+            console.error("점포데이터 조회 오류:", err);
+          }
+        },
+        setBrand: (options) =>
+          set({
+            brandOptions: options,
+            brandCodes: options.map((option) => option.value),
+          }),
+      }),
+      {
+        name: "useCodesStore",
+      }
+    ),
 
     {
       name: "codes-storage",
-      // storage: createJSONStorage(() => sessionStorage),
-      getStorage: () => localStorage,
+      storage: createJSONStorage(() => localStorage),
     }
   )
 );

@@ -1,4 +1,7 @@
-const LoadingSpinner = ({ children, isLoading, active = false }) => {
+import { useLoadingStore } from "../../stores/loading";
+
+const LoadingSpinner = ({ children, active = false }) => {
+  const isLoading = useLoadingStore((state) => state.isLoading);
   return (
     <>
       {children}

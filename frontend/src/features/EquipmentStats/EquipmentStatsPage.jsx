@@ -1,11 +1,64 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import ContentLayout from "../../layout/ContentLayout";
-import Title from "../../components/title/Title";
-
+import Pagination from "../../components/pagination/Pagination";
+import SearchBar from "./components/SearchBar";
+import DeviceStatTable from "./components/DeviceStatTable";
+import { toYYYYMMDD } from "../../utils/customFormat";
+import useCategoryCode from "../../hooks/useCategoryCode";
+import useUserStore from "../../stores/user";
+import { getDeviceStat } from "../../api/device/device";
+import { toast } from "react-toastify";
 const EquipmentStatsPage = () => {
+  const { user } = useUserStore();
+  const today = useMemo(() => new Date(), []);
+
+  const [searchParams, setSearchParams] = useState({
+    from_date: toYYYYMMDD(today),
+    to_date: toYYYYMMDD(today),
+    category_code: "",
+  });
+
+  const { categoryOptions, getCategoryCodes } = useCategoryCode();
+
+  useEffect(() => {
+    getCategoryCodes(user?.brand_code);
+  }, [user]);
+
+  const [deviceList, setDeviceList] = useState([]);
+
+  // 장비 통계 (가동율) 조회
+  const handleGetDeviceStat = async () => {
+    try {
+      const response = await getDeviceStat(searchParams);
+      const { status, data } = response;
+      if (status === 200) {
+        setDeviceList(data.data);
+      }
+    } catch (err) {
+      toast.error("장비 조회에 실패했습니다.");
+      console.error(err);
+    }
+  };
+
+  // useEffect(() => {
+  //   handleGetDeviceStat();
+  // }, []);
+
   return (
     <ContentLayout>
-      <Title text="장비통계" />
+      <SearchBar
+        searchParams={searchParams}
+        setSearchParams={setSearchParams}
+        handleGetDeviceStat={handleGetDeviceStat}
+      />
+
+      <DeviceStatTable
+        searchParams={searchParams}
+        setSearchParams={setSearchParams}
+        categoryOptions={categoryOptions}
+        handleGetDeviceStat={handleGetDeviceStat}
+        deviceList={deviceList}
+      />
     </ContentLayout>
   );
 };

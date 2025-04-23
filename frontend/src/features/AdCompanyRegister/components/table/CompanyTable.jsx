@@ -35,7 +35,7 @@ const CompanyTable = ({
                   }`}
                 onClick={() => handleRowClick(item)}
               >
-                <td>{item.seq}</td>
+                <td>{index + 1}</td>
                 <td>{item.business_name}</td>
                 <td>{toBusinessNumber(item.business_number)}</td>
                 <td>{item.brand_code}</td>

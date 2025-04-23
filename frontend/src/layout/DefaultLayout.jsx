@@ -3,20 +3,22 @@ import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import { Outlet, useNavigate } from "react-router-dom";
 import useUserStore from "../stores/user";
-import { loginSuccessResponse } from "../features/Login/dummy/data";
+import Cookies from "js-cookie";
 
 const DefaultLayout = () => {
   const navigate = useNavigate();
-  const { user, isAuthenticated, setUser } = useUserStore();
+  const { user, setUser, logout } = useUserStore();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      setMounted(true);
-    } else if (!isAuthenticated) {
+    const token = Cookies.get("token");
+    if (!token) {
+      logout();
       navigate("/login");
+    } else {
+      setMounted(true);
     }
-  }, [isAuthenticated, user]);
+  }, []);
 
   return (
     <>

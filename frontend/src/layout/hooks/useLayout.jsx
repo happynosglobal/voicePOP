@@ -6,7 +6,7 @@ function useLayout() {
   const { user } = useUserStore();
 
   const routes = useMemo(() => {
-    if (!user || !user.menu) return [];
+    if (!user || !user?.menu) return [];
 
     return user.menu
       .filter((item) => item.type === "screen") // screen 타입 메뉴만 필터링
