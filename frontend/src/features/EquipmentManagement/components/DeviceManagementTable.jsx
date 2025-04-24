@@ -63,8 +63,9 @@ const DeviceManagementTable = ({
             <th className="w-1/12">MD</th>
             <th className="w-1/12">방송상태</th>
             <th className="w-2/12">마지막 방송시간</th>
-            <th className="w-2/12">기기상태</th>
+            <th className="w-44">기기상태</th>
             <th>메모</th>
+            <th className="w-20">저장</th>
           </tr>
         </thead>
         <tbody>
@@ -89,10 +90,19 @@ const DeviceManagementTable = ({
                   value={statusOptions.find(
                     (opt) => opt.value === item.status_process
                   )}
+                  placeholder="선택하세요"
                 />
               </td>
               <td className="truncate">
-                <Tooltip place="bottom" id={1} content={item.comment} />
+                <input
+                  type="text"
+                  value={item.comment}
+                  className="input w-full cursor-pointer"
+                />
+                {/* <Tooltip place="bottom" id={1} content={item.comment} /> */}
+              </td>
+              <td>
+                <button className="btn btn-xs btn-accent">저장</button>
               </td>
             </tr>
           ))}
