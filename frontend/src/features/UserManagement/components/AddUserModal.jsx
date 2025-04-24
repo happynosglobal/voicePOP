@@ -7,7 +7,7 @@ import {
   passwordRegex,
   userIdRegex,
 } from "../../../utils/validation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { levelOptions } from "../../../utils/constant/options";
 import useBrandCode from "../../../hooks/useBrandCode";
 import LoadingSpinner from "../../../components/loading/LoadingSpinner";
@@ -96,6 +96,7 @@ const AddUserModal = ({
       setUserInfo(null);
       setStoreList([]);
       setIsIdChecked(false);
+      setIsEditingPassword(false);
     };
 
     modal.addEventListener("close", handleClose);
@@ -104,6 +105,10 @@ const AddUserModal = ({
       modal.removeEventListener("close", handleClose);
     };
   }, [modalRef]);
+
+  const [isEditingPassword, setIsEditingPassword] = useState(false);
+  console.log(mode);
+
   return (
     <dialog id="my_modal_1" className="modal" ref={modalRef}>
       <div className="modal-box bg-white max-w-xl">
@@ -126,7 +131,7 @@ const AddUserModal = ({
           </div>
           <div className="flex justify-between">
             <label className="py-2 font-semibold w-1/4 shrink-0">아이디</label>
-            <div className="w-full mr-3">
+            <div className="w-full">
               <Input
                 type="text"
                 name="user_id"
@@ -144,17 +149,21 @@ const AddUserModal = ({
                 disabled={mode === "modify" ? true : false}
               />
             </div>
-            <button
-              className="btn btn-sm btn-black"
-              onClick={checkIdDuplicate}
-              disabled={mode === "modify" ? true : false}
-            >
-              ID 중복 확인
-            </button>
+            {mode === "add" && (
+              <>
+                <button
+                  className="btn btn-sm btn-accent ml-3"
+                  onClick={checkIdDuplicate}
+                  disabled={mode === "modify" ? true : false}
+                >
+                  ID 중복 확인
+                </button>
+              </>
+            )}
           </div>
           <div className="flex justify-between">
             <label className="py-2 font-semibold w-1/4 shrink-0">
-              패스워드
+              비밀번호
             </label>
             <div className="w-full">
               <Input
@@ -167,12 +176,22 @@ const AddUserModal = ({
                 validation={passwordRegex}
                 errorMessage={errors.password}
                 handleError={handleError}
+                disabled={mode === "modify" && !isEditingPassword}
               />
             </div>
+            {mode === "modify" && (
+              <button
+                type="button"
+                className="btn btn-sm btn-accent ml-3"
+                onClick={() => setIsEditingPassword(true)}
+              >
+                비밀번호 변경
+              </button>
+            )}
           </div>
           <div className="flex justify-between">
             <label className="py-2 font-semibold w-1/4 shrink-0">
-              패스워드 확인
+              비밀번호 확인
             </label>
             <div className="w-full">
               <Input
@@ -186,6 +205,7 @@ const AddUserModal = ({
                   !isPasswordMatched ? "비밀번호가 일치하지 않습니다." : ""
                 }
                 handleError={handleError}
+                disabled={mode === "modify" && !isEditingPassword}
               />
             </div>
           </div>
@@ -286,7 +306,7 @@ const AddUserModal = ({
           {mode === "modify" && (
             <div className="flex justify-between">
               <label className="py-2 font-semibold w-1/4 shrink-0">상태</label>
-              <div className="flex gap-10 w-full">
+              <div className="flex gap-6 w-full">
                 <label
                   htmlFor="reject"
                   className="flex items-center gap-2 cursor-pointer text-base"

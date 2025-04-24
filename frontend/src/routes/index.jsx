@@ -21,6 +21,8 @@ import SelectBrand from "../features/Login/SelectBrand";
 import useLayout from "../layout/hooks/useLayout";
 import EquipmentSettingPage from "../features/EquipmentSetting/EquipmentSettingPage";
 import NotFoundPage from "../features/NotFound/NotFoundPage";
+import ForgotPassword from "../features/ForgotPassword/ForgotPassword";
+import ChangePassword from "../features/ChangePassword/ChangePassword";
 
 //route/index.jsx
 
@@ -49,6 +51,8 @@ function Root() {
       <Route index path={"/login"} element={<Login />} />
       <Route index path={"/login/select"} element={<SelectBrand />} />
       <Route path={"/signup"} element={<SignUp />} />
+      <Route path={"/forgot-password"} element={<ForgotPassword />} />
+      <Route path={"/change-password"} element={<ChangePassword />} />
       <Route
         path={URL_MAPPING.equipmentSetting}
         element={<EquipmentSettingPage />}

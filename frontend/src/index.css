@@ -122,3 +122,11 @@ textarea.input {padding-top: 6px; padding-bottom: 6px; min-height:60px;}
 .react-time-picker__inputGroup__minute {width:35px !important;}
 
 
+
+
+input:disabled,
+input[disabled] {
+  border-color: hsl(0, 0%, 80%);
+  background-color: #f1f1f1 !important;
+  color: #888888 !important;
+} 

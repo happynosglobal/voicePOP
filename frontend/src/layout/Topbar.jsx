@@ -5,14 +5,16 @@ import { Link } from "react-router-dom";
 import { LuLogOut } from "react-icons/lu";
 import useCodes from "../stores/codes";
 import { getStoreCodes } from "../api/storeGroup/storeGroup";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getStoreNameByCode } from "../hooks/useStoreCode";
 import Logo from "../components/logo/Logo";
+import AddUserModal from "../features/UserManagement/components/AddUserModal";
 
 const Topbar = () => {
   const navigate = useNavigate();
   const { user, logout } = useUserStore();
   const { resetStores } = useCodes();
+  const modalRef = useRef();
 
   const handleLogout = () => {
     logout();
@@ -29,6 +31,20 @@ const Topbar = () => {
       : "점포 관리자";
   };
 
+  const openModal = () => {
+    if (modalRef.current) {
+      modalRef.current.showModal();
+    }
+  };
+
+  const closeModal = () => {
+    if (modalRef.current) {
+      modalRef.current.close();
+    }
+  };
+
+  console.log(user);
+
   return (
     <header className="wide:fixed top-0 left-0 right-0 h-[60px] bg-white px-5 flex justify-between items-center border-b z-10 w-full">
       <h1 className="text-black text-2xl font-bold leading-none">
@@ -42,10 +58,20 @@ const Topbar = () => {
             <IoPersonSharp className="text-xl" />
           </div>
           <p className="text-gray-800 font-medium leading-none">
-            {user?.user_name}
-            <span className="text-gray-800 text-sm leading-none">
-              {`(${user?.brand_code} ${getStoreNameByCode(user?.store_code) || ""} ${getLevelName(user?.level)})`}
-            </span>
+            <button
+              to="/my-info"
+              className="hover:underline"
+              onClick={() => {
+                openModal();
+              }}
+            >
+              {user?.user_name}
+              <span className="text-gray-800 text-sm leading-none">
+                {`(${user?.brand_code} ${
+                  getStoreNameByCode(user?.store_code) || ""
+                } ${getLevelName(user?.level)})`}
+              </span>
+            </button>
           </p>
         </div>
 
@@ -59,6 +85,14 @@ const Topbar = () => {
           로그아웃
         </button>
       </div>
+      <AddUserModal
+        modalRef={modalRef}
+        closeModal={closeModal}
+        // setUserId={setUserId}
+        // setUserId={setUserId}
+        // handleGetUsers={handleGetUsers}
+        mode="modify"
+      />
     </header>
   );
 };

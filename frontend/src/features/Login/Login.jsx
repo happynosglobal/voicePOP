@@ -174,11 +174,16 @@ const Login = () => {
           <div className="flex align-center justify-between mt-4 text-sm">
             <button
               onClick={() => navigate("/signup")}
-              className="text-gray-500"
+              className="text-gray-500 hover:underline"
             >
               사용자 등록 신청
             </button>
-            <button className="text-gray-500">Password 분실</button>
+            <button
+              className="text-gray-500 hover:underline"
+              onClick={() => navigate("/forgot-password")}
+            >
+              Password 분실
+            </button>
           </div>
         </div>
       </div>
