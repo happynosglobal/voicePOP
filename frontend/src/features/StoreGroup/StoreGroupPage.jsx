@@ -10,7 +10,7 @@ import {
   postGroupDetail,
 } from "../../api/storeGroup/storeGroup";
 import useHandleStoreGroup from "./hooks/useHandleStoreGroup";
-import { toYYYYMMDD } from "../../utils/customFormat";
+import { toDate } from "../../utils/customFormat";
 import { toast } from "react-toastify";
 import EmptyState from "../../components/emptyState/EmptyState";
 
@@ -145,7 +145,7 @@ const StoreGroupPage = () => {
                     place="left"
                   />
                 </td>
-                <td>{toYYYYMMDD(item.created_at)}</td>
+                <td>{toDate(item.created_at)}</td>
                 <td>{item.creater}</td>
               </tr>
             ))}
@@ -162,6 +162,7 @@ const StoreGroupPage = () => {
         label={"그룹 생성"}
         handleSubmit={handleSubmit}
         handleDeleteGroup={handleDeleteGroup}
+        initialChosenStores={[]}
         mode={groupId ? "modify" : "add"}
         groupId={groupId}
         setGroupId={setGroupId}

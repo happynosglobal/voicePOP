@@ -1,9 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import ContentLayout from "../../layout/ContentLayout";
-import Pagination from "../../components/pagination/Pagination";
 import SearchBar from "./components/SearchBar";
-import DeviceStatTable from "./components/DeviceStatTable";
-import { toYYYYMMDD } from "../../utils/customFormat";
+import DeviceStatsTable from "./components/DeviceStatsTable";
+import { toDate } from "../../utils/customFormat";
 import useCategoryCode from "../../hooks/useCategoryCode";
 import useUserStore from "../../stores/user";
 import { getDeviceStat } from "../../api/device/device";
@@ -13,8 +12,8 @@ const EquipmentStatsPage = () => {
   const today = useMemo(() => new Date(), []);
 
   const [searchParams, setSearchParams] = useState({
-    from_date: toYYYYMMDD(today),
-    to_date: toYYYYMMDD(today),
+    from_date: toDate(today),
+    to_date: toDate(today),
     category_code: "",
   });
 
@@ -28,8 +27,10 @@ const EquipmentStatsPage = () => {
 
   // 장비 통계 (가동율) 조회
   const handleGetDeviceStat = async () => {
+    const params = searchParams;
+    params.brand_code = user?.brand_code;
     try {
-      const response = await getDeviceStat(searchParams);
+      const response = await getDeviceStat(params);
       const { status, data } = response;
       if (status === 200) {
         setDeviceList(data.data);
@@ -40,10 +41,6 @@ const EquipmentStatsPage = () => {
     }
   };
 
-  // useEffect(() => {
-  //   handleGetDeviceStat();
-  // }, []);
-
   return (
     <ContentLayout>
       <SearchBar
@@ -52,7 +49,7 @@ const EquipmentStatsPage = () => {
         handleGetDeviceStat={handleGetDeviceStat}
       />
 
-      <DeviceStatTable
+      <DeviceStatsTable
         searchParams={searchParams}
         setSearchParams={setSearchParams}
         categoryOptions={categoryOptions}

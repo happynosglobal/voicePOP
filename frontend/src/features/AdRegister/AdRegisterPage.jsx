@@ -8,7 +8,7 @@ import Input from "../../components/input/Input";
 import Radio from "../../components/input/Radio";
 import useAdRegister from "./hooks/useAdRegister";
 import CheckBox from "../../components/input/CheckBox";
-import { toYYYYMMDD } from "../../utils/customFormat";
+import { toDate } from "../../utils/customFormat";
 import useCodes from "../../stores/codes";
 import {
   gapOptions,
@@ -25,11 +25,12 @@ import {
 } from "../../api/broadcast/broadcast";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import LoadingSpinner from "../../components/loading/LoadingSpinner";
 
 const AdRegisterPage = () => {
   const { user } = useUserStore();
   const navigate = useNavigate();
-  const { storeByBrandCode } = useCodes();
+  const { storeByBrandCode, isLoading } = useCodes();
   const {
     formData,
     setFormData,
@@ -65,13 +66,15 @@ const AdRegisterPage = () => {
   const [selectedStartDate, setSelectedStartDate] = useState(today); // 시작날짜선택 STATE
   const [selectedEndDate, setSelectedEndDate] = useState(today); // 종료날짜선택 STATE
 
+  const [tempSelectedStores, setTempSelectedStores] = useState([]);
+
   /* 계약기간 시작일보다 종료일이 빠르면 시작일로 초기화*/
   useEffect(() => {
     if (selectedStartDate > selectedEndDate) {
       setSelectedEndDate(selectedStartDate);
       setFormData({
         ...formData,
-        end_date: toYYYYMMDD(selectedStartDate),
+        end_date: toDate(selectedStartDate),
       });
     }
   }, [selectedStartDate, selectedEndDate]);
@@ -247,7 +250,15 @@ const AdRegisterPage = () => {
                 </button>
                 <button
                   className="btn btn-sm btn-accent"
-                  onClick={() => storeModalRef.current.showModal()}
+                  onClick={() => {
+                    setTempSelectedStores(
+                      selectedStore.map((s) => ({
+                        value: s.store_code,
+                        label: s.store_name,
+                      }))
+                    );
+                    storeModalRef.current.showModal();
+                  }}
                 >
                   점포선택
                 </button>
@@ -319,7 +330,7 @@ const AdRegisterPage = () => {
               onChange={(date) => {
                 setFormData({
                   ...formData,
-                  start_date: toYYYYMMDD(date),
+                  start_date: toDate(date),
                 });
                 setSelectedStartDate(date);
               }}
@@ -330,7 +341,7 @@ const AdRegisterPage = () => {
               onChange={(date) => {
                 setFormData({
                   ...formData,
-                  end_date: toYYYYMMDD(date),
+                  end_date: toDate(date),
                 });
                 setSelectedEndDate(date);
               }}
@@ -450,11 +461,9 @@ const AdRegisterPage = () => {
         label={"점포 생성"}
         mode={"add"}
         handleSubmit={handleStoreGroup}
-        initialChosenStores={selectedStore.map((s) => ({
-          value: s.store_code,
-          label: s.store_name,
-        }))}
+        initialChosenStores={tempSelectedStores}
       />
+      <LoadingSpinner includeCodesLoading={true} />
     </ContentLayout>
   );
 };

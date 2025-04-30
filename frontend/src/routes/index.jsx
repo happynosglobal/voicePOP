@@ -46,23 +46,24 @@ import ChangePassword from "../features/ChangePassword/ChangePassword";
  */
 function Root() {
   const { routes } = useLayout();
+  
   return (
     <Routes>
-      <Route index path={"/login"} element={<Login />} />
-      <Route index path={"/login/select"} element={<SelectBrand />} />
-      <Route path={"/signup"} element={<SignUp />} />
-      <Route path={"/forgot-password"} element={<ForgotPassword />} />
-      <Route path={"/change-password"} element={<ChangePassword />} />
+      <Route index path={URL_MAPPING.login} element={<Login />} />
+      {/* <Route index path={"/login/select"} element={<SelectBrand />} /> */}
+      <Route path={URL_MAPPING.signUp} element={<SignUp />} />
+      <Route path={URL_MAPPING.resetPw} element={<ForgotPassword />} />
+      <Route path={URL_MAPPING.changePw} element={<ChangePassword />} />
       <Route
         path={URL_MAPPING.equipmentSetting}
         element={<EquipmentSettingPage />}
       />
       <Route path="*" element={<NotFoundPage />} />
       <Route path="/" element={<DefaultLayout />}>
-        {/* {routes.map(({ path, element }) => (
+        {routes.map(({ path, element }) => (
           <Route key={path} path={path} element={element} />
-        ))} */}
-        <Route path={URL_MAPPING.dashboard} element={<DashboardPage />} />
+        ))}
+        {/* <Route path={URL_MAPPING.dashboard} element={<DashboardPage />} />
         <Route
           path={URL_MAPPING.equipmentStatus}
           element={<EquipmentStatusPage />}
@@ -98,8 +99,8 @@ function Root() {
           path={URL_MAPPING.adCompanyRegister}
           element={<AdCompanyRegisterPage />}
         />
-        <Route path={URL_MAPPING.adApproval} element={<AdApprovalPage />} />
-      </Route>
+        <Route path={URL_MAPPING.adApproval} element={<AdApprovalPage />} />*/}
+      </Route> 
     </Routes>
   );
 }

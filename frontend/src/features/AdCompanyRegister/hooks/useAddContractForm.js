@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { toYYYYMMDD } from '../../../utils/customFormat';
+import { toDate } from '../../../utils/customFormat';
 import { getAdTypeList, patchAdContract, postAdContract } from '../../../api/advertisement/advertisement';
 import { toast } from 'react-toastify';
 
@@ -8,8 +8,8 @@ const useAddContractForm = () => {
   const initialFormData = useMemo(() => ({
     company_id: "",
     ad_type: "",
-    contract_from: toYYYYMMDD(today),
-    contract_to: toYYYYMMDD(today),
+    contract_from: toDate(today),
+    contract_to: toDate(today),
     comment: "",
     status: "미등록",
     use_yn: "Y",

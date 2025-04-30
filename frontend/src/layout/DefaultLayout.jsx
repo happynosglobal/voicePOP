@@ -4,16 +4,19 @@ import Topbar from "./Topbar";
 import { Outlet, useNavigate } from "react-router-dom";
 import useUserStore from "../stores/user";
 import Cookies from "js-cookie";
+import useCodes from "../stores/codes";
 
 const DefaultLayout = () => {
   const navigate = useNavigate();
-  const { user, setUser, logout } = useUserStore();
+  const { logout } = useUserStore();
+  const { resetStores } = useCodes();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const token = Cookies.get("token");
     if (!token) {
       logout();
+      resetStores();
       navigate("/login");
     } else {
       setMounted(true);

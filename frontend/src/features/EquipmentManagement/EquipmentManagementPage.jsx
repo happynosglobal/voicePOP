@@ -7,11 +7,12 @@ import useUserStore from "../../stores/user";
 import DeviceManagementTable from "./components/DeviceManagementTable";
 import useCodes from "../../stores/codes";
 import { toast } from "react-toastify";
-import { getDeviceList } from "../../api/device/device";
+import { getDeviceList, postDeviceStatus } from "../../api/device/device";
+import LoadingSpinner from "../../components/loading/LoadingSpinner";
 
 const EquipmentManagementPage = () => {
   const { user } = useUserStore();
-  const { storeByBrandCode } = useCodes();
+  const { storeByBrandCode, isLoading } = useCodes();
   const { categoryOptions, getCategoryCodes } = useCategoryCode();
 
   const [searchParams, setSearchParams] = useState({
@@ -33,14 +34,36 @@ const EquipmentManagementPage = () => {
   };
 
   const handleGetDeviceList = async () => {
+    const params = searchParams;
+    params.brand_code = user?.brand_code;
     try {
-      const response = await getDeviceList(searchParams);
+      const response = await getDeviceList(params);
       const { status, data } = response;
       if (status === 200) {
         setDeviceList(data.data);
       }
     } catch (err) {
       toast.error("장비 조회에 실패했습니다.");
+      console.error(err);
+    }
+  };
+
+  const handleModifyDeviceStatus = async (data) => {
+    if (!data) return;
+    const body = {
+      device_id: data.device_id,
+      status_process: data.status_process, //( 미확인:unconfirmed,고장:broken, AS:as, 정상:normal )
+      comment: data.comment,
+    };
+    try {
+      const response = await postDeviceStatus(body);
+      const { status, data } = response;
+      if (status === 200) {
+        toast.success("장비 상태가 변경되었습니다.");
+        handleGetDeviceList();
+      }
+    } catch (err) {
+      toast.error("장비 상태 변경에 실패했습니다.");
       console.error(err);
     }
   };
@@ -69,8 +92,11 @@ const EquipmentManagementPage = () => {
         setSearchParams={setSearchParams}
         categoryOptions={categoryOptions}
         handleGetDeviceList={handleGetDeviceList}
+        handleModifyDeviceStatus={handleModifyDeviceStatus}
         deviceList={deviceList}
+        setDeviceList={setDeviceList}
       />
+      <LoadingSpinner includeCodesLoading={true} />
     </ContentLayout>
   );
 };

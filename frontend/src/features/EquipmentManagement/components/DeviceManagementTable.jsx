@@ -1,13 +1,16 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Select from "react-select";
 import Tooltip from "../../../components/tooltip/Tooltip";
+import { toDateTime } from "../../../utils/customFormat";
 
 const DeviceManagementTable = ({
   searchParams,
   setSearchParams,
   categoryOptions,
   handleGetDeviceList,
+  handleModifyDeviceStatus,
   deviceList,
+  setDeviceList,
 }) => {
   const statusOptions = [
     { value: "normal", label: "정상" },
@@ -79,10 +82,14 @@ const DeviceManagementTable = ({
                     item.status === "running" ? "badge-success" : "badge-ghost"
                   }`}
                 >
-                  {item.status === "running" ? "송출" : "미송출"}
+                  {item.status === "running"
+                    ? "송출"
+                    : item.status === "stop"
+                    ? "미송출"
+                    : "알 수 없음"}
                 </span>
               </td>
-              <td>{item.latest_run_datetime}</td>
+              <td>{toDateTime(item.device_latest_run_datetime)}</td>
               <td>
                 <Select
                   options={statusOptions}
@@ -90,19 +97,37 @@ const DeviceManagementTable = ({
                   value={statusOptions.find(
                     (opt) => opt.value === item.status_process
                   )}
-                  placeholder="선택하세요"
+                  onChange={(selected) => {
+                    const updatedList = [...deviceList];
+                    updatedList[index].status_process = selected.value;
+                    setDeviceList(updatedList);
+                  }}
+                  placeholder={"알 수 없음"}
                 />
               </td>
               <td className="truncate">
                 <input
                   type="text"
-                  value={item.comment}
+                  value={item.comment || ""}
+                  onChange={(e) => {
+                    const updatedList = [...deviceList];
+                    updatedList[index].comment = e.target.value;
+                    setDeviceList(updatedList);
+                  }}
                   className="input w-full cursor-pointer"
                 />
+
                 {/* <Tooltip place="bottom" id={1} content={item.comment} /> */}
               </td>
               <td>
-                <button className="btn btn-xs btn-accent">저장</button>
+                <button
+                  className="btn btn-xs btn-accent"
+                  onClick={() => {
+                    handleModifyDeviceStatus(item);
+                  }}
+                >
+                  저장
+                </button>
               </td>
             </tr>
           ))}

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { toYYYYMMDD } from "../../../utils/customFormat";
+import { toDate } from "../../../utils/customFormat";
 import useUserStore from "../../../stores/user";
 import useCategoryCode from "../../../hooks/useCategoryCode";
 import {
@@ -18,8 +18,8 @@ const useAdRegister = () => {
       category_type_seq: "",
       company: "",
       contract: "",
-      start_date: toYYYYMMDD(today),
-      end_date: toYYYYMMDD(today),
+      start_date: toDate(today),
+      end_date: toDate(today),
       start_time: "0900",
       end_time: "2200",
       gap: 1, // 초단위
@@ -79,9 +79,9 @@ const useAdRegister = () => {
         if (status_code === 200) {
           const options = data.items.map((option) => ({
             value: option.id,
-            label: `${option.ad_type_name} / ${toYYYYMMDD(
+            label: `${option.ad_type_name} / ${toDate(
               option.contract_from
-            )} ~ ${toYYYYMMDD(option.contract_to)}`,
+            )} ~ ${toDate(option.contract_to)}`,
           }));
           setContractOptions(options);
         } else {

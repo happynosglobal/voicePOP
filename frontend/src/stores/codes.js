@@ -12,6 +12,7 @@ const useCodes = create(
         storesForTree: [],
         brandOptions: [],
         brandCodes: [],
+        isLoading: false,
 
         // 점포 정보 초기화
         resetStores: () =>
@@ -22,6 +23,7 @@ const useCodes = create(
             storesForTree: [],
             brandOptions: [],
             brandCodes: [],
+            isLoading: false,
           }),
 
         // 점포 데이터 fetch
@@ -31,6 +33,7 @@ const useCodes = create(
             return;
           }
 
+          set({ isLoading: true });
           try {
             const response = await getAllStores(brandCode);
 
@@ -42,11 +45,14 @@ const useCodes = create(
                 ...response.regionalGroupData,
                 ...response.nonRegionalData,
               ],
+              isLoading: false,
             });
           } catch (err) {
             console.error("점포데이터 조회 오류:", err);
+            set({ isLoading: false });
           }
         },
+
         setBrand: (options) =>
           set({
             brandOptions: options,
@@ -57,7 +63,6 @@ const useCodes = create(
         name: "useCodesStore",
       }
     ),
-
     {
       name: "codes-storage",
       storage: createJSONStorage(() => localStorage),

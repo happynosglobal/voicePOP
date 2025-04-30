@@ -9,18 +9,21 @@ import { useEffect, useRef, useState } from "react";
 import { getStoreNameByCode } from "../hooks/useStoreCode";
 import Logo from "../components/logo/Logo";
 import AddUserModal from "../features/UserManagement/components/AddUserModal";
+import MyInfo from "../features/MyInfo/MyInfo";
 
 const Topbar = () => {
   const navigate = useNavigate();
   const { user, logout } = useUserStore();
   const { resetStores } = useCodes();
   const modalRef = useRef();
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
     resetStores();
     navigate("/login");
   };
+
   const getLevelName = (level) => {
     return level === "ADMIN"
       ? "전체 관리자"
@@ -32,18 +35,12 @@ const Topbar = () => {
   };
 
   const openModal = () => {
-    if (modalRef.current) {
-      modalRef.current.showModal();
-    }
+    setIsOpen(true);
   };
 
   const closeModal = () => {
-    if (modalRef.current) {
-      modalRef.current.close();
-    }
+    setIsOpen(false);
   };
-
-  console.log(user);
 
   return (
     <header className="wide:fixed top-0 left-0 right-0 h-[60px] bg-white px-5 flex justify-between items-center border-b z-10 w-full">
@@ -59,11 +56,8 @@ const Topbar = () => {
           </div>
           <p className="text-gray-800 font-medium leading-none">
             <button
-              to="/my-info"
               className="hover:underline"
-              onClick={() => {
-                openModal();
-              }}
+              onClick={openModal}
             >
               {user?.user_name}
               <span className="text-gray-800 text-sm leading-none">
@@ -77,22 +71,22 @@ const Topbar = () => {
 
         <button
           className="flex items-center gap-1.5 h-[32.50px] px-[15px] py-2 bg-[#484c56] text-white text-sm rounded-[40px] font-semibold"
-          onClick={() => {
-            handleLogout();
-          }}
+          onClick={handleLogout}
         >
           <LuLogOut className="text-lg" />
           로그아웃
         </button>
       </div>
-      <AddUserModal
-        modalRef={modalRef}
-        closeModal={closeModal}
-        // setUserId={setUserId}
-        // setUserId={setUserId}
-        // handleGetUsers={handleGetUsers}
-        mode="modify"
-      />
+
+      {/* 모달은 필요할 때만 렌더링 */}
+      {isOpen && (
+        <MyInfo
+          modalRef={modalRef}
+          closeModal={closeModal}
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+        />
+      )}
     </header>
   );
 };

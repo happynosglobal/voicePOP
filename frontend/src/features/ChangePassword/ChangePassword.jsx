@@ -1,9 +1,49 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Logo from "../../components/logo/Logo";
+import { useLocation, useNavigate } from "react-router-dom";
+import { URL_MAPPING } from "../../utils/constant/urls";
+import { changePassword } from "../../api/user/user";
+import { toast } from "react-toastify";
+import { commonErrorMessage } from "../../utils/constant/messages";
 
 const ChangePassword = () => {
-  const [step, setStep] = useState(1); //임시 스테이트
-  const [userId, setUserId] = useState(""); //임시 스테이트
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const { user_id, user_name, email } = location.state || {};
+
+  useEffect(() => {
+    if (!user_id || !user_name || !email) {
+      navigate("/", { replace: true });
+    }
+  }, [user_id, user_name, email, navigate]);
+  
+  const [formData, setFormData] = useState({
+    password1: "",
+    password2: "",
+  });
+
+  const handleInput = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async () => {
+    const body = formData;
+    try {
+      const response = await changePassword(body);
+      const { status, data } = response;
+      if (status === 200) {
+        toast.success(data.message);
+        navigate(URL_MAPPING.login);
+      }
+    } catch (err) {
+      toast.error(
+        err.response.data.message || commonErrorMessage
+      );
+      console.error(err);
+    }
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -26,7 +66,7 @@ const ChangePassword = () => {
               type="text"
               placeholder="아이디를 입력해주세요."
               className="input input-bordered w-full"
-              value="heysunny612"
+              value={user_id || ""}
               disabled
             />
           </div>
@@ -40,7 +80,7 @@ const ChangePassword = () => {
               type="text"
               placeholder="아이디를 입력해주세요."
               className="input input-bordered w-full"
-              value="황수연"
+              value={user_name || ""}
               disabled
             />
           </div>
@@ -54,7 +94,7 @@ const ChangePassword = () => {
               type="text"
               placeholder="아이디를 입력해주세요."
               className="input input-bordered w-full"
-              value="heysunny612@naver.com"
+              value={email || ""}
               disabled
             />
           </div>
@@ -65,9 +105,11 @@ const ChangePassword = () => {
           </label>
           <div className="flex gap-2">
             <input
+              name="password1"
               type="password"
               placeholder="새로운 비밀번호를 입력해주세요."
               className="input input-bordered w-full"
+              onChange={handleInput}
             />
           </div>
         </div>
@@ -77,16 +119,23 @@ const ChangePassword = () => {
           </label>
           <div className="flex gap-2">
             <input
+              name="password2"
               type="password"
               placeholder="새로운 비밀번호를 확인해주세요."
               className="input input-bordered w-full"
+              onChange={handleInput}
             />
           </div>
         </div>
 
         <div className="mt-6 flex gap-2">
-          <button className="btn btn-neutral flex-1">취소</button>
-          <button className="btn btn-primary flex-1">비밀번호 변경</button>
+          <button
+            className="btn btn-neutral flex-1"
+            onClick={() => navigate(URL_MAPPING.login)}
+          >
+            취소
+          </button>
+          <button className="btn btn-primary flex-1" onClick={handleSubmit}>비밀번호 변경</button>
         </div>
       </div>
     </div>

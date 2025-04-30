@@ -1,0 +1,1 @@
+export const commonErrorMessage = "요청 처리 중 문제가 발생했습니다."

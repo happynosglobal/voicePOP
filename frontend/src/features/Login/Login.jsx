@@ -11,6 +11,7 @@ import Logo from "../../components/logo/Logo";
 import Select from "react-select";
 import { toast } from "react-toastify";
 import useBrandCode from "../../hooks/useBrandCode";
+import { URL_MAPPING } from "../../utils/constant/urls";
 
 const Login = () => {
   const { user, logout, setUser } = useUserStore.getState();
@@ -65,18 +66,30 @@ const Login = () => {
     try {
       const response = await postLogin(formData);
       const { status_code, data } = response.data;
+
       if (status_code === 200) {
-        setUser(data, formData.brand_code);
-        getBrandCodes();
-        fetchStores(formData.brand_code);
         Cookies.set("token", data.token);
         Cookies.set("refresh_token", data.refresh_token);
-        navigate("/");
-      } else if (status_code === 401) {
-        setError(data.message);
+        // 가입 후 최초 로그인 시 비밀번호 변경 진행
+        if (!data.last_changed_time) {
+          return navigate(URL_MAPPING.changePw, {
+            state: {
+              user_id: data.user_id,
+              user_name: data.user_name,
+              email: data.email,
+            },
+          });
+        }
+
+        setUser(data, formData.brand_code); // 선택한 브랜드 세팅
+        getBrandCodes(); // 브랜드 목록 조회
+        fetchStores(formData.brand_code); // 선택한 브랜드의 점포목록
+
+        return navigate("/");
       }
+
     } catch (err) {
-      setError(err?.response.data.message || "");
+      setError("로그인에 실패했습니다.");
     }
   };
   return (
@@ -173,14 +186,14 @@ const Login = () => {
           </div>
           <div className="flex align-center justify-between mt-4 text-sm">
             <button
-              onClick={() => navigate("/signup")}
               className="text-gray-500 hover:underline"
+              onClick={() => navigate(URL_MAPPING.signUp)}
             >
               사용자 등록 신청
             </button>
             <button
               className="text-gray-500 hover:underline"
-              onClick={() => navigate("/forgot-password")}
+              onClick={() => navigate(URL_MAPPING.resetPw)}
             >
               Password 분실
             </button>

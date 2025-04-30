@@ -1,7 +1,11 @@
 import { format } from "date-fns"
 
-export const toYYYYMMDD = (date) => {
+export const toDate = (date) => {
   return format(new Date(date), "yyyy-MM-dd");
+}
+
+export const toDateTime = (date) => {
+  return format(new Date(date), "yyyy-MM-dd HH:mm:ss");
 }
 
 export const toPriceFormat = (value) => {

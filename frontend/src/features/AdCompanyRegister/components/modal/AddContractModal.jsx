@@ -2,8 +2,9 @@ import CustomDatePicker from "../../../../components/customDatePicker/CustomDate
 import Select from "react-select";
 import { useEffect, useMemo, useState } from "react";
 import useAddContractForm from "../../hooks/useAddContractForm";
-import { toYYYYMMDD } from "../../../../utils/customFormat";
+import { toDate } from "../../../../utils/customFormat";
 import Input from "../../../../components/input/Input";
+import LoadingSpinner from "../../../../components/loading/LoadingSpinner";
 
 const AddContractModal = ({ activeRow, modalRef, getContractList, mode, selectedContract, setSelectedContract }) => {
   const {
@@ -26,8 +27,8 @@ const AddContractModal = ({ activeRow, modalRef, getContractList, mode, selected
     if (mode === "modify" && selectedContract) {
       setFormData({
         ad_type: selectedContract.ad_type,
-        contract_from: toYYYYMMDD(selectedContract.contract_from),
-        contract_to: toYYYYMMDD(selectedContract.contract_to),
+        contract_from: toDate(selectedContract.contract_from),
+        contract_to: toDate(selectedContract.contract_to),
         comment: selectedContract.comment,
         company_id: activeRow?.id,
       });
@@ -42,7 +43,7 @@ const AddContractModal = ({ activeRow, modalRef, getContractList, mode, selected
       setSelectedEndDate(selectedStartDate);
       setFormData({
         ...formData,
-        end_period: toYYYYMMDD(selectedStartDate)
+        end_period: toDate(selectedStartDate)
       });
     }
   }, [selectedStartDate, selectedEndDate]);
@@ -144,7 +145,7 @@ const AddContractModal = ({ activeRow, modalRef, getContractList, mode, selected
                 onChange={(date) => {
                   setFormData({
                     ...formData,
-                    contract_from: toYYYYMMDD(date)
+                    contract_from: toDate(date)
                   });
                   setSelectedStartDate(date);
                 }}
@@ -157,7 +158,7 @@ const AddContractModal = ({ activeRow, modalRef, getContractList, mode, selected
                 onChange={(date) => {
                   setFormData({
                     ...formData,
-                    contract_to: toYYYYMMDD(date)
+                    contract_to: toDate(date)
                   });
                   setSelectedEndDate(date);
                 }}
@@ -199,6 +200,7 @@ const AddContractModal = ({ activeRow, modalRef, getContractList, mode, selected
           )}
         </div>
       </div>
+      <LoadingSpinner includeCodesLoading={true} />
     </dialog>
   );
 };

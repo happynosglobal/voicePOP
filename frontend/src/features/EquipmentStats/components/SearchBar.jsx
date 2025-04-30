@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import CustomDatePicker from "../../../components/customDatePicker/CustomDatePicker";
 import { RiFileExcel2Line } from "react-icons/ri";
-import { toYYYYMMDD } from "../../../utils/customFormat";
+import { toDate } from "../../../utils/customFormat";
 
 const SearchBar = ({ searchParams, setSearchParams, handleGetDeviceStat }) => {
   const today = useMemo(() => new Date(), []);
@@ -13,7 +13,7 @@ const SearchBar = ({ searchParams, setSearchParams, handleGetDeviceStat }) => {
       setSelectedEndDate(selectedStartDate);
       setSearchParams((prev) => ({
         ...prev,
-        to_date: toYYYYMMDD(selectedStartDate),
+        to_date: toDate(selectedStartDate),
       }));
     }
   }, [selectedStartDate, selectedEndDate]);
@@ -29,7 +29,7 @@ const SearchBar = ({ searchParams, setSearchParams, handleGetDeviceStat }) => {
                 onChange={(date) => {
                   setSearchParams((prev) => ({
                     ...prev,
-                    from_date: toYYYYMMDD(date),
+                    from_date: toDate(date),
                   }));
                   setSelectedStartDate(date);
                 }}
@@ -42,7 +42,7 @@ const SearchBar = ({ searchParams, setSearchParams, handleGetDeviceStat }) => {
                 onChange={(date) => {
                   setSearchParams((prev) => ({
                     ...prev,
-                    to_date: toYYYYMMDD(date),
+                    to_date: toDate(date),
                   }));
                   setSelectedEndDate(date);
                 }}

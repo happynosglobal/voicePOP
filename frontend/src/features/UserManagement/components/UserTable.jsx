@@ -1,8 +1,8 @@
 import { format } from "date-fns";
 import Pagination from "../../../components/pagination/Pagination";
-import { toYYYYMMDD } from "../../../utils/customFormat";
+import { toDate } from "../../../utils/customFormat";
 import EmptyState from "../../../components/emptyState/EmptyState";
-import { getStoreNameByCode } from "../../../hooks/useStoreCode";
+import useCodes from "../../../stores/codes";
 
 const UserTable = ({
   setUserId,
@@ -13,6 +13,13 @@ const UserTable = ({
   setPage,
   openModal,
 }) => {
+  const allStores = useCodes((state) => state.allStoreCode); // 여기서 직접 상태 구독
+
+  const getStoreNameByCode = (store_code) => {
+    if (!store_code) return "";
+    const match = allStores.find((store) => store.id === store_code);
+    return match?.name || "";
+  };
   return (
     <div className="overflow-x-auto">
       <table className="table">
@@ -78,8 +85,8 @@ const UserTable = ({
                       : ""}
                   </span>
                 </td>
-                <td>{toYYYYMMDD(item.latest_login_at)}</td>
-                <td>{toYYYYMMDD(item.updated_at)}</td>
+                <td>{toDate(item.latest_login_at)}</td>
+                <td>{toDate(item.updated_at)}</td>
               </tr>
             ))}
           </tbody>

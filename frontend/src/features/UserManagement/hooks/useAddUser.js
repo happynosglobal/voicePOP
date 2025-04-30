@@ -236,7 +236,6 @@ const useAddUser = () => {
       company_id: formData.company_id,
       level: formData.level,
       brand_code: formData.brand_code,
-      password: formData.password,
       store_code: formData.store_code,
       email: formData.email,
       status: formData.status,

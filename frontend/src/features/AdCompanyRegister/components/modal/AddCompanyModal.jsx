@@ -126,7 +126,7 @@ const AddCompanyModal = ({ modalRef, getCompanyList }) => {
           </button>
         </div>
       </div>
-      <LoadingSpinner />
+      <LoadingSpinner includeCodesLoading={true} />
     </dialog>
   );
 };

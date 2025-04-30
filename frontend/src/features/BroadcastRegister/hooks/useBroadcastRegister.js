@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { toYYYYMMDD } from '../../../utils/customFormat';
+import { toDate } from '../../../utils/customFormat';
 import useUserStore from '../../../stores/user';
 import useCategoryCode from '../../../hooks/useCategoryCode';
 
@@ -10,8 +10,8 @@ const useBroadcastRegister = () => {
   const initialFormData = useMemo(() => ({
     title: "",
     category_type_seq: "",
-    start_date: toYYYYMMDD(today),
-    end_date: toYYYYMMDD(today),
+    start_date: toDate(today),
+    end_date: toDate(today),
     start_time: "0900",
     end_time: "2200",
     gap: 1, // 초단위

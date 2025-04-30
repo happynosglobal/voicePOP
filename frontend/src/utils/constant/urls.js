@@ -16,6 +16,9 @@ import UserManagementPage from "../../features/UserManagement/UserManagementPage
 
 export const URL_MAPPING = {
   login: "/login",
+  signUp: "/signup",
+  resetPw: "/help/pw/reset",
+  changePw: "/help/pw/change",
 
   dashboard: "/status",
   equipmentStatus: "/equipment-status",

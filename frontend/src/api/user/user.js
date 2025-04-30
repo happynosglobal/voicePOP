@@ -2,6 +2,7 @@ import axios from "axios";
 import apiCall from "../../utils/axiosConfig";
 const { VITE_API_BASE_URL, VITE_API_PREFIX } = import.meta.env;
 
+/* 로그인 요청 */
 export const postLogin = (body) => {
     return axios.post(`${VITE_API_PREFIX}/user/login`, body);
 }
@@ -39,3 +40,12 @@ export const requestUser = (body) => {
     return apiCall.post(`/user/request`, body)
 }
 
+/* 사용자 암호 초기화 */
+export const resetPassword = (body) => {
+    return apiCall.post(`/user/reset-password`, body)
+}
+
+/* 사용자 암호 변경 */
+export const changePassword = (body) => {
+    return apiCall.post(`/user/change-password`, body)
+}

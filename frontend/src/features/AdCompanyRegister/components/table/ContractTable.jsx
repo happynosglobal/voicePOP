@@ -2,7 +2,11 @@ import React, { useEffect } from "react";
 import Tooltip from "../../../../components/tooltip/Tooltip";
 import useHandleContract from "../../hooks/useHandleContract";
 import EmptyState from "../../../../components/emptyState/EmptyState";
-import { toBusinessNumber, toPriceFormat, toYYYYMMDD } from "../../../../utils/customFormat";
+import {
+  toBusinessNumber,
+  toPriceFormat,
+  toDate,
+} from "../../../../utils/customFormat";
 import Pagination from "../../../../components/pagination/Pagination";
 
 const ContractTable = ({
@@ -13,9 +17,8 @@ const ContractTable = ({
   activeRow,
   contractModalRef,
   contractList,
-  handleOpenEditModal
+  handleOpenEditModal,
 }) => {
-
   return (
     <>
       <div className="relative flex justify-between items-end mb-6">
@@ -54,9 +57,17 @@ const ContractTable = ({
               >
                 <td>{item.ad_type_name}</td>
                 <td>{toPriceFormat(item.ad_type_base_price)}</td>
-                <td>{`${toYYYYMMDD(item.contract_from)} ~ ${toYYYYMMDD(item.contract_to)}`}</td>
                 <td>
-                  <span className={`font-semibold ${item.status === "승인" ? "text-green-600" : "text-red-600"}`}>
+                  {toDate(item.contract_from)}
+                  <br />
+                  ~ {toDate(item.contract_to)}
+                </td>
+                <td>
+                  <span
+                    className={`font-semibold ${
+                      item.status === "승인" ? "text-green-600" : "text-red-600"
+                    }`}
+                  >
                     {item.status}
                   </span>
                 </td>
@@ -71,12 +82,7 @@ const ContractTable = ({
       {contractList.length === 0 && (
         <EmptyState text="일치하는 검색 결과가 없습니다." />
       )}
-      <Pagination
-        limit={limit}
-        page={page}
-        setPage={setPage}
-        total={total}
-      />
+      <Pagination limit={limit} page={page} setPage={setPage} total={total} />
     </>
   );
 };

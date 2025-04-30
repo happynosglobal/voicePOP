@@ -26,12 +26,11 @@ const GroupSelectModal = ({
   mode,
   groupId,
   setGroupId,
-  initialChosenStores = [],
+  initialChosenStores,
 }) => {
-  const { storeByBrandCode, storesForTree } = useCodes();
+  const { storeByBrandCode, storesForTree, isLoading } = useCodes();
   const { storeGroupListForTree, getStoreGroupListForTree } =
     useStoreGroupModal();
-
   useEffect(() => {
     getStoreGroupListForTree();
   }, []);
@@ -65,8 +64,12 @@ const GroupSelectModal = ({
 
   // 선택된 점포로 넘기기 전 선택된 원본 노드
   const [tempCheckedStores, setTempCheckedStores] = useState([]);
-  console.log(initialChosenStores)
-  console.log(chosenStores)
+
+  // 선택딘 점포 세팅
+  useEffect(() => {
+    setChosenStores(initialChosenStores);
+  }, [initialChosenStores]);
+
   // 권역별 기본 그룹 + 커스텀 그룹 -> 전체점포 Tree 구조에 set
   useEffect(() => {
     setAllStores([...storeGroupListForTree, ...storesForTree]);
@@ -144,9 +147,6 @@ const GroupSelectModal = ({
 
   /* ---- Tree Data 컨트롤 Start ----*/
 
-  useEffect(() => {
-      setChosenStores(initialChosenStores);
-  }, [initialChosenStores]);
   // 개별 그룹 정보 조회(수정 및 삭제 모달)
   const getStoreGroupInfo = async () => {
     try {
@@ -164,24 +164,7 @@ const GroupSelectModal = ({
     }
   }, [mode, groupId]);
   /* ---- Tree Data 컨트롤 End ----*/
-    /* 모달창 열 때 수행 할 로직 */
-  useEffect(() => {
-    console.log(1)
-    const modal = modalRef?.current;
-    if (!modal) return;
-    console.log(2)
-  
-    const handleOpen = () => {
-      setChosenStores(initialChosenStores);
-      // 필요한 로직 추가 가능
-    };
-  
-    modal.addEventListener("open", handleOpen);
-  
-    return () => {
-      modal.removeEventListener("open", handleOpen);
-    };
-  }, [modalRef]);
+
   /* 모달창 닫을 때 수행 할 로직 */
   useEffect(() => {
     const modal = modalRef?.current;
@@ -193,7 +176,7 @@ const GroupSelectModal = ({
       setCheckedAllStores([]);
       setTempCheckedStores([]);
       setExpandedAllStores([]);
-      if (addable) setChosenStores([]);
+      setChosenStores([]);
       setCheckedChosenStores([]);
       setExpandedChosenStores([]);
       if (setGroupId) setGroupId(null);
@@ -493,7 +476,7 @@ const GroupSelectModal = ({
             )}
           </div>
         </div>
-        <LoadingSpinner />
+        <LoadingSpinner includeCodesLoading={true} />
       </dialog>
     </>
   );

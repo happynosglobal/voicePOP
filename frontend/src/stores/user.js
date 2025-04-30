@@ -10,10 +10,12 @@ const useUserStore = create(
       setUser: (userData, brand_code) => {
         set({
           user: {
+            id: userData.id,
             user_id: userData.user_id,
             user_name: userData.user_name,
             level: userData.level,
             brand_code: brand_code,
+            brandPermissions: userData.brand_code,
             latest_login_at: userData.latest_login_at,
             email: userData.email,
             store_code: userData.store_code,
@@ -21,6 +23,15 @@ const useUserStore = create(
             dashboard_url: userData.dashboard_url,
           },
         });
+      },
+
+      modifyUser: (email) => {
+        set((state) => ({
+          user: {
+            ...state.user,
+            email: email,
+          },
+        }));
       },
 
       logout: () => {

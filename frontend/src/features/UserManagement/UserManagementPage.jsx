@@ -4,6 +4,7 @@ import UserTable from "./components/UserTable";
 import AddUserModal from "./components/AddUserModal";
 import ContentLayout from "../../layout/ContentLayout";
 import useHandleUserList from "./hooks/useHandleUserList";
+import LoadingSpinner from "../../components/loading/LoadingSpinner";
 
 const UserManagementPage = () => {
   const modalRef = useRef();
@@ -71,6 +72,7 @@ const UserManagementPage = () => {
         handleGetUsers={handleGetUsers}
         mode={userId ? "modify" : "add"}
       />
+      <LoadingSpinner includeCodesLoading={true} />
     </ContentLayout>
   );
 };
