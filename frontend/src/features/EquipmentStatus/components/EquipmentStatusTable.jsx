@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import Tooltip from "../../../components/tooltip/Tooltip";
 import { toDateTime } from "../../../utils/customFormat";
 import EmptyState from "../../../components/emptyState/EmptyState";
+import { UNSAFE_getSingleFetchDataStrategy } from "react-router-dom";
+import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 
 const EquipmentStatusTable = ({
   searchParams,
@@ -41,47 +43,87 @@ const EquipmentStatusTable = ({
     return group;
   }, [deviceList]);
 
+  const [openTables, setOpenTables] = useState({
+    미등록: true,
+    미송출: true,
+    송출: true,
+  });
+  const toggleTable = (title) => {
+    setOpenTables((prev) => ({ ...prev, [title]: !prev[title] }));
+  };
+
   const renderTable = (title, list, badgeClass) => (
-    <div className="flex flex-col border p-2 max-h-[550px]">
-      <div className={`mb-1 h-9 badge badge-lg ${badgeClass} font-semibold`}>
-        {title}
-        <span className="text-sm font-normal">&nbsp;/ {list.length}대</span>
+    <div className="flex flex-col bg-white rounded-[10px] overflow-hidden border">
+      <div
+        role="button"
+        className="px-4 py-1.5 w-full flex items-center justify-between bg-slate-100"
+        onClick={() => toggleTable(title)}
+      >
+        <div className={`h-9 badge badge-lg ${badgeClass} font-semibold`}>
+          {title}
+          <span className="text-sm font-normal">&nbsp;/ {list.length}대</span>
+        </div>
+        <div className="w-10 h-10 flex items-center justify-center">
+          {openTables[title] ? (
+            <IoIosArrowUp className="text-2xl" />
+          ) : (
+            <IoIosArrowDown className="text-2xl" />
+          )}
+        </div>
       </div>
-      <div className="flex-1 overflow-y-auto">
-        <table className="table thead-fixed">
-          <thead>
-            <tr>
-              <th className="w-2/12">점포명</th>
-              <th className="w-1/12">MD</th>
-              <th className="w-2/12">마지막 방송시간</th>
-              <th className="w-2/12">메모</th>
-            </tr>
-          </thead>
-          <tbody>
-            {list.map((device, index) => (
-              <tr key={index}>
-                <td>{device.str_name}</td>
-                <td>{device.category_name}</td>
-                <td>{toDateTime(device.latest_run_datetime)}</td>
-                <td className="truncate">
-                  <Tooltip
-                    place="bottom"
-                    id={`tooltip-${device.id}`}
-                    content={device.memo}
-                  />
-                </td>
+      {openTables[title] && (
+        <div className="flex-1 p-4">
+          <table className="table">
+            <thead>
+              <tr>
+                <th className="w-1/6">점포명</th>
+                <th className="w-1/6">MD</th>
+                <th className="w-1/6">마지막 방송시간</th>
+                <th className="w-2/6">메모</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-        {list.length === 0 && (
-          <EmptyState text="일치하는 검색 결과가 없습니다." />
-        )}
-      </div>
+            </thead>
+            <tbody>
+              {list.map((device, index) => (
+                <tr key={index}>
+                  <td>{device.str_name}</td>
+                  <td>{device.category_name}</td>
+                  <td>{toDateTime(device.latest_run_datetime)}</td>
+                  <td className="truncate">
+                    <Tooltip
+                      place="bottom"
+                      id={`tooltip-${device.id}`}
+                      content={device.memo}
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {list.length === 0 && (
+            <EmptyState text="일치하는 검색 결과가 없습니다." />
+          )}
+        </div>
+      )}
     </div>
   );
   return (
     <>
+      <ul className="flex mb-7 gap-2">
+        {Object.entries(categorizedDevices).map(([category, devices]) => (
+          <li
+            className="flex-1 flex items-center justify-center h-14 bg-[#484C56] rounded-[10px] text-white gap-1.5"
+            key={category}
+          >
+            <span className="text-lg font-medium">{category}</span>
+            <span className="text-2xl font-semibold">{devices.length}</span>
+          </li>
+        ))}
+        <li className="flex-1 flex items-center justify-center h-14 bg-[#484C56] rounded-[10px] text-white gap-1.5">
+          <span className="text-lg font-medium">합계 </span>
+          <span className="text-2xl font-semibold">{deviceList.length}</span>
+        </li>
+      </ul>
+
       <div className="tabs-wrapper">
         <div className="tabs-nav">
           {tabs.map((option, index) => (
@@ -102,27 +144,9 @@ const EquipmentStatusTable = ({
             </button>
           ))}
         </div>
-        <div className="search-count">
-          <div className="count-number">
-            <span>미등록 : </span>
-            <b>{categorizedDevices["미등록"].length}</b>
-          </div>
-          <div className="count-number">
-            <span>미송출 : </span>
-            <b>{categorizedDevices["미송출"].length}</b>
-          </div>
-          <div className="count-number">
-            <span>송출 : </span>
-            <b>{categorizedDevices["송출"].length}</b>
-          </div>
-          <div className="count-number">
-            <span>합계 : </span>
-            <b>{deviceList.length}</b>
-          </div>
-        </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-2">
+      <div className="flex flex-col gap-5">
         {renderTable("미등록", categorizedDevices["미등록"], "badge-error")}
         {renderTable("미송출", categorizedDevices["미송출"], "badge-ghost")}
         {renderTable("송출", categorizedDevices["송출"], "badge-success")}

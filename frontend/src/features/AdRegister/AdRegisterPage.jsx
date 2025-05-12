@@ -27,6 +27,8 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../../components/loading/LoadingSpinner";
 
+import { IoMdCloseCircle } from "react-icons/io";
+
 const AdRegisterPage = () => {
   const { user } = useUserStore();
   const navigate = useNavigate();
@@ -219,7 +221,7 @@ const AdRegisterPage = () => {
         </div>
         <div className="form-group">
           <label className="form-label">MD</label>
-          <div className="form-input-group">
+          <div className="form-input-group flex-wrap gap-2.5">
             {categoryOptions.map((item, index) => (
               <label key={index} htmlFor={item.code} className="input-label">
                 <Radio
@@ -243,14 +245,6 @@ const AdRegisterPage = () => {
                 <button
                   className="btn btn-sm btn-accent"
                   onClick={() => {
-                    handleStoreGroup("", storeByBrandCode);
-                  }}
-                >
-                  전점
-                </button>
-                <button
-                  className="btn btn-sm btn-accent"
-                  onClick={() => {
                     setTempSelectedStores(
                       selectedStore.map((s) => ({
                         value: s.store_code,
@@ -263,6 +257,14 @@ const AdRegisterPage = () => {
                   점포선택
                 </button>
                 <button
+                  className="btn btn-sm btn-accent"
+                  onClick={() => {
+                    handleStoreGroup("", storeByBrandCode);
+                  }}
+                >
+                  전점
+                </button>
+                <button
                   className="btn btn-sm btn-error"
                   onClick={() => {
                     handleStoreGroup("", []);
@@ -272,20 +274,21 @@ const AdRegisterPage = () => {
                 </button>
               </div>
               <p className="text-gray-500 text-right leading-tight">
-                선택된 점포 수 :{" "}
+                선택된 점포 수 :
                 <b className="text-gray-900">{selectedStore.length}</b>개
               </p>
             </div>
             {selectedStore.length !== 0 && (
               <div className="p-2 border rounded-[10px] max-h-48 min-h-16 overflow-y-auto">
-                <div className="flex flex-wrap gap-1 text-center">
+                <div className="grid grid-cols-7 gap-2">
                   {selectedStore.map((store, index) => (
-                    <span
+                    <button
                       key={index}
-                      className="bg-gray-200 text-gray-700 px-2.5 py-0.5 rounded text-sm"
+                      className="flex items-center justify-between gap-1 bg-gray-200 text-gray-700 px-2.5 py-0.5 rounded text-sm hover:bg-gray-300 text-left"
                     >
                       {store.store_name}
-                    </span>
+                      <IoMdCloseCircle className="flex-shrink-0" />
+                    </button>
                   ))}
                 </div>
               </div>
@@ -298,7 +301,7 @@ const AdRegisterPage = () => {
           <label className="form-label">광고 업체</label>
           <Select
             name="company"
-            className="min-w-64"
+            className="w-full"
             options={companyOptions}
             value={companyOptions.filter(
               (option) => option.value === formData.company
@@ -395,7 +398,7 @@ const AdRegisterPage = () => {
               <CheckBox
                 name="repeat_count"
                 className="checkbox"
-                label="횟수"
+                label="횟수 / 간격"
                 checked={isRepeatCountChecked}
                 onChange={() => setIsRepeatCountChecked(!isRepeatCountChecked)}
               />
@@ -410,18 +413,7 @@ const AdRegisterPage = () => {
               onChange={handleSelectBox}
               isDisabled={!isRepeatCountChecked}
             />
-            회
-          </div>
-          <div className="ml-10 form-input-group gap-2">
-            <label className="input-label">
-              <CheckBox
-                name="repeat_method"
-                className="checkbox"
-                label="간격"
-                checked={isIntervalChecked}
-                onChange={() => setIsIntervalChecked(!isIntervalChecked)}
-              />
-            </label>
+            회<span className="px-2">/</span>
             <Select
               name="repeat_interval"
               className="min-w-24"
@@ -430,7 +422,7 @@ const AdRegisterPage = () => {
                 (option) => option.value === formData.repeat_interval
               )}
               onChange={handleSelectBox}
-              isDisabled={!isIntervalChecked}
+              isDisabled={!isRepeatCountChecked}
             />
             분
           </div>
@@ -441,7 +433,23 @@ const AdRegisterPage = () => {
           <label className="font-semibold w-32 shrink-0 leading-9">
             방송파일
           </label>
-          <FileUploader audioFile={audioFile} setAudioFile={setAudioFile} />
+          <div className="w-full flex flex-col gap-5">
+            <FileUploader audioFile={audioFile} setAudioFile={setAudioFile} />
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label className="font-semibold w-32 shrink-0 leading-9">
+            방송파일 설명
+          </label>
+          <Input
+            type="text"
+            name="title"
+            placeholder="방송파일 설명을 입력하세요"
+            className="input w-full"
+            value={formData.title}
+            onChange={handleInput}
+          />
         </div>
 
         <div className="flex w-full items-center justify-center gap-2.5 mt-12">

@@ -125,6 +125,39 @@ const AdStatusPage = () => {
         </div>
       </div>
 
+      <ul className="flex mb-7 gap-2">
+        {activeTab === "업체별 현황" && (
+          <>
+            <li className="flex-1 flex items-center justify-center h-14 bg-[#484C56] rounded-[10px] text-white gap-1.5">
+              <span className="text-lg font-medium">광고수 </span>
+              <span className="text-2xl font-semibold">124</span>
+            </li>
+            <li className="flex-1 flex items-center justify-center h-14 bg-[#484C56] rounded-[10px] text-white gap-1.5">
+              <span className="text-lg font-medium">업체수 </span>
+              <span className="text-2xl font-semibold">498</span>
+            </li>
+            <li className="flex-1 flex items-center justify-center h-14 bg-[#484C56] rounded-[10px] text-white gap-1.5">
+              <span className="text-lg font-medium">일반</span>
+              <span className="text-2xl font-semibold">211</span>
+            </li>
+            <li className="flex-1 flex items-center justify-center h-14 bg-[#484C56] rounded-[10px] text-white gap-1.5">
+              <span className="text-lg font-medium">스탠다드 </span>
+              <span className="text-2xl font-semibold">10</span>
+            </li>
+            <li className="flex-1 flex items-center justify-center h-14 bg-[#484C56] rounded-[10px] text-white gap-1.5">
+              <span className="text-lg font-medium">프리미엄 </span>
+              <span className="text-2xl font-semibold">19</span>
+            </li>
+          </>
+        )}
+        {activeTab === "점포별 현황" && (
+          <li className="flex-1 flex items-center justify-center h-14 bg-[#484C56] rounded-[10px] text-white gap-1.5">
+            <span className="text-lg font-medium">전체 점포 </span>
+            <span className="text-2xl font-semibold">111</span>
+          </li>
+        )}
+      </ul>
+
       <div className="tabs-wrapper">
         <div className="tabs-nav">
           {tabs.map((tab) => (
@@ -136,31 +169,6 @@ const AdStatusPage = () => {
               {tab}
             </button>
           ))}
-        </div>
-        <div className="search-count">
-          {activeTab === "업체별 현황" && (
-            <>
-              <div className="count-number">
-                <span>광고수 : </span> <b>124</b>
-              </div>
-              <div className="count-number">
-                <span>업체수 : </span> <b>498</b>
-              </div>
-              <div className="count-number">
-                <span>광고타입 - </span>
-                <span>일반 : </span>
-                <b>211</b>, <span>스탠다드 : </span>
-                <b>10</b>, <span>프리미엄 : </span>
-                <b>19</b>
-              </div>
-            </>
-          )}
-
-          {activeTab === "점포별 현황" && (
-            <p>
-              <span className="font-medium">전체 점포</span>: <b>22</b>개점
-            </p>
-          )}
         </div>
       </div>
       {activeTab === "업체별 현황" ? (

@@ -38,10 +38,10 @@ body {min-width:1400px;}
 
 
   /** 기본 작성 폼 **/
-  .form-container {@apply bg-white max-w-5xl;}
+  .form-container {@apply bg-white;}
   .form-group {@apply flex py-3.5 border-b last-of-type:border-none;}
   .form-label {@apply font-semibold w-32 shrink-0 leading-9;}
-  .form-input-group {@apply flex gap-6 items-center;}
+  .form-input-group {@apply flex gap-4 items-center flex-wrap;}
   .input-label {@apply flex items-center gap-2 shrink-0 mr-2 cursor-pointer font-semibold;}
 
 
@@ -49,9 +49,9 @@ body {min-width:1400px;}
 
 
   /** 기본 탭 **/
-  .tabs-wrapper {@apply flex justify-between items-end mb-4 border-b border-gray-400;}
-  .tabs-nav {@apply flex gap-px;}
-  .tab-btn {@apply w-40 h-[42px] font-semibold rounded-t-[10px] transition  text-gray-500 hover:bg-gray-100 bg-stone-50;}
+  .tabs-wrapper {@apply mb-4;}
+  .tabs-nav {@apply flex gap-px flex-wrap border-b border-gray-400 pb-1.5;}
+  .tab-btn {@apply min-w-36 h-[42px] font-semibold rounded-[10px] transition  text-gray-500 hover:bg-gray-100 bg-stone-100;}
   .tab-btn.is-active {@apply bg-blue-600 text-white;}
 
   /** 검색된 항목수 **/

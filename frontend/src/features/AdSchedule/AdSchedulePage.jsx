@@ -127,17 +127,6 @@ const CustomToolbar = ({
 }) => {
   return (
     <div className="tabs-wrapper">
-      <div className="tabs-nav">
-        {tabs.map((tab) => (
-          <button
-            key={tab}
-            className={`tab-btn ${activeTab === tab ? "is-active" : ""}`}
-            onClick={() => setActiveTab(tab)}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
       <div className="flex items-center gap-4 px-4 py-2 mb-2 bg-gray-100 rounded-lg text-gray-700">
         <button onClick={() => onNavigate("PREV")}>
           <AiOutlineLeft className="mr-2" />{" "}
@@ -154,6 +143,18 @@ const CustomToolbar = ({
         >
           오늘
         </button>
+      </div>
+
+      <div className="tabs-nav">
+        {tabs.map((tab) => (
+          <button
+            key={tab}
+            className={`tab-btn ${activeTab === tab ? "is-active" : ""}`}
+            onClick={() => setActiveTab(tab)}
+          >
+            {tab}
+          </button>
+        ))}
       </div>
     </div>
   );
