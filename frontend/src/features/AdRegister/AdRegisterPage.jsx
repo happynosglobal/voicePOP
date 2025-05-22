@@ -81,9 +81,8 @@ const AdRegisterPage = () => {
     }
   }, [selectedStartDate, selectedEndDate]);
 
-  const [isGapChecked, setIsGapChecked] = useState(false); //GAP
-  const [isRepeatCountChecked, setIsRepeatCountChecked] = useState(false); //반복 횟수
-  const [isIntervalChecked, setIsIntervalChecked] = useState(false); //반복 간격
+  const [isGapChecked, setIsGapChecked] = useState(true); //GAP
+  const [isRepeatChecked, setIsRepeatChecked] = useState(false); //반복 횟수
 
   const [startTime, setStartTime] = useState("09:00"); // 시작 시간
   const [endTime, setEndTime] = useState("22:00"); // 종료 시간
@@ -113,24 +112,15 @@ const AdRegisterPage = () => {
     setSelectedStore(formattedStores);
     storeModalRef.current.close();
   };
-
+  // 점포 제거 handler
+  const handleRemoveStore = (store) => {
+    setSelectedStore((prev) =>
+      prev.filter((item) => item.store_code !== store.store_code)
+    );
+  };
   // 광고 방송 등록 handler
   const handleSubmit = async () => {
-    // 예상 api
     try {
-      // // 방송 대상 점포 등록
-      // const targetStoreRes = await postBcTargetStore({
-      //   brand_code: user?.brand_code,
-      //   content_id: "",
-      //   item: selectedStore,
-      // });
-
-      // if (targetStoreRes.status !== 200) {
-      //   throw new Error("방송 대상 점포 등록 실패");
-      // }
-
-      // const targetStoresId = targetStoreRes.data.data.id;
-
       const body = {
         type: "commercial",
         title: formData.title,
@@ -140,11 +130,15 @@ const AdRegisterPage = () => {
         end_time: formData.end_time,
         start_date: formData.start_date,
         end_date: formData.end_date,
-        gap: formData.gap,
-        repeat_count: formData.repeat_count,
-        repeat_interval: formData.repeat_interval,
         user_id: user?.user_id,
       };
+
+      if (isGapChecked && !isRepeatChecked) {
+        body.gap = formData.gap;
+      } else if (!isGapChecked && isRepeatChecked) {
+        body.repeat_count = formData.repeat_count;
+        body.repeat_interval = formData.repeat_interval;
+      }
 
       // 마스터 방송 등록
       const broadcastRes = await postBcMaster(body);
@@ -173,7 +167,7 @@ const AdRegisterPage = () => {
       const audioFormData = new FormData();
       audioFormData.append("media_type", "sound");
       audioFormData.append("media_filename", audioFile);
-      audioFormData.append("media_desc", "시범데이터");
+      audioFormData.append("media_desc", formData.media_desc);
 
       const audioRes = await postBcMedia(audioFormData);
 
@@ -287,7 +281,10 @@ const AdRegisterPage = () => {
                       className="flex items-center justify-between gap-1 bg-gray-200 text-gray-700 px-2.5 py-0.5 rounded text-sm hover:bg-gray-300 text-left"
                     >
                       {store.store_name}
-                      <IoMdCloseCircle className="flex-shrink-0" />
+                      <IoMdCloseCircle
+                        className="flex-shrink-0"
+                        onClick={() => handleRemoveStore(store)}
+                      />
                     </button>
                   ))}
                 </div>
@@ -296,7 +293,6 @@ const AdRegisterPage = () => {
           </div>
         </div>
 
-        {/* 방송 등록과 달리, 광고 등록에만 추가되는 폼 START */}
         <div className="form-group">
           <label className="form-label">광고 업체</label>
           <Select
@@ -323,7 +319,6 @@ const AdRegisterPage = () => {
             placeholder="광고 계약을 선택하세요"
           />
         </div>
-        {/* 방송 등록과 달리, 광고 등록에만 추가되는 폼 END */}
 
         <div className="form-group">
           <label className="form-label">기간 설정</label>
@@ -374,7 +369,10 @@ const AdRegisterPage = () => {
                 label="GAP"
                 className="checkbox"
                 checked={isGapChecked}
-                onChange={() => setIsGapChecked(!isGapChecked)}
+                onChange={() => {
+                  setIsGapChecked(!isGapChecked);
+                  setIsRepeatChecked(false);
+                }}
               />
             </label>
             <Select
@@ -399,8 +397,11 @@ const AdRegisterPage = () => {
                 name="repeat_count"
                 className="checkbox"
                 label="횟수 / 간격"
-                checked={isRepeatCountChecked}
-                onChange={() => setIsRepeatCountChecked(!isRepeatCountChecked)}
+                checked={isRepeatChecked}
+                onChange={() => {
+                  setIsRepeatChecked(!isRepeatChecked);
+                  setIsGapChecked(false);
+                }}
               />
             </label>
             <Select
@@ -411,9 +412,9 @@ const AdRegisterPage = () => {
                 (option) => option.value === formData.repeat_count
               )}
               onChange={handleSelectBox}
-              isDisabled={!isRepeatCountChecked}
+              isDisabled={!isRepeatChecked}
             />
-            회<span className="px-2">/</span>
+            <span className="px-2">/</span>
             <Select
               name="repeat_interval"
               className="min-w-24"
@@ -422,9 +423,8 @@ const AdRegisterPage = () => {
                 (option) => option.value === formData.repeat_interval
               )}
               onChange={handleSelectBox}
-              isDisabled={!isRepeatCountChecked}
+              isDisabled={!isRepeatChecked}
             />
-            분
           </div>
         </div>
 
@@ -444,10 +444,10 @@ const AdRegisterPage = () => {
           </label>
           <Input
             type="text"
-            name="title"
+            name="media_desc"
             placeholder="방송파일 설명을 입력하세요"
             className="input w-full"
-            value={formData.title}
+            value={formData.media_desc}
             onChange={handleInput}
           />
         </div>
@@ -458,7 +458,7 @@ const AdRegisterPage = () => {
             type="submit"
             className="btn btn-primary min-w-24"
             onClick={handleSubmit}
-            disabled={!isFormValid()}
+            disabled={!isFormValid(isGapChecked)}
           >
             등록
           </button>

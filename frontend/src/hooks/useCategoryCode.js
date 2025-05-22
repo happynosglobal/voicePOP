@@ -13,7 +13,7 @@ const useCategoryCode = () => {
       };
       const res = await getCategoryList(params);
       const { status_code, data } = res.data;
-      if (status_code === 200) {
+      if (status_code === 200 || status_code === 204) {
         setCategoryOptions(data.items);
         parsingCategories4Select(data.items);
       }

@@ -29,7 +29,7 @@ const SignUp = () => {
   useEffect(() => {
     getBrandCodes();
   }, []);
-  
+
   const handleSubmitPost = async () => {
     try {
       await handleRequestUser();
@@ -63,7 +63,7 @@ const SignUp = () => {
 
         <div className="form-control mt-4">
           <label className="label flex justify-between">
-            <span className="label-text font-semibold">신청 ID</span>
+            <span className="label-text font-semibold">신청 ID (사번)</span>
           </label>
           <div className="relative">
             <Input
@@ -73,12 +73,7 @@ const SignUp = () => {
               className="input input-bordered w-[360px]"
               value={formData.user_id}
               onChange={handleInput}
-              validation={userIdRegex}
-              errorMessage={
-                errors.user_id ||
-                (!isIdChecked ? "ID 중복 확인을 해주세요." : "")
-              }
-              handleError={handleError}
+              maxLength={10}
             />
             <button
               className="absolute top-0 right-0 btn btn-sm btn-accent"
@@ -87,48 +82,21 @@ const SignUp = () => {
               ID 중복 확인
             </button>
           </div>
+          {!isIdChecked ? (
+            <p className="mt-2 text-error text-sm">
+              {errors.user_id}
+            </p>
+          ) : (
+            <p className="mt-2 text-sm text-gray-500 text-primary">
+              사용 가능한 ID 입니다.
+            </p>
+          )}
           <p className="mt-2 text-sm text-gray-500">
-            * 사번 또는 영문 소문자와 숫자를 결합하여
-            <span className="text-primary font-semibold">6자~10자</span> 이내.
+            * 사번 또는 영문 소문자와 숫자를 포함하여
+            <span className="text-primary font-semibold"> 6자~10자</span> 이내.
           </p>
         </div>
 
-        {/* <div className="form-control mt-4">
-          <label className="label">
-            <span className="label-text font-semibold">Password</span>
-          </label>
-          <Input
-            type="password"
-            name="password"
-            placeholder="비밀번호 입력하세요."
-            className="input input-bordered w-full"
-            value={formData.password}
-            onChange={handleInput}
-            validation={passwordRegex}
-            errorMessage={errors.password}
-            handleError={handleError}
-          />
-          <p className="mt-2 text-sm text-gray-500">
-            * 영문 대/소문자와 특수문자, 숫자를 결합하여
-            <span className="text-primary font-semibold">6자~10자</span> 이내.
-          </p>
-        </div>
-
-        <div className="form-control mt-4">
-          <label className="label">
-            <span className="label-text font-semibold">Password 확인</span>
-          </label>
-          <Input
-            type="password"
-            name="confirm_password"
-            placeholder="비밀번호를 다시한번 입력해주세요."
-            className="input input-bordered w-full"
-            value={formData.confirm_password}
-            onChange={handleInput}
-            errorMessage={!isPasswordMatched ? "비밀번호가 일치하지 않습니다." : ""}
-            handleError={handleError}
-          />
-        </div> */}
         <div className="form-control mt-4">
           <label className="label">
             <span className="label-text font-semibold">회사명</span>

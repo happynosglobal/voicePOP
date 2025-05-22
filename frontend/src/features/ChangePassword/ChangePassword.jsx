@@ -5,6 +5,8 @@ import { URL_MAPPING } from "../../utils/constant/urls";
 import { changePassword } from "../../api/user/user";
 import { toast } from "react-toastify";
 import { commonErrorMessage } from "../../utils/constant/messages";
+import Input from "../../components/input/Input";
+import { passwordRegex } from "../../utils/validation";
 
 const ChangePassword = () => {
   const location = useLocation();
@@ -17,15 +19,38 @@ const ChangePassword = () => {
       navigate("/", { replace: true });
     }
   }, [user_id, user_name, email, navigate]);
-  
+
   const [formData, setFormData] = useState({
     password1: "",
     password2: "",
   });
 
+  const [errors, setErrors] = useState({});
+
+  const isPasswordMatched = formData.password1 === formData.password2;
+
   const handleInput = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleError = (name, errorMessage) => {
+    setErrors((prev) => ({ ...prev, [name]: errorMessage }));
+  };
+
+  const isFormValid = () => {
+    let isValid = false;
+
+    // 모든 에러 값이 빈 문자열인지 검사
+    const isErrorsEmpty = Object.values(errors).every((error) => error === "");
+
+    isValid =
+      formData.password1 &&
+      formData.password2 &&
+      isPasswordMatched &&
+      isErrorsEmpty;
+
+    return isValid;
   };
 
   const handleSubmit = async () => {
@@ -38,9 +63,7 @@ const ChangePassword = () => {
         navigate(URL_MAPPING.login);
       }
     } catch (err) {
-      toast.error(
-        err.response.data.message || commonErrorMessage
-      );
+      toast.error(err.response.data.message || commonErrorMessage);
       console.error(err);
     }
   };
@@ -103,31 +126,35 @@ const ChangePassword = () => {
           <label className="label">
             <span className="label-text font-semibold">새 비밀번호</span>
           </label>
-          <div className="flex gap-2">
-            <input
-              name="password1"
-              type="password"
-              placeholder="새로운 비밀번호를 입력해주세요."
-              className="input input-bordered w-full"
-              onChange={handleInput}
-            />
-          </div>
+          <Input
+            type="password"
+            name="password1"
+            placeholder="새로운 비밀번호를 입력해주세요."
+            className="input input-bordered w-full"
+            value={formData.password1}
+            validation={passwordRegex}
+            errorMessage={errors.password1}
+            handleError={handleError}
+            onChange={handleInput}
+          />
         </div>
         <div className="form-control mt-4">
           <label className="label">
             <span className="label-text font-semibold">새 비밀번호 확인</span>
           </label>
-          <div className="flex gap-2">
-            <input
-              name="password2"
-              type="password"
-              placeholder="새로운 비밀번호를 확인해주세요."
-              className="input input-bordered w-full"
-              onChange={handleInput}
-            />
-          </div>
+          <Input
+            type="password"
+            name="password2"
+            placeholder="새로운 비밀번호를 확인해주세요."
+            className="input input-bordered w-full"
+            value={formData.password2}
+            errorMessage={
+              !isPasswordMatched ? "비밀번호가 일치하지 않습니다." : ""
+            }
+            handleError={handleError}
+            onChange={handleInput}
+          />
         </div>
-
         <div className="mt-6 flex gap-2">
           <button
             className="btn btn-neutral flex-1"
@@ -135,7 +162,13 @@ const ChangePassword = () => {
           >
             취소
           </button>
-          <button className="btn btn-primary flex-1" onClick={handleSubmit}>비밀번호 변경</button>
+          <button
+            className="btn btn-primary flex-1"
+            onClick={handleSubmit}
+            disabled={!isFormValid()}
+          >
+            비밀번호 변경
+          </button>
         </div>
       </div>
     </div>

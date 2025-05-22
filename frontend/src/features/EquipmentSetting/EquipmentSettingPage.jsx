@@ -7,7 +7,11 @@ import Logo from "../../components/logo/Logo";
 import useCodes from "../../stores/codes";
 
 const EquipmentSettingPage = () => {
-  const { brandOptions } = useCodes();
+  const { brandOptions, getBrandCodes } = useBrandCode();
+
+  useEffect(() => {
+    getBrandCodes();
+  }, []);
   // const { categoryOptions4Select, getCategoryCodes } = useCategoryCode();
   const {
     formData,

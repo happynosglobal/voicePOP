@@ -6,16 +6,23 @@ export const levelOptions = [
 ];
 
 export const gapOptions = Array.from({ length: 61 }, (_, i) => ({
-  value: i,
-  label: i
-}));
-
-export const repeatOptions = Array.from({ length: 100 }, (_, i) => ({
   value: i + 1,
   label: i + 1
 }));
 
-export const repeatInterval = Array.from({ length: 61 }, (_, i) => ({
-  value: i,
-  label: i
+export const repeatOptions = Array.from({ length: 100 }, (_, i) => ({
+  value: i + 1,
+  label: `${i + 1}회`
 }));
+
+export const repeatInterval = [
+  { value: 1, label: "1초" },
+  { value: 3, label: "3초" },
+  { value: 5, label: "5초" },
+  { value: 10, label: "10초" },
+  { value: 30, label: "30초" },
+  ...Array.from({ length: 60 }, (_, i) => {
+    const minute = i + 1;
+    return { value: minute * 60, label: `${minute}분` };
+  }),
+];

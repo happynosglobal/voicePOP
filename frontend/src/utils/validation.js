@@ -4,13 +4,13 @@ import Joi from "joi";
 export const userIdRegex = Joi.string()
     .min(6)
     .max(10)
-    .pattern(/^(?=.*[a-z])(?=.*\d)[a-z\d]{6,10}$/)
+    .pattern(/^[a-z\d]{6,10}$/)
     .required()
     .messages({
-        "string.empty": "ID를 입력해주세요.",
-        "string.min": "ID는 최소 6자 이상이어야 합니다.",
-        "string.max": "ID는 최대 10자까지 가능합니다.",
-        "string.pattern.base": "ID는 영문 소문자와 숫자를 포함해야 합니다."
+      "string.empty": "ID를 입력해주세요.",
+      "string.min": "ID는 최소 6자 이상이어야 합니다.",
+      "string.max": "ID는 최대 10자까지 가능합니다.",
+      "string.pattern.base": "ID는 영문 소문자와 숫자를 포함해야 합니다."
     });
 
 // 영문 대/소문자와 특수문자, 숫자를 결합하여 6자~10자 이내  

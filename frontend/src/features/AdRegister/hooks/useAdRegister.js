@@ -22,9 +22,10 @@ const useAdRegister = () => {
       end_date: toDate(today),
       start_time: "0900",
       end_time: "2200",
-      gap: 1, // 초단위
-      repeat_count: 5,
-      repeat_interval: 1, // 분단위
+      gap: 3, // 초단위
+      repeat_count: 1,
+      repeat_interval: 1, // 초단위
+      media_desc: "",
     }),
     [today]
   );
@@ -105,10 +106,8 @@ const useAdRegister = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const isFormValid = () => {
-    let isValid = false;
-
-    isValid =
+  const isFormValid = (isGapChecked) => {
+    const hasCommonFields =
       formData.title &&
       formData.category_type_seq &&
       selectedStore.length !== 0 &&
@@ -117,11 +116,14 @@ const useAdRegister = () => {
       formData.end_date &&
       formData.start_time &&
       formData.end_time &&
-      formData.gap &&
-      formData.repeat_count &&
-      formData.repeat_interval &&
+      formData.media_desc &&
       audioFile;
 
+    const hasGapField = isGapChecked && formData.gap;
+    const hasRepeatFields =
+      !isGapChecked && formData.repeat_count && formData.repeat_interval;
+
+    const isValid = hasCommonFields && (hasGapField || hasRepeatFields);
     return isValid;
   };
 

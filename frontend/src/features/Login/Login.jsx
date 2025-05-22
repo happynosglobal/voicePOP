@@ -1,11 +1,8 @@
 import { useEffect, useState } from "react";
 import useUserStore from "../../stores/user";
 import { useNavigate } from "react-router-dom";
-import { loginSuccessResponse } from "./dummy/data";
-import apiCall from "../../utils/axiosConfig";
-import { deleteUser, postLogin, postUserBrand } from "../../api/user/user";
+import { postLogin, postUserBrand } from "../../api/user/user";
 import useCodes from "../../stores/codes";
-import LoadingSpinner from "../../components/loading/LoadingSpinner";
 import Cookies from "js-cookie";
 import Logo from "../../components/logo/Logo";
 import Select from "react-select";
@@ -25,7 +22,7 @@ const Login = () => {
   });
 
   const [error, setError] = useState("");
-
+  const [isBrandFixed, setIsBrandFixed] = useState(false);
   const [brandOptions, setBrandOptions] = useState([]);
 
   useEffect(() => {
@@ -41,12 +38,22 @@ const Login = () => {
     const { status, data } = response;
     if (status === 200) {
       if (data.status_code === 200) {
-        setBrandOptions(
-          data.data.brand_code.map((option) => ({
-            value: option,
-            label: option,
-          }))
-        );
+        const options = data.data.brand_code.map((option) => ({
+          value: option,
+          label: option,
+        }));
+
+        setBrandOptions(options);
+
+        if (options.length === 1) {
+          setFormData((prev) => ({
+            ...prev,
+            brand_code: options[0].value,
+          }));
+          setIsBrandFixed(true);
+        } else {
+          setIsBrandFixed(false);
+        }
       } else {
         toast.error(data.message);
       }
@@ -87,7 +94,6 @@ const Login = () => {
 
         return navigate("/");
       }
-
     } catch (err) {
       setError("로그인에 실패했습니다.");
     }
@@ -116,16 +122,11 @@ const Login = () => {
                     user_id: newUserId,
                     brand_code: "",
                   }));
-
+                  setIsBrandFixed(false);
                   setBrandOptions([]);
                 }}
+                onBlur={handleGetBrandOptions}
               />
-              <button
-                className="btn btn-sm btn-accent px-4"
-                onClick={handleGetBrandOptions}
-              >
-                권한조회
-              </button>
             </div>
           </div>
 
@@ -136,7 +137,8 @@ const Login = () => {
             <Select
               options={brandOptions}
               className="min-w-56"
-              isClearable
+              isClearable={!isBrandFixed}
+              isDisabled={isBrandFixed}
               placeholder="브랜드를 선택해주세요."
               value={
                 brandOptions.find((opt) => opt.value === formData.brand_code) ||

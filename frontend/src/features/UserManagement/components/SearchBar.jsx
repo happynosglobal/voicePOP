@@ -21,9 +21,9 @@ const SearchBar = ({
   const { brandOptions } = useCodes();
 
   const handleOnClick = () => {
-    handleGetUsers(1);
+    handleGetUsers(searchParams, 1);
     setPage(1);
-  }
+  };
 
   return (
     <div className="flex mb-5 gap-1">
@@ -31,10 +31,7 @@ const SearchBar = ({
         <div className="flex flex-wrap items-center gap-1.5">
           <Select
             name="level"
-            options={[
-              { value: "", label: "모든 관리자" },
-              ...levelOptions
-            ]}
+            options={[{ value: "", label: "모든 관리자" }, ...levelOptions]}
             className="min-w-32"
             onChange={handleSelectBox}
             defaultValue={{ value: "", label: "모든 관리자" }}
@@ -42,10 +39,7 @@ const SearchBar = ({
 
           <Select
             name="brand_code"
-            options={[
-              { value: "", label: "모든 브랜드" },
-              ...brandOptions
-            ]}
+            options={[{ value: "", label: "모든 브랜드" }, ...brandOptions]}
             className="min-w-32"
             onChange={handleSelectBox}
             defaultValue={{ value: "", label: "모든 브랜드" }}
@@ -90,7 +84,9 @@ const SearchBar = ({
             />
           </div>
 
-          <button className="btn btn-accent btn-sm" onClick={handleOnClick}>검색</button>
+          <button className="btn btn-accent btn-sm" onClick={handleOnClick}>
+            검색
+          </button>
         </div>
 
         {/* <!-- 사용자 등록 버튼 --> */}

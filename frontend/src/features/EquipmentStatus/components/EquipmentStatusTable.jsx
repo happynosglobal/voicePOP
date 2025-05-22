@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import Tooltip from "../../../components/tooltip/Tooltip";
 import { toDateTime } from "../../../utils/customFormat";
 import EmptyState from "../../../components/emptyState/EmptyState";
-import { UNSAFE_getSingleFetchDataStrategy } from "react-router-dom";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 
 const EquipmentStatusTable = ({

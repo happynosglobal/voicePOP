@@ -20,6 +20,8 @@ const DeviceManagementTable = ({
   ];
   const [activeTab, setActiveTab] = useState("");
 
+  const [originalComments, setOriginalComments] = useState({});
+
   // "전체" 항목 포함한 탭 목록 생성
   const tabs = useMemo(() => {
     return [{ code: "", name: "전체" }, ...categoryOptions];
@@ -68,7 +70,6 @@ const DeviceManagementTable = ({
             <th className="w-2/12">마지막 방송시간</th>
             <th className="w-44">기기상태</th>
             <th>메모</th>
-            <th className="w-20">저장</th>
           </tr>
         </thead>
         <tbody>
@@ -79,14 +80,18 @@ const DeviceManagementTable = ({
               <td>
                 <span
                   className={`badge badge-lg ${
-                    item.status === "running" ? "badge-success" : "badge-ghost"
+                    item.status === "running"
+                      ? "badge-success"
+                      : item.status === ""
+                      ? "badge-error"
+                      : "badge-ghost"
                   }`}
                 >
                   {item.status === "running"
                     ? "송출"
                     : item.status === "stop"
                     ? "미송출"
-                    : "알 수 없음"}
+                    : "error"}
                 </span>
               </td>
               <td>{toDateTime(item.device_latest_run_datetime)}</td>
@@ -94,19 +99,23 @@ const DeviceManagementTable = ({
                 <Select
                   options={statusOptions}
                   className="min-w-32"
-                  value={statusOptions.find(
-                    (opt) => opt.value === item.status_process
-                  )}
+                  value={
+                    statusOptions.find(
+                      (opt) => opt.value === item.status_process
+                    ) || null
+                  }
                   onChange={(selected) => {
                     const updatedList = [...deviceList];
                     updatedList[index].status_process = selected.value;
                     setDeviceList(updatedList);
+                    handleModifyDeviceStatus(updatedList[index]);
                   }}
-                  placeholder={"알 수 없음"}
+                  placeholder="알 수 없음"
                 />
               </td>
               <td className="truncate">
                 <input
+                  name="comment"
                   type="text"
                   value={item.comment || ""}
                   onChange={(e) => {
@@ -114,20 +123,23 @@ const DeviceManagementTable = ({
                     updatedList[index].comment = e.target.value;
                     setDeviceList(updatedList);
                   }}
+                  onBlur={(e) => {
+                    if (
+                      (e.target.value || "") !==
+                      originalComments[item.device_id]
+                    ) {
+                      handleModifyDeviceStatus(item);
+                    }
+                  }}
+                  onFocus={() => {
+                    setOriginalComments((prev) => ({
+                      ...prev,
+                      [item.device_id]: item.comment || "",
+                    }));
+                  }}
                   className="input w-full cursor-pointer"
                 />
-
                 {/* <Tooltip place="bottom" id={1} content={item.comment} /> */}
-              </td>
-              <td>
-                <button
-                  className="btn btn-xs btn-accent"
-                  onClick={() => {
-                    handleModifyDeviceStatus(item);
-                  }}
-                >
-                  저장
-                </button>
               </td>
             </tr>
           ))}

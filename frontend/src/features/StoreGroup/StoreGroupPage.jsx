@@ -5,6 +5,7 @@ import Pagination from "../../components/pagination/Pagination";
 import GroupSelectModal from "../../components/modal/GroupSelectModal";
 import useUserStore from "../../stores/user";
 import {
+  deleteGroupDetail,
   patchGroup,
   postGroup,
   postGroupDetail,
@@ -55,6 +56,14 @@ const StoreGroupPage = () => {
       }
 
       const groupId = groupRes.data.data.id;
+
+      if (id) {
+        groupRes = await deleteGroupDetail(id);
+      }
+
+      if (groupRes.data.status_code !== 200) {
+        throw new Error("그룹 내 점포 삭제 실패");
+      }
 
       //그룹 내에 선택된 점포들 등록
       const groupedStoresRes = await postGroupDetail(groupId, {
@@ -118,6 +127,7 @@ const StoreGroupPage = () => {
             <th>점포</th>
             <th className="w-2/12">생성일</th>
             <th className="w-1/12">생성자</th>
+            <th className="w-20">삭제</th>
           </tr>
         </thead>
         {storeGroupList.length > 0 && (
@@ -147,6 +157,16 @@ const StoreGroupPage = () => {
                 </td>
                 <td>{toDate(item.created_at)}</td>
                 <td>{item.creater}</td>
+                <td>
+                  <button
+                    className="btn btn-xs btn-error"
+                    onClick={() => {
+                      handleDeleteGroup(item.id);
+                    }}
+                  >
+                    삭제
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>

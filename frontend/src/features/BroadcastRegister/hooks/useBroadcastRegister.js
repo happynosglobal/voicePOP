@@ -1,23 +1,27 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import { toDate } from '../../../utils/customFormat';
-import useUserStore from '../../../stores/user';
-import useCategoryCode from '../../../hooks/useCategoryCode';
+import React, { useEffect, useMemo, useState } from "react";
+import { toDate } from "../../../utils/customFormat";
+import useUserStore from "../../../stores/user";
+import useCategoryCode from "../../../hooks/useCategoryCode";
 
 const useBroadcastRegister = () => {
   const { user } = useUserStore();
-  const today = useMemo(() => (new Date()), []);
+  const today = useMemo(() => new Date(), []);
 
-  const initialFormData = useMemo(() => ({
-    title: "",
-    category_type_seq: "",
-    start_date: toDate(today),
-    end_date: toDate(today),
-    start_time: "0900",
-    end_time: "2200",
-    gap: 1, // 초단위
-    repeat_count: 5,
-    repeat_interval: 1, // 분단위
-  }), [today]);
+  const initialFormData = useMemo(
+    () => ({
+      title: "",
+      category_type_seq: "",
+      start_date: toDate(today),
+      end_date: toDate(today),
+      start_time: "0900",
+      end_time: "2200",
+      gap: 3, // 초단위
+      repeat_count: 1,
+      repeat_interval: 1, // 초단위
+      media_desc: "",
+    }),
+    [today]
+  );
 
   const { categoryOptions, getCategoryCodes } = useCategoryCode();
 
@@ -32,18 +36,16 @@ const useBroadcastRegister = () => {
   const handleInput = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-  }
+  };
 
   const handleSelectBox = (option, option2) => {
     const { label, value } = option;
     const { name } = option2;
     setFormData({ ...formData, [name]: value });
-  }
+  };
 
-  const isFormValid = () => {
-    let isValid = false;
-
-    isValid =
+  const isFormValid = (isGapChecked) => {
+    const hasCommonFields =
       formData.title &&
       formData.category_type_seq &&
       selectedStore.length !== 0 &&
@@ -51,10 +53,14 @@ const useBroadcastRegister = () => {
       formData.end_date &&
       formData.start_time &&
       formData.end_time &&
-      formData.gap &&
-      formData.repeat_count &&
-      formData.repeat_interval &&
+      formData.media_desc &&
       audioFile;
+
+    const hasGapField = isGapChecked && formData.gap;
+    const hasRepeatFields =
+      !isGapChecked && formData.repeat_count && formData.repeat_interval;
+
+    const isValid = hasCommonFields && (hasGapField || hasRepeatFields);
 
     return isValid;
   };
@@ -68,8 +74,8 @@ const useBroadcastRegister = () => {
     categoryOptions,
     handleInput,
     handleSelectBox,
-    isFormValid
-  }
-}
+    isFormValid,
+  };
+};
 
 export default useBroadcastRegister;

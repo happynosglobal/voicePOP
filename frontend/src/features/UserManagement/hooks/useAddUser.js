@@ -11,6 +11,7 @@ import {
 import { toast } from "react-toastify";
 import { useLoadingStore } from "../../../stores/loading";
 import useCodes from "../../../stores/codes";
+import { userIdRegex } from "../../../utils/validation";
 
 const useAddUser = () => {
   const {brandCodes, brandOptions} = useCodes();
@@ -35,25 +36,34 @@ const useAddUser = () => {
   const isPasswordMatched = formData.password === formData.confirm_password;
   /* 신청ID 중복확인 */
   const checkIdDuplicate = async () => {
-    if (!formData.user_id) return;
-    const body = {
-      user_id: formData.user_id,
-    };
-    checkUser(body)
-      .then((res) => {
-        const { status_code } = res.data;
-        if (status_code === 200) {
-          setIsIdChecked(false);
-          setErrors({ ...errors, user_id: "사용자가 존재 합니다" });
-        } else if (status_code === 404) {
-          setIsIdChecked(true);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        toast.error("중복체크 중 오류가 발생했습니다.");
+    const { user_id } = formData;
+  
+    // 정규식 유효성 검사
+    const { error } = userIdRegex.validate(user_id);
+    if (error) {
+      setErrors((prev) => ({ ...prev, user_id: error.details[0].message }));
+      setIsIdChecked(false);
+      return;
+    }
+  
+    // 중복 확인 요청
+    try {
+      const body = { user_id };
+      const res = await checkUser(body);
+      const { status_code } = res.data;
+  
+      if (status_code === 200) {
         setIsIdChecked(false);
-      });
+        setErrors((prev) => ({ ...prev, user_id: "사용자가 존재합니다." }));
+      } else if (status_code === 404) {
+        setIsIdChecked(true);
+        setErrors((prev) => ({ ...prev, user_id: "" }));
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("중복체크 중 오류가 발생했습니다.");
+      setIsIdChecked(false);
+    }
   };
 
   /* Input handler */
@@ -61,6 +71,7 @@ const useAddUser = () => {
     const { name, value } = e.target;
     //id 변경시마다 중복체크확인 상태 false
     if (name === "user_id") {
+      if (value.length > 10) return;
       setIsIdChecked(false);
       setErrors((prev) => ({ ...prev, user_id: "" }));
     }

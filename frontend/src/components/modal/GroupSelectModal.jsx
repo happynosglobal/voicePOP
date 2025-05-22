@@ -49,10 +49,7 @@ const GroupSelectModal = ({
   const [filteredChosenStores, setFilteredChosenStores] = useState([]);
 
   // 전체 점포 목록 (왼쪽)
-  const [allStores, setAllStores] = useState([
-    ...storeGroupListForTree,
-    ...storesForTree,
-  ]);
+  const [allStores, setAllStores] = useState([]);
 
   const [checkedAllStores, setCheckedAllStores] = useState([]);
   const [expandedAllStores, setExpandedAllStores] = useState([]);
@@ -72,7 +69,11 @@ const GroupSelectModal = ({
 
   // 권역별 기본 그룹 + 커스텀 그룹 -> 전체점포 Tree 구조에 set
   useEffect(() => {
-    setAllStores([...storeGroupListForTree, ...storesForTree]);
+    if (addable) {
+      setAllStores([...storesForTree]);
+    } else {
+      setAllStores([...storesForTree, ...storeGroupListForTree]);
+    }
   }, [storeGroupListForTree, storesForTree]);
 
   // 점포 체크박스 선택
@@ -172,10 +173,14 @@ const GroupSelectModal = ({
     const handleClose = () => {
       setGroupName("");
       setSearchKeyword("");
+      setIsSearching(false);
       setFilteredStores([]);
       setCheckedAllStores([]);
       setTempCheckedStores([]);
       setExpandedAllStores([]);
+      setSearchChosenKeyword("");
+      setIsSearchingChosen(false);
+      setFilteredChosenStores([]);
       setChosenStores([]);
       setCheckedChosenStores([]);
       setExpandedChosenStores([]);
@@ -195,7 +200,8 @@ const GroupSelectModal = ({
     setTempCheckedStores([]);
     setIsSearching(true); // 검색 중 상태 ON
 
-    const combinedStores = [...storeGroupListForTree, ...storesForTree];
+    // const combinedStores = [...storeGroupListForTree, ...storesForTree];
+    const combinedStores = [...allStores];
 
     const filterNodes = (nodes, keyword) => {
       return nodes
@@ -207,7 +213,13 @@ const GroupSelectModal = ({
           if (node.children) {
             const filteredChildren = filterNodes(node.children, keyword);
             if (filteredChildren.length > 0) {
-              return { ...node, children: filteredChildren };
+              return {
+                value: node.value,
+                label: `${node.label.split(" (")[0]} (${
+                  filteredChildren.length
+                })`,
+                children: filteredChildren,
+              };
             }
           }
 
@@ -301,6 +313,11 @@ const GroupSelectModal = ({
                   className="input input-bordered w-full focus:ring-0 focus:outline-none"
                   value={searchKeyword}
                   onChange={(e) => setSearchKeyword(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleSearch();
+                    }
+                  }}
                 />
                 <button
                   className="btn btn-accent btn-sm"
@@ -384,6 +401,11 @@ const GroupSelectModal = ({
                   className="input input-bordered w-full focus:ring-0 focus:outline-none"
                   value={searchChosenKeyword}
                   onChange={(e) => setSearchChosenKeyword(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleSearchChosen();
+                    }
+                  }}
                 />
                 <button
                   className="btn btn-accent btn-sm"
@@ -453,6 +475,7 @@ const GroupSelectModal = ({
                 type="submit"
                 className="btn btn-primary min-w-24"
                 onClick={() => handleSubmit(groupName, chosenStores, null)}
+                disabled={addable && !groupName ? true : false}
               >
                 확인
               </button>

@@ -163,26 +163,25 @@ const AddUserModal = ({
                   className="input w-full"
                   value={formData.user_id}
                   onChange={handleInput}
-                  {...(mode === "add" && {
-                    validation: userIdRegex,
-                    errorMessage:
-                      errors.user_id ||
-                      (!isIdChecked ? "ID 중복 확인을 해주세요." : ""),
-                    handleError: handleError,
-                  })}
+                  maxLength={10}
                   disabled={mode === "modify" ? true : false}
                 />
+                {!isIdChecked ? (
+                  <p className="mt-2 text-error text-sm">{errors.user_id}</p>
+                ) : (
+                  <p className="mt-2 text-sm text-gray-500 text-primary">
+                    사용 가능한 ID 입니다.
+                  </p>
+                )}
               </div>
               {mode === "add" && (
-                <>
-                  <button
-                    className="btn btn-sm btn-accent ml-3"
-                    onClick={checkIdDuplicate}
-                    disabled={mode === "modify" ? true : false}
-                  >
-                    ID 중복 확인
-                  </button>
-                </>
+                <button
+                  className="btn btn-sm btn-accent ml-3"
+                  onClick={checkIdDuplicate}
+                  disabled={mode === "modify" ? true : false}
+                >
+                  ID 중복 확인
+                </button>
               )}
             </div>
             <div className="flex justify-between">

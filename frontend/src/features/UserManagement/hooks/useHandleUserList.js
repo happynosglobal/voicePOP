@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react'
-import { dummyUserList } from '../dummy/data';
-import { getUsers } from '../../../api/user/user';
-import { removeEmptyString } from '../../../utils/customFormat';
+import React, { useEffect, useState } from "react";
+import { dummyUserList } from "../dummy/data";
+import { getUsers } from "../../../api/user/user";
+import { removeEmptyString } from "../../../utils/customFormat";
 
 const useHandleUserList = () => {
   const limit = 10;
@@ -13,23 +13,23 @@ const useHandleUserList = () => {
     brand_code: "",
     status: "",
     keyword_type: "user_id",
-    keyword: ""
+    keyword: "",
   });
   const [userList, setUserList] = useState([]);
 
-  const handleGetUsers = (pageNumber = page) => {
+  const handleGetUsers = (params = searchParams, pageNumber = page) => {
     const tempParams = {
-      level: searchParams.level,
-      brand_code: searchParams.brand_code,
-      status: searchParams.status,
+      level: params.level,
+      brand_code: params.brand_code,
+      status: params.status,
       page: pageNumber,
       page_size: limit,
-      [searchParams.keyword_type]: searchParams.keyword,
-    }
+      [params.keyword_type]: params.keyword,
+    };
 
-    const params = removeEmptyString(tempParams)
+    const newParams = removeEmptyString(tempParams);
 
-    getUsers(params)
+    getUsers(newParams)
       .then((res) => {
         const { status_code, data } = res.data;
         if (status_code === 200) {
@@ -48,13 +48,17 @@ const useHandleUserList = () => {
   const handleInput = (e) => {
     const { name, value } = e.target;
     setSearchParams({ ...searchParams, [name]: value });
-  }
+  };
 
   const handleSelectBox = (option, option2) => {
     const { label, value } = option;
     const { name } = option2;
-    setSearchParams({ ...searchParams, [name]: value });
-  }
+    const newParams = { ...searchParams, [name]: value };
+    setSearchParams(newParams);
+    if(name !== "keyword_type") {
+      handleGetUsers(newParams, 1);
+    }
+  };
   return {
     userList,
     searchParams,
@@ -64,8 +68,8 @@ const useHandleUserList = () => {
     setPage,
     handleGetUsers,
     handleInput,
-    handleSelectBox
-  }
-}
+    handleSelectBox,
+  };
+};
 
 export default useHandleUserList;

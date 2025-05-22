@@ -102,6 +102,10 @@ const useEquipmentSettingForm = () => {
     try {
       const response = await postSettingDevice(formData);
       const { status, data } = response;
+      if (status === 200) {
+        toast.success(data.message);
+        navigate("/login");
+      }
     } catch (err) {
       console.error(err);
       toast.error(

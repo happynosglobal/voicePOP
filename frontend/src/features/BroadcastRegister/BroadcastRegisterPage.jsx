@@ -65,9 +65,8 @@ const BroadcastRegisterPage = () => {
     }
   }, [selectedStartDate, selectedEndDate]);
 
-  const [isGapChecked, setIsGapChecked] = useState(false); //GAP
-  const [isRepeatCountChecked, setIsRepeatCountChecked] = useState(false); //반복 횟수
-  const [isIntervalChecked, setIsIntervalChecked] = useState(false); //반복 간격
+  const [isGapChecked, setIsGapChecked] = useState(true); //GAP
+  const [isRepeatChecked, setIsRepeatChecked] = useState(false); //반복 횟수
 
   const [startTime, setStartTime] = useState("09:00"); // 시작 시간
   const [endTime, setEndTime] = useState("22:00"); // 종료 시간
@@ -97,24 +96,15 @@ const BroadcastRegisterPage = () => {
     setSelectedStore(formattedStores);
     storeModalRef.current.close();
   };
-
+  // 점포 제거 handler
+  const handleRemoveStore = (store) => {
+    setSelectedStore((prev) =>
+      prev.filter((item) => item.store_code !== store.store_code)
+    );
+  };
   // 광고 방송 등록 handler
   const handleSubmit = async () => {
-    // 예상 api
     try {
-      // // 방송 대상 점포 등록
-      // const targetStoreRes = await postBcTargetStore({
-      //   brand_code: user?.brand_code,
-      //   content_id: "",
-      //   item: selectedStore,
-      // });
-
-      // if (targetStoreRes.status !== 200) {
-      //   throw new Error("방송 대상 점포 등록 실패");
-      // }
-
-      // const targetStoresId = targetStoreRes.data.data.id;
-
       const body = {
         type: "normal",
         title: formData.title,
@@ -123,11 +113,15 @@ const BroadcastRegisterPage = () => {
         end_time: "2300",
         start_date: formData.start_date,
         end_date: formData.end_date,
-        gap: formData.gap,
-        repeat_count: formData.repeat_count,
-        repeat_interval: formData.repeat_interval,
         user_id: user?.user_id,
       };
+
+      if (isGapChecked && !isRepeatChecked) {
+        body.gap = formData.gap;
+      } else if (!isGapChecked && isRepeatChecked) {
+        body.repeat_count = formData.repeat_count;
+        body.repeat_interval = formData.repeat_interval;
+      }
 
       // 마스터 방송 등록
       const broadcastRes = await postBcMaster(body);
@@ -156,7 +150,7 @@ const BroadcastRegisterPage = () => {
       const audioFormData = new FormData();
       audioFormData.append("media_type", "sound");
       audioFormData.append("media_filename", audioFile);
-      audioFormData.append("media_desc", "시범데이터");
+      audioFormData.append("media_desc", formData.media_desc);
 
       const audioRes = await postBcMedia(audioFormData);
 
@@ -204,7 +198,7 @@ const BroadcastRegisterPage = () => {
         </div>
         <div className="form-group">
           <label className="form-label">MD</label>
-          <div className="form-input-group">
+          <div className="form-input-group flex-wrap gap-2.5">
             {categoryOptions.map((item, index) => (
               <label key={index} htmlFor={item.code} className="input-label">
                 <Radio
@@ -270,8 +264,10 @@ const BroadcastRegisterPage = () => {
                       className="flex items-center justify-between gap-1 bg-gray-200 text-gray-700 px-2.5 py-0.5 rounded text-sm hover:bg-gray-300 text-left"
                     >
                       {store.store_name}
-
-                      <IoMdCloseCircle className="flex-shrink-0" />
+                      <IoMdCloseCircle
+                        className="flex-shrink-0"
+                        onClick={() => handleRemoveStore(store)}
+                      />
                     </button>
                   ))}
                 </div>
@@ -328,7 +324,10 @@ const BroadcastRegisterPage = () => {
                 label="GAP"
                 className="checkbox"
                 checked={isGapChecked}
-                onChange={() => setIsGapChecked(!isGapChecked)}
+                onChange={() => {
+                  setIsGapChecked(!isGapChecked);
+                  setIsRepeatChecked(false);
+                }}
               />
             </label>
             <Select
@@ -353,8 +352,11 @@ const BroadcastRegisterPage = () => {
                 name="repeat_count"
                 className="checkbox"
                 label="횟수 / 간격"
-                checked={isRepeatCountChecked}
-                onChange={() => setIsRepeatCountChecked(!isRepeatCountChecked)}
+                checked={isRepeatChecked}
+                onChange={() => {
+                  setIsRepeatChecked(!isRepeatChecked);
+                  setIsGapChecked(false);
+                }}
               />
             </label>
             <Select
@@ -365,9 +367,9 @@ const BroadcastRegisterPage = () => {
                 (option) => option.value === formData.repeat_count
               )}
               onChange={handleSelectBox}
-              isDisabled={!isRepeatCountChecked}
+              isDisabled={!isRepeatChecked}
             />
-            회<span className="px-2">/</span>
+            <span className="px-2">/</span>
             <Select
               name="repeat_interval"
               className="min-w-24"
@@ -376,9 +378,8 @@ const BroadcastRegisterPage = () => {
                 (option) => option.value === formData.repeat_interval
               )}
               onChange={handleSelectBox}
-              isDisabled={!isRepeatCountChecked}
+              isDisabled={!isRepeatChecked}
             />
-            분
           </div>
         </div>
 
@@ -387,7 +388,9 @@ const BroadcastRegisterPage = () => {
           <label className="font-semibold w-32 shrink-0 leading-9">
             방송파일
           </label>
-          <FileUploader audioFile={audioFile} setAudioFile={setAudioFile} />
+          <div className="w-full flex flex-col gap-5">
+            <FileUploader audioFile={audioFile} setAudioFile={setAudioFile} />
+          </div>
         </div>
 
         <div className="form-group">
@@ -396,10 +399,10 @@ const BroadcastRegisterPage = () => {
           </label>
           <Input
             type="text"
-            name="title"
+            name="media_desc"
             placeholder="방송파일 설명을 입력하세요"
             className="input w-full"
-            value={formData.title}
+            value={formData.media_desc}
             onChange={handleInput}
           />
         </div>
@@ -410,7 +413,7 @@ const BroadcastRegisterPage = () => {
             type="submit"
             className="btn btn-primary min-w-24"
             onClick={handleSubmit}
-            disabled={!isFormValid()}
+            disabled={!isFormValid(isGapChecked)}
           >
             등록
           </button>

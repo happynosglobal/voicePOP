@@ -7,10 +7,10 @@ import {
 import useCodes from "../stores/codes";
 
 const regionalGroupTypes = [
-  { value: "G1", label: "권역1" },
-  { value: "G2", label: "권역2" },
-  { value: "G3", label: "권역3" },
-  { value: "G4", label: "권역4" },
+  { value: "G1", label: "판매1담당" },
+  { value: "G2", label: "판매2담당" },
+  { value: "G3", label: "판매3담당" },
+  { value: "G4", label: "판매4담당" },
 ];
 
 export const getAllStores = async (brand_code) => {
@@ -19,7 +19,9 @@ export const getAllStores = async (brand_code) => {
     const { code, data } = response.data;
 
     if (code === "0000" && Array.isArray(data)) {
-      const allStores = data;
+      const allStores = data.sort((a, b) =>
+        a.name.localeCompare(b.name, "ko-KR", { sensitivity: "base" })
+      );
 
       const filteredData = data.filter(
         (store) => store.com_code === brand_code
@@ -47,13 +49,22 @@ export const getAllStores = async (brand_code) => {
               value: `${store.id}_${group.value}`,
               label: store.name,
             }));
-          return children.length > 0 ? { ...group, children } : null;
+
+          if (children.length > 0) {
+            return {
+              value: group.value,
+              label: `${group.label} (${children.length})`,
+              children,
+            };
+          }
+
+          return null;
         })
         .filter(Boolean);
 
       return {
         allStores, // 전체 점포
-        storeByBrandCode, // 로그인시 고른 브랜드코드로 필터링된 점포
+        storeByBrandCode, // 브랜드코드로 필터링된 점포
         regionalGroupData, // 권역 그룹 점포
         nonRegionalData, // 그룹 없음 점포
       };
@@ -64,62 +75,6 @@ export const getAllStores = async (brand_code) => {
   }
 };
 
-// export const getAllStores = async () => {
-//   try {
-//     const response = await getStoreCodes();
-//     const { code, data } = response.data;
-//     if (code === "0000" && Array.isArray(data)) {
-//       return data;
-//     }
-//   } catch (err) {
-//     toast.error("점포 정보를 불러오는데 실패했습니다.");
-//     console.error(err);
-//   }
-// };
-
-// export const getRegionalGroupStores = async (brand_code) => {
-//   try {
-//     const response = await getStoreCodes({ store_type: brand_code });
-//     const { code, data } = response.data;
-
-//     if (code === "0000" && Array.isArray(data)) {
-//       // 그룹없이 개별 점포 목록 세팅
-//       const storeByBrandCode = data.map((store) => {
-//         return { value: store.id, label: store.name };
-//       });
-
-//       // group_id가 있는 점포들 필터링
-//       const groupedStores = data.filter((store) => store.group_id);
-
-//       // group_id가 없는 점포들 필터링
-//       const nonRegionalData = data
-//         .filter((store) => !store.group_id)
-//         .map((store) => {
-//           return { value: store.id, label: store.name };
-//         });
-
-//       // regionalGroupTypes와 매핑하여 그룹화
-//       const regionalGroupData = regionalGroupTypes
-//         .map((group) => {
-//           const children = groupedStores
-//             .filter((store) => store.group_id === group.value)
-//             // .map(store => ({ value: store.id, label: store.name }));
-//             .map((store) => ({
-//               value: store.id + "_" + group.value,
-//               label: store.name,
-//             }));
-
-//           return children.length > 0 ? { ...group, children: children } : null;
-//         })
-//         .filter(Boolean);
-
-//       return { storeByBrandCode, regionalGroupData, nonRegionalData };
-//     }
-//   } catch (err) {
-//     toast.error("점포 정보를 불러오는데 실패했습니다.");
-//     console.error(err);
-//   }
-// };
 
 export const getGroupInfo = async (id) => {
   try {
