@@ -25,10 +25,10 @@ const localizer = dateFnsLocalizer({
 });
 
 const categoryColors = {
-  "1": "#22C55E",
-  "2": "#FB923C",
-  "3": "#6366F1",
-  "4": "#06B6D4",
+  1: "#22C55E",
+  2: "#FB923C",
+  3: "#6366F1",
+  4: "#06B6D4",
 };
 
 const convertItemsToEvents = (items, selectedDate) => {
@@ -36,7 +36,7 @@ const convertItemsToEvents = (items, selectedDate) => {
 
   items.forEach((item) => {
     const id = item.id;
-    const title = item.title;
+    const baseTitle = item.title;
     const category = item.category_type_seq;
 
     const parseTime = (timeStr) => {
@@ -55,41 +55,47 @@ const convertItemsToEvents = (items, selectedDate) => {
     const baseEnd = parseTime(item.end_time);
     const durationMs = baseEnd - baseStart;
 
-    const gap = item.gap;
-    const interval = item.repeat_interval;
-    const count = item.repeat_count || 1;
+    const gap = item.gap > 0 ? item.gap : 0;
+    const interval = item.repeat_interval > 0 ? item.repeat_interval : 0;
+    const count = item.repeat_count > 0 ? item.repeat_count : 0;
+    const playTimeSeconds = item.play_time_seconds || 63;
+    const playDurationMs = playTimeSeconds * 1000;
 
-    if (gap && gap > 0) {
+    // GAP이 설정된 방송 : 하나의 이벤트만 생성
+    if (gap > 0) {
+      allEvents.push({
+        id: `${id}-gap-full`,
+        title: `${baseTitle} (gap: ${gap}s)`,
+        category,
+        start: baseStart,
+        end: baseEnd,
+      });
+    }
+
+    // repeat이 설정된 방송 : count × interval 개수만큼 반복 이벤트 생성
+    else if (interval > 0 && count > 0) {
       let currentStart = new Date(baseStart);
-      let i = 0;
-      while (currentStart.getTime() + durationMs <= baseEnd.getTime()) {
-        const currentEnd = new Date(currentStart.getTime() + durationMs);
+
+      for (let i = 0; i < count; i++) {
+        const currentEnd = new Date(currentStart.getTime() + playDurationMs);
+
         allEvents.push({
-          id: `${id}-gap-${i}`,
-          title,
+          id: `${id}-repeat-${i}`,
+          title: `${baseTitle} (${playTimeSeconds}s)`,
           category,
           start: currentStart,
           end: currentEnd,
         });
-        currentStart = new Date(currentEnd.getTime() + gap * 1000);
-        i++;
+
+        currentStart = new Date(currentEnd.getTime() + interval * 1000);
       }
-    } else if (interval && interval > 0 && count > 0) {
-      for (let i = 0; i < count; i++) {
-        const start = new Date(baseStart.getTime() + i * interval * 1000);
-        const end = new Date(start.getTime() + durationMs);
-        allEvents.push({
-          id: `${id}-int-${i}`,
-          title,
-          category,
-          start,
-          end,
-        });
-      }
-    } else {
+    }
+
+    // 아무 조건 없을 경우 단일 이벤트
+    else {
       allEvents.push({
         id: `${id}-single`,
-        title,
+        title: baseTitle,
         category,
         start: baseStart,
         end: baseEnd,
@@ -122,12 +128,23 @@ const CustomToolbar = ({
   return (
     <div className="tabs-wrapper">
       <div className="flex items-center gap-4 px-4 py-2 mb-2 bg-gray-100 rounded-lg text-gray-700">
-        <button onClick={() => onNavigate("PREV")}> <AiOutlineLeft className="mr-2" /></button>
+        <button onClick={() => onNavigate("PREV")}>
+          {" "}
+          <AiOutlineLeft className="mr-2" />
+        </button>
         <div className="w-40">
           <CustomDatePicker selectedDate={date} onChange={setDate} />
         </div>
-        <button onClick={() => onNavigate("NEXT")}> <AiOutlineRight className="ml-2" /></button>
-        <button onClick={() => onNavigate("TODAY")} className="btn btn-sm btn-accent">오늘</button>
+        <button onClick={() => onNavigate("NEXT")}>
+          {" "}
+          <AiOutlineRight className="ml-2" />
+        </button>
+        <button
+          onClick={() => onNavigate("TODAY")}
+          className="btn btn-sm btn-accent"
+        >
+          오늘
+        </button>
         <div className="flex flex-wrap items-center gap-1.5">
           <Select
             name="str_code"
@@ -143,10 +160,15 @@ const CustomToolbar = ({
         {tabs.map((option, index) => (
           <button
             key={index}
-            className={`tab-btn ${activeTab === option.code ? "is-active" : ""}`}
+            className={`tab-btn ${
+              activeTab === option.code ? "is-active" : ""
+            }`}
             onClick={() => {
               setActiveTab(option.code);
-              setSearchParams((prev) => ({ ...prev, category_code: option.code }));
+              setSearchParams((prev) => ({
+                ...prev,
+                category_code: option.code,
+              }));
             }}
           >
             {option.name}
@@ -189,6 +211,7 @@ const AdSchedulePage = () => {
         str_code: searchParams.str_code,
         rows_per_page: 1000,
         search_date: toDate(date),
+        use_yn: "Y",
       };
       const params = removeEmptyString(tempParams);
       try {
@@ -208,17 +231,23 @@ const AdSchedulePage = () => {
   return (
     <ContentLayout>
       <Calendar
-      dayLayoutAlgorithm="no-overlap"
         localizer={localizer}
         events={events}
         defaultView="day"
         views={["day"]}
         date={date}
         onNavigate={(newDate) => setDate(newDate)}
-        step={10}
-        timeslots={6}
-        min={new Date(date.getFullYear(), date.getMonth(), date.getDate(), 9, 0)}
-        max={new Date(date.getFullYear(), date.getMonth(), date.getDate(), 22, 0)}
+        step={1}
+        timeslots={5}
+        popup={true}
+        dayLayoutAlgorithm="no-overlap"
+        scrollToTime={new Date(1970, 1, 1, 9, 0)}
+        min={
+          new Date(date.getFullYear(), date.getMonth(), date.getDate(), 9, 0)
+        }
+        max={
+          new Date(date.getFullYear(), date.getMonth(), date.getDate(), 22, 0)
+        }
         formats={{
           timeGutterFormat: (date) => format(date, "HH:mm"),
           eventTimeRangeFormat: ({ start, end }) =>
@@ -227,6 +256,10 @@ const AdSchedulePage = () => {
         style={{ height: "1600px" }}
         eventPropGetter={(event) => ({
           style: {
+            maxWidth: "200px",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
             backgroundColor: categoryColors[event.category] || "#888888",
             color: "#fff",
             borderRadius: "6px",
