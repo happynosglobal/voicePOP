@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { toDate } from "../../../utils/customFormat";
 import EmptyState from "../../../components/emptyState/EmptyState";
+import Tab from "../../../components/tab/tab";
 
 const DeviceStatsTable = ({
   searchParams,
@@ -28,7 +29,8 @@ const DeviceStatsTable = ({
 
   return (
     <>
-      <div className="tabs-wrapper">
+      <Tab tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
+      {/* <div className="tabs-wrapper">
         <div className="tabs-nav">
           {tabs.map((option, index) => (
             <button
@@ -48,7 +50,7 @@ const DeviceStatsTable = ({
             </button>
           ))}
         </div>
-      </div>
+      </div> */}
 
       <table className="table">
         <thead>

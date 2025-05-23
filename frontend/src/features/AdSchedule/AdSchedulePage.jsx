@@ -14,6 +14,7 @@ import useCategoryCode from "../../hooks/useCategoryCode";
 import useUserStore from "../../stores/user";
 import { getBcMasterList } from "../../api/broadcast/broadcast";
 import { removeEmptyString, toDate } from "../../utils/customFormat";
+import Tab from "../../components/tab/tab";
 
 const locales = { "en-US": enUS };
 const localizer = dateFnsLocalizer({
@@ -126,7 +127,7 @@ const CustomToolbar = ({
   };
 
   return (
-    <div className="tabs-wrapper">
+    <>
       <div className="flex items-center gap-4 px-4 py-2 mb-2 bg-gray-100 rounded-lg text-gray-700">
         <button onClick={() => onNavigate("PREV")}>
           {" "}
@@ -156,26 +157,18 @@ const CustomToolbar = ({
         </div>
       </div>
 
-      <div className="tabs-nav">
-        {tabs.map((option, index) => (
-          <button
-            key={index}
-            className={`tab-btn ${
-              activeTab === option.code ? "is-active" : ""
-            }`}
-            onClick={() => {
-              setActiveTab(option.code);
-              setSearchParams((prev) => ({
-                ...prev,
-                category_code: option.code,
-              }));
-            }}
-          >
-            {option.name}
-          </button>
-        ))}
-      </div>
-    </div>
+      <Tab
+        tabs={tabs}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        onTabChange={(code) => {
+          setSearchParams((prev) => ({
+            ...prev,
+            category_code: code,
+          }));
+        }}
+      />
+    </>
   );
 };
 

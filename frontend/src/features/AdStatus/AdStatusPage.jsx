@@ -5,6 +5,7 @@ import CustomDatePicker from "../../components/customDatePicker/CustomDatePicker
 import Tooltip from "../../components/tooltip/Tooltip";
 import Pagination from "../../components/pagination/Pagination";
 import { RiFileExcel2Line } from "react-icons/ri";
+import Tab from "../../components/tab/tab";
 
 const dummyAD = [
   {
@@ -158,19 +159,8 @@ const AdStatusPage = () => {
         )}
       </ul>
 
-      <div className="tabs-wrapper">
-        <div className="tabs-nav">
-          {tabs.map((tab) => (
-            <button
-              key={tab}
-              className={`tab-btn ${activeTab === tab ? "is-active" : ""}`}
-              onClick={() => setActiveTab(tab)}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
-      </div>
+      <Tab tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
+
       {activeTab === "업체별 현황" ? (
         <>
           <table className="table">

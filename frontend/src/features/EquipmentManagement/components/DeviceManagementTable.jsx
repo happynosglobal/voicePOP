@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import Select from "react-select";
 import Tooltip from "../../../components/tooltip/Tooltip";
 import { toDateTime } from "../../../utils/customFormat";
+import Tab from "../../../components/tab/tab";
 
 const DeviceManagementTable = ({
   searchParams,
@@ -39,27 +40,17 @@ const DeviceManagementTable = ({
 
   return (
     <>
-      <div className="tabs-wrapper">
-        <div className="tabs-nav">
-          {tabs.map((option, index) => (
-            <button
-              key={index}
-              className={`tab-btn ${
-                activeTab === option.code ? "is-active" : ""
-              }`}
-              onClick={() => {
-                setActiveTab(option.code);
-                setSearchParams((prev) => ({
-                  ...prev,
-                  category_code: option.code,
-                }));
-              }}
-            >
-              {option.name}
-            </button>
-          ))}
-        </div>
-      </div>
+      <Tab
+        tabs={tabs}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        onTabChange={(code) => {
+          setSearchParams((prev) => ({
+            ...prev,
+            category_code: code,
+          }));
+        }}
+      />
 
       <table className="table">
         <thead>
