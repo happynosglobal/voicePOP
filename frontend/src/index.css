@@ -49,8 +49,14 @@ body {min-width:1400px;}
 
 
   /** 기본 탭 **/
-.tabs-wrapper { @apply mb-4 w-full overflow-x-scroll border-b border-gray-400;}
-.tabs-nav { @apply flex gap-2;}
+.tabs-wrapper { @apply mb-4 w-full overflow-x-auto border-b border-gray-400;}
+.tabs-wrapper::-webkit-scrollbar {height: 12px;}
+.tabs-wrapper::-webkit-scrollbar-track { background: #f7f7f7;}
+.tabs-wrapper::-webkit-scrollbar-thumb { border: 3px solid #f7f7f7;background-color: #8B817C; border-radius: 9999px;}
+
+.tabs-wrapper {scrollbar-width: auto; scrollbar-color: #8B817C #f7f7f7;}
+
+.tabs-nav { @apply flex gap-2 pb-2;}
 .tab-btn {@apply min-w-36 h-[42px] font-semibold rounded-[10px] transition  text-gray-500 hover:bg-gray-100 bg-stone-100;}
 .tab-btn.is-active {@apply bg-blue-600 text-white;}
 
