@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import { enUS } from "date-fns/locale";
@@ -12,9 +12,14 @@ import CustomDatePicker from "../../components/customDatePicker/CustomDatePicker
 import useCodes from "../../stores/codes";
 import useCategoryCode from "../../hooks/useCategoryCode";
 import useUserStore from "../../stores/user";
-import { getBcMasterList } from "../../api/broadcast/broadcast";
+import {
+  getBcMasterList,
+  getBcMasterListByStore,
+  getBcTargetStore,
+} from "../../api/broadcast/broadcast";
 import { removeEmptyString, toDate } from "../../utils/customFormat";
-import Tab from "../../components/tab/tab";
+import Tab from "../../components/tab/Tab";
+import AdEventDetailModal from "./components/AdEventDetailModal";
 
 const locales = { "en-US": enUS };
 const localizer = dateFnsLocalizer({
@@ -59,17 +64,25 @@ const convertItemsToEvents = (items, selectedDate) => {
     const gap = item.gap > 0 ? item.gap : 0;
     const interval = item.repeat_interval > 0 ? item.repeat_interval : 0;
     const count = item.repeat_count > 0 ? item.repeat_count : 0;
-    const playTimeSeconds = item.play_time_seconds || 63;
+
+    const media = item.medias?.[0];
+    const playTimeSeconds =
+      media?.play_time_seconds || item.play_time_seconds || 63;
+    const mediaFilename = media?.media_filename || "음성파일 없음";
     const playDurationMs = playTimeSeconds * 1000;
 
     // GAP이 설정된 방송 : 하나의 이벤트만 생성
     if (gap > 0) {
       allEvents.push({
+        originalId: id,
         id: `${id}-gap-full`,
         title: `${baseTitle} (gap: ${gap}s)`,
         category,
         start: baseStart,
         end: baseEnd,
+        gap,
+        playTimeSeconds,
+        mediaFilename,
       });
     }
 
@@ -81,11 +94,15 @@ const convertItemsToEvents = (items, selectedDate) => {
         const currentEnd = new Date(currentStart.getTime() + playDurationMs);
 
         allEvents.push({
+          originalId: id,
           id: `${id}-repeat-${i}`,
           title: `${baseTitle} (${playTimeSeconds}s)`,
           category,
           start: currentStart,
           end: currentEnd,
+          gap,
+          playTimeSeconds,
+          mediaFilename,
         });
 
         currentStart = new Date(currentEnd.getTime() + interval * 1000);
@@ -95,11 +112,15 @@ const convertItemsToEvents = (items, selectedDate) => {
     // 아무 조건 없을 경우 단일 이벤트
     else {
       allEvents.push({
+        originalId: id,
         id: `${id}-single`,
         title: baseTitle,
         category,
         start: baseStart,
         end: baseEnd,
+        gap,
+        playTimeSeconds,
+        mediaFilename,
       });
     }
   });
@@ -111,6 +132,7 @@ const CustomToolbar = ({
   label,
   date,
   onNavigate,
+  user,
   tabs,
   activeTab,
   setActiveTab,
@@ -121,7 +143,7 @@ const CustomToolbar = ({
   const { storeByBrandCode } = useCodes();
 
   const handleSelectBox = (option, option2) => {
-    const { value } = option;
+    const { label, value } = option;
     const { name } = option2;
     setSearchParams((prev) => ({ ...prev, [name]: value }));
   };
@@ -130,14 +152,12 @@ const CustomToolbar = ({
     <>
       <div className="flex items-center gap-4 px-4 py-2 mb-2 bg-gray-100 rounded-lg text-gray-700">
         <button onClick={() => onNavigate("PREV")}>
-          {" "}
           <AiOutlineLeft className="mr-2" />
         </button>
         <div className="w-40">
           <CustomDatePicker selectedDate={date} onChange={setDate} />
         </div>
         <button onClick={() => onNavigate("NEXT")}>
-          {" "}
           <AiOutlineRight className="ml-2" />
         </button>
         <button
@@ -151,7 +171,15 @@ const CustomToolbar = ({
             name="str_code"
             options={[{ value: "", label: "모든 점포" }, ...storeByBrandCode]}
             className="min-w-64"
-            onChange={handleSelectBox}
+            onChange={(option, meta) => {
+              if (user?.level !== "STORE") handleSelectBox(option, meta);
+            }}
+            value={
+              [{ value: "", label: "모든 점포" }, ...storeByBrandCode].find(
+                (opt) => opt.value === searchParams.str_code
+              ) || { value: "", label: "모든 점포" }
+            }
+            isDisabled={user?.level === "STORE"}
             defaultValue={{ value: "", label: "모든 점포" }}
           />
         </div>
@@ -177,10 +205,14 @@ const AdSchedulePage = () => {
   const [date, setDate] = useState(new Date());
   const [events, setEvents] = useState([]);
   const [searchParams, setSearchParams] = useState({
-    str_code: "",
+    str_code: user?.store_code || "",
     category_code: "",
     rows_per_page: 1000,
   });
+  
+  const [selectedEvent, setSelectedEvent] = useState(null);
+
+  const modalRef = useRef(null);
   const [activeTab, setActiveTab] = useState("");
   const { categoryOptions, getCategoryCodes } = useCategoryCode();
 
@@ -189,6 +221,12 @@ const AdSchedulePage = () => {
   }, [categoryOptions]);
 
   useEffect(() => {
+    // if (user?.level === "STORE" && user?.store_code) {
+    //   setSearchParams((prev) => ({
+    //     ...prev,
+    //     str_code: user.store_code,
+    //   }));
+    // }
     getCategoryCodes(user?.brand_code);
   }, [user]);
 
@@ -201,14 +239,27 @@ const AdSchedulePage = () => {
       const tempParams = {
         type: "commercial",
         category_type_seq: searchParams.category_code,
-        str_code: searchParams.str_code,
         rows_per_page: 1000,
         search_date: toDate(date),
+        brand_code: user?.brand_code,
         use_yn: "Y",
       };
+
       const params = removeEmptyString(tempParams);
+
       try {
-        const response = await getBcMasterList(params);
+        let response;
+        if (searchParams.str_code) {
+          // str_code가 설정된 경우: 점포별 조회
+          response = await getBcMasterListByStore(
+            searchParams.str_code,
+            params
+          );
+        } else {
+          // 모든 점포 조회
+          response = await getBcMasterList(params);
+        }
+
         if (response.status === 200) {
           const events = convertItemsToEvents(response.data.data.items, date);
           setEvents(events);
@@ -218,9 +269,22 @@ const AdSchedulePage = () => {
         console.error(err);
       }
     };
+
     getAdList();
   }, [searchParams, date]);
-
+  const handleSelectEvent = async (event) => {
+    try {
+      const res = await getBcTargetStore(event.originalId, {
+        page_size: 1000,
+      });
+      const stores = res.data.data.items;
+      setSelectedEvent({ ...event, stores });
+      modalRef.current?.showModal();
+    } catch (e) {
+      toast.error("점포 정보를 불러오는 데 실패했습니다.");
+      console.error(e);
+    }
+  };
   return (
     <ContentLayout>
       <Calendar
@@ -233,6 +297,7 @@ const AdSchedulePage = () => {
         step={1}
         timeslots={5}
         popup={true}
+        onSelectEvent={handleSelectEvent}
         dayLayoutAlgorithm="no-overlap"
         scrollToTime={new Date(1970, 1, 1, 9, 0)}
         min={
@@ -264,6 +329,7 @@ const AdSchedulePage = () => {
           toolbar: (props) => (
             <CustomToolbar
               {...props}
+              user={user}
               tabs={tabs}
               activeTab={activeTab}
               setActiveTab={setActiveTab}
@@ -274,6 +340,11 @@ const AdSchedulePage = () => {
             />
           ),
         }}
+      />
+      <AdEventDetailModal
+        selectedEvent={selectedEvent}
+        modalRef={modalRef}
+        onClose={() => modalRef.current?.close()}
       />
     </ContentLayout>
   );

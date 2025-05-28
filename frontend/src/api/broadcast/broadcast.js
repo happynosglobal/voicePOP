@@ -12,13 +12,21 @@ export const putBcMaster = (id, body) => {
 export const getBcMaster = (id) => {
   return apiCall.get(`/content/master/${id}`);
 };
+/* 방송 마스터 삭제 */
+export const deleteBcMaster = (id) => {
+  return apiCall.delete(`/content/master/${id}`);
+};
 /* 방송 마스터 목록 조회 */
 export const getBcMasterList = (params) => {
   return apiCall.get(`/content/master`, { params });
 };
-/* 방송 마스터 목록 조회 */
-export const getBcMasterListBystore = (id, params) => {
-  return apiCall.get(`/content/store/broadcasts/${id}`, { params });
+/* 방송 마스터 목록 조회 (점포별) */
+export const getBcMasterListByStore = (storeCode, params) => {
+  return apiCall.get(`/content/store/broadcasts/${storeCode}`, { params });
+};
+/* 방송 대상 점포 조회 */
+export const getBcTargetStore = (id, params) => {
+  return apiCall.get(`/content/store/${id}`, { params });
 };
 /* 방송 대상 점포 등록 */
 export const postBcTargetStore = (body) => {

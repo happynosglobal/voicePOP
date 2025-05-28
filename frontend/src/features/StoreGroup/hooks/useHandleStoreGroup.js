@@ -23,9 +23,9 @@ const useHandleStoreGroup = () => {
       });
       const { status, data } = response;
       if (status === 200) {
-        setStoreGroupList(data.items);
-        setTotal(data.count);
-        setPage(data.page);
+        setStoreGroupList(data.data.items);
+        setTotal(data.data.count);
+        setPage(data.data.page);
       }
     } catch (error) {
       console.error("그룹 및 점포 조회 오류:", error);

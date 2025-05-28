@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import Select from "react-select";
 import Tooltip from "../../../components/tooltip/Tooltip";
 import { toDateTime } from "../../../utils/customFormat";
-import Tab from "../../../components/tab/tab";
+import Tab from "../../../components/tab/Tab";
 
 const DeviceManagementTable = ({
   searchParams,

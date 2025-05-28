@@ -5,7 +5,7 @@ import CustomDatePicker from "../../components/customDatePicker/CustomDatePicker
 import Tooltip from "../../components/tooltip/Tooltip";
 import Pagination from "../../components/pagination/Pagination";
 import { RiFileExcel2Line } from "react-icons/ri";
-import Tab from "../../components/tab/tab";
+import Tab from "../../components/tab/Tab";
 
 const dummyAD = [
   {

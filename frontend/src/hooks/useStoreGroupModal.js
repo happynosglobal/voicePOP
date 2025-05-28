@@ -16,8 +16,8 @@ const useStoreGroupModal = () => {
         page_size: 100,
       });
 
-      let groups = groupResponse.data.items
-        .filter((item) => item.count > 0 || item.store_names.length > 0)
+      let groups = groupResponse.data.data.items
+        .filter((item) => item.count > 0 || item.store_names?.length > 0)
         .map((item) => ({
           value: item.id,
           label: item.name,

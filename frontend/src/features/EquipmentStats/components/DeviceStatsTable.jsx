@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { toDate } from "../../../utils/customFormat";
 import EmptyState from "../../../components/emptyState/EmptyState";
-import Tab from "../../../components/tab/tab";
+import Tab from "../../../components/tab/Tab";
 
 const DeviceStatsTable = ({
   searchParams,
@@ -29,28 +29,17 @@ const DeviceStatsTable = ({
 
   return (
     <>
-      <Tab tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
-      {/* <div className="tabs-wrapper">
-        <div className="tabs-nav">
-          {tabs.map((option, index) => (
-            <button
-              key={index}
-              className={`tab-btn ${
-                activeTab === option.code ? "is-active" : ""
-              }`}
-              onClick={() => {
-                setActiveTab(option.code);
-                setSearchParams((prev) => ({
-                  ...prev,
-                  category_code: option.code,
-                }));
-              }}
-            >
-              {option.name}
-            </button>
-          ))}
-        </div>
-      </div> */}
+      <Tab
+        tabs={tabs}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        onTabChange={(code) => {
+          setSearchParams((prev) => ({
+            ...prev,
+            category_code: code,
+          }));
+        }}
+      />
 
       <table className="table">
         <thead>

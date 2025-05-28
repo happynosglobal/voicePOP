@@ -194,7 +194,7 @@ const useAddUser = () => {
       const { status_code, data } = response.data;
       if (status_code === 200) {
         if (data.level === "STORE" && data.brand_code.length !== 0) {
-          await handleClickBrand(data.brand_code);
+          await handleClickBrand(data.brand_code[0]);
         }
         setUserInfo(data);
         setFormData({

@@ -18,6 +18,7 @@ import {
 import FileUploader from "../../components/input/FileUploader";
 import useUserStore from "../../stores/user";
 import {
+  deleteBcMaster,
   postAudioMapping,
   postBcMaster,
   postBcMedia,
@@ -28,6 +29,7 @@ import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../../components/loading/LoadingSpinner";
 
 import { IoMdCloseCircle } from "react-icons/io";
+import { getStoreNameByCode } from "../../hooks/useStoreCode";
 
 const AdRegisterPage = () => {
   const { user } = useUserStore();
@@ -120,6 +122,7 @@ const AdRegisterPage = () => {
   };
   // 광고 방송 등록 handler
   const handleSubmit = async () => {
+    let masterBroadcastId = null;
     try {
       const body = {
         type: "commercial",
@@ -131,6 +134,7 @@ const AdRegisterPage = () => {
         start_date: formData.start_date,
         end_date: formData.end_date,
         user_id: user?.user_id,
+        brand_code: user?.brand_code,
       };
 
       if (isGapChecked && !isRepeatChecked) {
@@ -147,13 +151,23 @@ const AdRegisterPage = () => {
         throw new Error("마스터 방송 등록 실패");
       }
 
-      const masterBroadcastId = broadcastRes.data.data.id;
+      masterBroadcastId = broadcastRes.data.data.id;
+
+      const storeList =
+        user?.level === "STORE"
+          ? [
+              {
+                store_code: user?.store_code,
+                store_name: getStoreNameByCode(user?.store_code),
+              },
+            ]
+          : selectedStore; // 점포관리자면 본인의 점포만 대상으로 요청
 
       // 방송 대상 점포 등록
       const targetStoreRes = await postBcTargetStore({
         brand_code: user?.brand_code,
         content_id: masterBroadcastId,
-        item: selectedStore,
+        item: storeList,
         user_id: user?.user_id,
       });
 
@@ -167,7 +181,7 @@ const AdRegisterPage = () => {
       const audioFormData = new FormData();
       audioFormData.append("media_type", "sound");
       audioFormData.append("media_filename", audioFile);
-      audioFormData.append("media_desc", formData.media_desc);
+      audioFormData.append("media_desc", " ");
 
       const audioRes = await postBcMedia(audioFormData);
 
@@ -196,6 +210,14 @@ const AdRegisterPage = () => {
     } catch (error) {
       console.error("방송 등록 중 오류 발생:", error);
       toast.error("방송 등록 중 오류가 발생했습니다.");
+      // 실패 시 마스터 방송 삭제
+      if (masterBroadcastId) {
+        try {
+          await deleteBcMaster(masterBroadcastId);
+        } catch (err) {
+          console.error("마스터 방송 삭제 중 오류:", err);
+        }
+      }
     }
   };
 
@@ -231,67 +253,69 @@ const AdRegisterPage = () => {
             ))}
           </div>
         </div>
-        <div className="form-group">
-          <label className="form-label">적용점포</label>
-          <div className="w-full">
-            <div className="mb-2 flex justify-between items-center gap-2">
-              <div className="space-x-2">
-                <button
-                  className="btn btn-sm btn-accent"
-                  onClick={() => {
-                    setTempSelectedStores(
-                      selectedStore.map((s) => ({
-                        value: s.store_code,
-                        label: s.store_name,
-                      }))
-                    );
-                    storeModalRef.current.showModal();
-                  }}
-                >
-                  점포선택
-                </button>
-                <button
-                  className="btn btn-sm btn-accent"
-                  onClick={() => {
-                    handleStoreGroup("", storeByBrandCode);
-                  }}
-                >
-                  전점
-                </button>
-                <button
-                  className="btn btn-sm btn-error"
-                  onClick={() => {
-                    handleStoreGroup("", []);
-                  }}
-                >
-                  초기화
-                </button>
-              </div>
-              <p className="text-gray-500 text-right leading-tight">
-                선택된 점포 수 :
-                <b className="text-gray-900">{selectedStore.length}</b>개
-              </p>
-            </div>
-            {selectedStore.length !== 0 && (
-              <div className="p-2 border rounded-[10px] max-h-48 min-h-16 overflow-y-auto">
-                <div className="grid grid-cols-7 gap-2">
-                  {selectedStore.map((store, index) => (
-                    <button
-                      key={index}
-                      className="flex items-center justify-between gap-1 bg-gray-200 text-gray-700 px-2.5 py-0.5 rounded text-sm hover:bg-gray-300 text-left"
-                    >
-                      {store.store_name}
-                      <IoMdCloseCircle
-                        className="flex-shrink-0"
-                        onClick={() => handleRemoveStore(store)}
-                      />
-                    </button>
-                  ))}
+        {user.level !== "STORE" && (
+          <div className="form-group">
+            <label className="form-label">적용점포</label>
+            <div className="w-full">
+              <div className="mb-2 flex justify-between items-center gap-2">
+                <div className="space-x-2">
+                  <button
+                    className="btn btn-sm btn-accent"
+                    onClick={() => {
+                      setTempSelectedStores(
+                        selectedStore.map((s) => ({
+                          value: s.store_code,
+                          label: s.store_name,
+                        }))
+                      );
+                      storeModalRef.current.showModal();
+                    }}
+                  >
+                    점포선택
+                  </button>
+                  <button
+                    className="btn btn-sm btn-accent"
+                    onClick={() => {
+                      handleStoreGroup("", storeByBrandCode);
+                    }}
+                  >
+                    전점
+                  </button>
+                  <button
+                    className="btn btn-sm btn-error"
+                    onClick={() => {
+                      handleStoreGroup("", []);
+                    }}
+                  >
+                    초기화
+                  </button>
                 </div>
+                <p className="text-gray-500 text-right leading-tight">
+                  선택된 점포 수 :
+                  <b className="text-gray-900">{selectedStore.length}</b>개
+                </p>
               </div>
-            )}
+              {selectedStore.length !== 0 && (
+                <div className="p-2 border rounded-[10px] max-h-48 min-h-16 overflow-y-auto">
+                  <div className="grid grid-cols-7 gap-2">
+                    {selectedStore.map((store, index) => (
+                      <button
+                        key={index}
+                        className="flex items-center justify-between gap-1 bg-gray-200 text-gray-700 px-2.5 py-0.5 rounded text-sm hover:bg-gray-300 text-left"
+                      >
+                        {store.store_name}
+                        <IoMdCloseCircle
+                          className="flex-shrink-0"
+                          onClick={() => handleRemoveStore(store)}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="form-group">
           <label className="form-label">광고 업체</label>
@@ -385,7 +409,6 @@ const AdRegisterPage = () => {
               onChange={handleSelectBox}
               isDisabled={!isGapChecked}
             />
-            초
           </div>
         </div>
 
@@ -436,20 +459,6 @@ const AdRegisterPage = () => {
           <div className="w-full flex flex-col gap-5">
             <FileUploader audioFile={audioFile} setAudioFile={setAudioFile} />
           </div>
-        </div>
-
-        <div className="form-group">
-          <label className="font-semibold w-32 shrink-0 leading-9">
-            방송파일 설명
-          </label>
-          <Input
-            type="text"
-            name="media_desc"
-            placeholder="방송파일 설명을 입력하세요"
-            className="input w-full"
-            value={formData.media_desc}
-            onChange={handleInput}
-          />
         </div>
 
         <div className="flex w-full items-center justify-center gap-2.5 mt-12">

@@ -5,10 +5,21 @@ export const levelOptions = [
   { value: "STORE", label: "점포 관리자" },
 ];
 
-export const gapOptions = Array.from({ length: 61 }, (_, i) => ({
-  value: i + 1,
-  label: i + 1
-}));
+export const gapOptions = [
+  // 1초 ~ 60초
+  ...Array.from({ length: 60 }, (_, i) => ({
+    value: i + 1,
+    label: `${i + 1}초`,
+  })),
+  // 2분 ~ 60분 (120초 ~ 3600초)
+  ...Array.from({ length: 59 }, (_, i) => {
+    const minute = i + 2;
+    return {
+      value: minute * 60,
+      label: `${minute}분`,
+    };
+  }),
+];
 
 export const repeatOptions = Array.from({ length: 100 }, (_, i) => ({
   value: i + 1,

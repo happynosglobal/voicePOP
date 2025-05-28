@@ -25,7 +25,6 @@ const useAdRegister = () => {
       gap: 3, // 초단위
       repeat_count: 1,
       repeat_interval: 1, // 초단위
-      media_desc: "",
     }),
     [today]
   );

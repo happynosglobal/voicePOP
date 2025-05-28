@@ -42,14 +42,19 @@ const EquipmentStatusTable = ({
     return group;
   }, [deviceList]);
 
-  const [openTables, setOpenTables] = useState({
-    미등록: true,
-    미송출: true,
-    송출: true,
-  });
+  const [openTables, setOpenTables] = useState(null);
   const toggleTable = (title) => {
     setOpenTables((prev) => ({ ...prev, [title]: !prev[title] }));
   };
+  useEffect(() => {
+    if (!openTables && deviceList.length > 0) {
+      setOpenTables({
+        미등록: categorizedDevices["미등록"].length > 0,
+        미송출: categorizedDevices["미송출"].length > 0,
+        송출: categorizedDevices["송출"].length > 0,
+      });
+    }
+  }, [deviceList, categorizedDevices, openTables, searchParams]);
 
   const renderTable = (title, list, badgeClass) => (
     <div className="flex flex-col bg-white rounded-[10px] overflow-hidden border">
@@ -63,14 +68,14 @@ const EquipmentStatusTable = ({
           <span className="text-sm font-normal">&nbsp;/ {list.length}대</span>
         </div>
         <div className="w-10 h-10 flex items-center justify-center">
-          {openTables[title] ? (
+          {openTables?.[title] ? (
             <IoIosArrowUp className="text-2xl" />
           ) : (
             <IoIosArrowDown className="text-2xl" />
           )}
         </div>
       </div>
-      {openTables[title] && (
+      {openTables?.[title] && (
         <div className="flex-1 p-4">
           <table className="table">
             <thead>
@@ -105,6 +110,7 @@ const EquipmentStatusTable = ({
       )}
     </div>
   );
+
   return (
     <>
       <ul className="flex mb-7 gap-2">
@@ -146,9 +152,19 @@ const EquipmentStatusTable = ({
       </div>
 
       <div className="flex flex-col gap-5">
-        {renderTable("미등록", categorizedDevices["미등록"], "badge-error")}
-        {renderTable("미송출", categorizedDevices["미송출"], "badge-ghost")}
-        {renderTable("송출", categorizedDevices["송출"], "badge-success")}
+        {categorizedDevices["미등록"].length === 0 ? (
+          <>
+            {renderTable("미송출", categorizedDevices["미송출"], "badge-ghost")}
+            {renderTable("송출", categorizedDevices["송출"], "badge-success")}
+            {renderTable("미등록", categorizedDevices["미등록"], "badge-error")}
+          </>
+        ) : (
+          <>
+            {renderTable("미등록", categorizedDevices["미등록"], "badge-error")}
+            {renderTable("미송출", categorizedDevices["미송출"], "badge-ghost")}
+            {renderTable("송출", categorizedDevices["송출"], "badge-success")}
+          </>
+        )}
       </div>
     </>
   );

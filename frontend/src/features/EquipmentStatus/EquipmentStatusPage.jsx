@@ -15,12 +15,18 @@ const EquipmentStatusPage = () => {
   const { categoryOptions, getCategoryCodes } = useCategoryCode();
 
   const [searchParams, setSearchParams] = useState({
-    str_code: "",
+    str_code: user?.store_code || "",
     category_code: "",
     rows_per_page: 1000,
   });
 
   useEffect(() => {
+    // if (user?.level === "STORE" && user?.store_code) {
+    //   setSearchParams((prev) => ({
+    //     ...prev,
+    //     str_code: user?.store_code,
+    //   }));
+    // }
     getCategoryCodes(user?.brand_code);
   }, [user]);
 
@@ -57,7 +63,15 @@ const EquipmentStatusPage = () => {
               name="str_code"
               options={[{ value: "", label: "모든 점포" }, ...storeByBrandCode]}
               className="min-w-64"
-              onChange={handleSelectBox}
+              onChange={(option, meta) => {
+                if (user?.level !== "STORE") handleSelectBox(option, meta);
+              }}
+              value={
+                [{ value: "", label: "모든 점포" }, ...storeByBrandCode].find(
+                  (opt) => opt.value === searchParams.str_code
+                ) || { value: "", label: "모든 점포" }
+              }
+              isDisabled={user?.level === "STORE"}
               defaultValue={{ value: "", label: "모든 점포" }}
             />
           </div>

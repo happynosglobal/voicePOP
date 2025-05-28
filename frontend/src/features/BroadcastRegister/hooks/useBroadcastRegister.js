@@ -18,7 +18,6 @@ const useBroadcastRegister = () => {
       gap: 3, // 초단위
       repeat_count: 1,
       repeat_interval: 1, // 초단위
-      media_desc: "",
     }),
     [today]
   );
@@ -45,15 +44,15 @@ const useBroadcastRegister = () => {
   };
 
   const isFormValid = (isGapChecked) => {
+    const isStoreManager = user?.level === "STORE";
     const hasCommonFields =
       formData.title &&
       formData.category_type_seq &&
-      selectedStore.length !== 0 &&
+       (isStoreManager || selectedStore.length !== 0) &&
       formData.start_date &&
       formData.end_date &&
       formData.start_time &&
       formData.end_time &&
-      formData.media_desc &&
       audioFile;
 
     const hasGapField = isGapChecked && formData.gap;

@@ -16,7 +16,7 @@ const EquipmentManagementPage = () => {
   const { categoryOptions, getCategoryCodes } = useCategoryCode();
 
   const [searchParams, setSearchParams] = useState({
-    str_code: "",
+    str_code: user?.store_code || "",
     category_code: "",
   });
 
