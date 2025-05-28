@@ -3,6 +3,7 @@ import Input from "../../../components/input/Input";
 import { RiFileExcel2Line } from "react-icons/ri";
 import { levelOptions } from "../../../utils/constant/options";
 import useBrandCode from "../../../hooks/useBrandCode";
+import useCodes from "../../../stores/codes";
 
 const SearchBar = ({
   setUserId,
@@ -17,11 +18,12 @@ const SearchBar = ({
   handleSelectBox,
   handleGetUsers,
 }) => {
-  const { brandOptions } = useBrandCode();
+  const { brandOptions } = useCodes();
+
   const handleOnClick = () => {
-    handleGetUsers();
+    handleGetUsers(searchParams, 1);
     setPage(1);
-  }
+  };
 
   return (
     <div className="flex mb-5 gap-1">
@@ -29,10 +31,7 @@ const SearchBar = ({
         <div className="flex flex-wrap items-center gap-1.5">
           <Select
             name="level"
-            options={[
-              { value: "", label: "모든 관리자" },
-              ...levelOptions
-            ]}
+            options={[{ value: "", label: "모든 관리자" }, ...levelOptions]}
             className="min-w-32"
             onChange={handleSelectBox}
             defaultValue={{ value: "", label: "모든 관리자" }}
@@ -40,10 +39,7 @@ const SearchBar = ({
 
           <Select
             name="brand_code"
-            options={[
-              { value: "", label: "모든 브랜드" },
-              ...brandOptions
-            ]}
+            options={[{ value: "", label: "모든 브랜드" }, ...brandOptions]}
             className="min-w-32"
             onChange={handleSelectBox}
             defaultValue={{ value: "", label: "모든 브랜드" }}
@@ -52,8 +48,10 @@ const SearchBar = ({
             name="status"
             options={[
               { value: "", label: "모든 상태" },
-              { value: "1", label: "승인" },
-              { value: "2", label: "미승인" },
+              { value: "normal", label: "승인" },
+              { value: "require", label: "미승인" },
+              { value: "banned", label: "정지" },
+              { value: "removed", label: "이용중지" },
             ]}
             className="min-w-32"
             onChange={handleSelectBox}
@@ -67,12 +65,12 @@ const SearchBar = ({
               name="keyword_type"
               options={[
                 { value: "user_id", label: "ID" },
-                { value: "user_name", label: "성명" },
+                { value: "name", label: "성명" },
               ]}
               isClearable={false}
               className="min-w-32"
               onChange={handleSelectBox}
-              defaultValue={{ value: "1", label: "ID" }}
+              defaultValue={{ value: "user_id", label: "ID" }}
             />
           </div>
           <div className="flex items-center gap-2">
@@ -86,18 +84,20 @@ const SearchBar = ({
             />
           </div>
 
-          <button className="btn btn-accent btn-sm" onClick={handleOnClick}>검색</button>
+          <button className="btn btn-accent btn-sm" onClick={handleOnClick}>
+            검색
+          </button>
         </div>
 
         {/* <!-- 사용자 등록 버튼 --> */}
         <div className="flex gap-2">
-          <button className="btn btn-sm btn-success">
+          {/* <button className="btn btn-sm btn-success">
             <RiFileExcel2Line className="text-xl" /> 엑셀다운로드
-          </button>
+          </button> */}
           <button
             className="btn btn-primary btn-sm"
             onClick={() => {
-              setUserId("");
+              setUserId(null);
               openModal();
             }}
           >

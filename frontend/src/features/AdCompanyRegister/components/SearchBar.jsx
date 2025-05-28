@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import Select from 'react-select'
-import useBrandCode from '../../../hooks/useBrandCode'
 import Input from '../../../components/input/Input';
+import useCodes from '../../../stores/codes';
 
 const SearchBar = ({
   searchParams,
@@ -10,8 +10,8 @@ const SearchBar = ({
   handleSelectBox,
   getCompanyList
 }) => {
-  const { brandOptions } = useBrandCode();
-  // console.log(searchParams)
+  const { brandOptions} = useCodes();
+
   return (
     <div className="flex mb-5 gap-1.5">
       <Select

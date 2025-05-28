@@ -13,25 +13,16 @@ const dummyBrandData = [
 ];
 
 const SelectBrand = () => {
-  const { logout, login, selectBrand, user, isAuthenticated } = useUserStore();
+  const { logout, login, selectBrand, user } = useUserStore();
   const { resetStores } = useCodes();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [selectedBrand, setSelectedBrand] = useState(null);
 
-  /* 로그인 된 상태일 경우 기본url로 라우팅*/
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate(user.dashboard_url);
-    } else {
-      setIsLoading(false);
-    }
-  }, [isAuthenticated]);
-
   const handleSelection = async () => {
     if (selectedBrand) {
       selectBrand(selectedBrand);
-      navigate(user.dashboard_url)
+      navigate(user?.dashboard_url)
     }
   };
 

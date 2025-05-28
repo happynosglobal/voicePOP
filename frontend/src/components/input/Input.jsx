@@ -1,21 +1,25 @@
 import { useEffect, useState } from "react";
 
-const Input = ({ value, onChange, validation, errorMessage, ...rest }) => {
-  const [validationError, setValidationError] = useState("");
+const Input = ({ name, value, onChange, validation, errorMessage, handleError, ...rest }) => {
   useEffect(() => {
     if (validation && value) {
       const { error } = validation.validate(value);
-      setValidationError(error ? error.details[0].message : "");
+      const errorMsg = error ? error.details[0].message : "";
+
+      if (handleError) {
+        handleError(name, errorMsg);
+      }
     }
-  }, [value, validation]);
+  }, [value, validation, name]);
   return (
     <>
       <input
+        name={name}
         value={value}
         onChange={onChange}
         {...rest}
       />
-      {(errorMessage || validationError) && <p className="mt-2 text-error text-sm">{errorMessage || validationError}</p>}
+      {(errorMessage) && <p className="mt-2 text-error text-sm">{errorMessage}</p>}
     </>
 
   );

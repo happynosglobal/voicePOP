@@ -1,8 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import ContentLayout from "../../layout/ContentLayout";
-import Title from "../../components/title/Title";
 import AdCompanyList from "./components/AdCompanyList";
 import AdContractList from "./components/AdContractList";
+import {
+  getAdCompanay,
+  getAdContract,
+} from "../../api/advertisement/advertisement";
 
 const AdCompanyRegisterPage = () => {
   const companyModalRef = useRef(null); // 업체 등록 모달 ref
@@ -16,7 +19,6 @@ const AdCompanyRegisterPage = () => {
 
   return (
     <ContentLayout>
-      <Title text="광고계약 관리" />
       <div className=" flex gap-6">
         {/* 광고업체 */}
         <AdCompanyList

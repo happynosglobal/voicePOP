@@ -27,7 +27,7 @@ const CompanyList = ({
   useEffect(() => {
     getCompanyList();
   }, [page]);
-
+  
   return (
     <>
       <div className="relative wide:w-2/5 w-1/2">
@@ -49,9 +49,11 @@ const CompanyList = ({
           activeRow={activeRow}
           handleRowClick={handleRowClick}
         />
-        <LoadingSpinner isLoading={false} />
       </div>
-      <AddCompanyModal modalRef={companyModalRef} /> {/* 업체등록 모달 */}
+      <AddCompanyModal
+        modalRef={companyModalRef}
+        getCompanyList={getCompanyList}
+      />
     </>
   )
 }

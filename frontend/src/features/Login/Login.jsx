@@ -1,85 +1,158 @@
 import { useEffect, useState } from "react";
 import useUserStore from "../../stores/user";
 import { useNavigate } from "react-router-dom";
-import { loginSuccessResponse } from "./dummy/data";
-import apiCall from "../../utils/axiosConfig";
-import { deleteUser, postLogin } from "../../api/user/user";
+import { postLogin, postUserBrand } from "../../api/user/user";
 import useCodes from "../../stores/codes";
-import LoadingSpinner from "../../components/loading/LoadingSpinner";
+import Cookies from "js-cookie";
+import Logo from "../../components/logo/Logo";
+import Select from "react-select";
+import { toast } from "react-toastify";
+import useBrandCode from "../../hooks/useBrandCode";
+import { URL_MAPPING } from "../../utils/constant/urls";
 
 const Login = () => {
-  const { logout, setUser, user, isAuthenticated } = useUserStore.getState();
+  const { user, logout, setUser } = useUserStore.getState();
   const { fetchStores } = useCodes.getState();
+  const { getBrandCodes } = useBrandCode();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     user_id: "",
     password: "",
-    brand_code: "EM",
+    brand_code: "",
   });
 
   const [error, setError] = useState("");
+  const [isBrandFixed, setIsBrandFixed] = useState(false);
+  const [brandOptions, setBrandOptions] = useState([]);
 
-  /* 로그인 된 상태일 경우 기본url로 라우팅*/
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate(user.dashboard_url);
+    const token = Cookies.get("token");
+    if (token && user) {
+      navigate("/");
     }
-  }, [isAuthenticated]);
+  }, [user]);
 
+  const handleGetBrandOptions = async () => {
+    if (!formData.user_id) return;
+    const response = await postUserBrand({ user_id: formData.user_id });
+    const { status, data } = response;
+    if (status === 200) {
+      if (data.status_code === 200) {
+        const options = data.data.brand_code.map((option) => ({
+          value: option,
+          label: option,
+        }));
+
+        setBrandOptions(options);
+
+        if (options.length === 1) {
+          setFormData((prev) => ({
+            ...prev,
+            brand_code: options[0].value,
+          }));
+          setIsBrandFixed(true);
+        } else {
+          setIsBrandFixed(false);
+        }
+      } else {
+        toast.error(data.message);
+      }
+    }
+  };
   /* 로그인 폼 작성 검사 */
   const isFormfilled = () => {
-    return formData.user_id?.trim() && formData.password?.trim();
-  }
+    return (
+      formData.user_id?.trim() &&
+      formData.password?.trim() &&
+      formData.brand_code?.trim()
+    );
+  };
 
   const handleLogin = async () => {
     if (!isFormfilled()) return;
-    setIsLoading(true);
     try {
-      setUser(loginSuccessResponse,);
-      fetchStores(loginSuccessResponse.brand_code);
+      const response = await postLogin(formData);
+      const { status_code, data } = response.data;
 
-      navigate(loginSuccessResponse.dashboard_url);
+      if (status_code === 200) {
+        Cookies.set("token", data.token);
+        Cookies.set("refresh_token", data.refresh_token);
+        // 가입 후 최초 로그인 시 비밀번호 변경 진행
+        if (!data.last_changed_time) {
+          return navigate(URL_MAPPING.changePw, {
+            state: {
+              user_id: data.user_id,
+              user_name: data.user_name,
+              email: data.email,
+            },
+          });
+        }
 
-      /* 추후 연동 예상 로그인 api */
-      // const response = await postLogin(formData);
-      // const { status_code, data } = response.data;
-      // if (status_code === 200) {
-      //   setUser(data); //Zustand store에 저장
-      //   navigate(data.dashboard_url); // 응답데이터의 기본 url로 이동
-      // } else {
-      //   setError("로그인 실패"); // 추후 로그인 실패 메시지 정해서 추가
-      // }
+        setUser(data, formData.brand_code); // 선택한 브랜드 세팅
+        getBrandCodes(); // 브랜드 목록 조회
+        fetchStores(formData.brand_code); // 선택한 브랜드의 점포목록
+
+        return navigate("/");
+      }
     } catch (err) {
-      setError("로그인 요청 중 오류가 발생했습니다.");
-    } finally {
-      setIsLoading(false);
+      setError("로그인에 실패했습니다.");
     }
   };
-
   return (
     <>
-
-      {/* {!isLoading && ( */}
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <div className="card w-96 bg-white shadow-xl p-6">
-          <h2 className="text-2xl font-bold text-center mb-4">Vocie PoP</h2>
+        <div className="card max-w-md bg-white shadow-xl px-6 py-10 w-full">
+          <h2 className="flex justify-center items-center text-3xl font-bold mb-6">
+            <Logo />
+          </h2>
           <div className="form-control">
             <label className="label">
               <span className="label-text font-semibold">User ID</span>
             </label>
-            <input
-              type="text"
-              placeholder="아이디를 입력해주세요."
-              className="input input-bordered w-full"
-              onChange={(e) => {
-                setFormData({
-                  ...formData,
-                  user_id: e.target.value
-                });
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="아이디를 입력해주세요."
+                className="input input-bordered w-full"
+                onChange={(e) => {
+                  const newUserId = e.target.value;
+
+                  setFormData((prev) => ({
+                    ...prev,
+                    user_id: newUserId,
+                    brand_code: "",
+                  }));
+                  setIsBrandFixed(false);
+                  setBrandOptions([]);
+                }}
+                onBlur={handleGetBrandOptions}
+              />
+            </div>
+          </div>
+
+          <div className="form-control mt-4">
+            <label className="label">
+              <span className="label-text font-semibold">브랜드</span>
+            </label>
+            <Select
+              options={brandOptions}
+              className="min-w-56"
+              isClearable={!isBrandFixed}
+              isDisabled={isBrandFixed}
+              placeholder="브랜드를 선택해주세요."
+              value={
+                brandOptions.find((opt) => opt.value === formData.brand_code) ||
+                null
+              }
+              onChange={(selected) => {
+                setFormData((prev) => ({
+                  ...prev,
+                  brand_code: selected?.value || "",
+                }));
               }}
             />
           </div>
+
           <div className="form-control mt-4">
             <label className="label">
               <span className="label-text font-semibold">Password</span>
@@ -91,7 +164,7 @@ const Login = () => {
               onChange={(e) => {
                 setFormData({
                   ...formData,
-                  password: e.target.value
+                  password: e.target.value,
                 });
               }}
               onKeyDown={(e) => {
@@ -100,9 +173,7 @@ const Login = () => {
                 }
               }}
             />
-            <p className="mt-2 text-error text-sm">
-              비밀번호가 일치하지 않습니다.
-            </p>
+            {error && <p className="mt-2 text-error text-sm">{error}</p>}
           </div>
           <div className="form-control mt-6">
             <button
@@ -116,20 +187,23 @@ const Login = () => {
             </button>
           </div>
           <div className="flex align-center justify-between mt-4 text-sm">
-            <button onClick={() => navigate('/signup')} className="text-gray-500">
+            <button
+              className="text-gray-500 hover:underline"
+              onClick={() => navigate(URL_MAPPING.signUp)}
+            >
               사용자 등록 신청
             </button>
-            <button className="text-gray-500">
+            <button
+              className="text-gray-500 hover:underline"
+              onClick={() => navigate(URL_MAPPING.resetPw)}
+            >
               Password 분실
             </button>
           </div>
         </div>
       </div>
-      <LoadingSpinner isLoading={isLoading} />
-      {/* )} */}
     </>
   );
 };
 
 export default Login;
-

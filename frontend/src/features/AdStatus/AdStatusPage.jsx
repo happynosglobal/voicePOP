@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import ContentLayout from "../../layout/ContentLayout";
-import Title from "../../components/title/Title";
 import Select from "react-select";
 import CustomDatePicker from "../../components/customDatePicker/CustomDatePicker";
 import Tooltip from "../../components/tooltip/Tooltip";
 import Pagination from "../../components/pagination/Pagination";
 import { RiFileExcel2Line } from "react-icons/ri";
+import Tab from "../../components/tab/Tab";
 
 const dummyAD = [
   {
@@ -62,11 +62,10 @@ const AdStatusPage = () => {
   const [selectedStartDate, setSelectedStartDate] = useState(new Date()); //임시 날짜선택 STATE
   const [selectedEndDate, setSelectedEndDate] = useState(new Date()); //임시 날짜선택 STATE
 
-  const [activeTab, setActiveTab] = useState("업체별 현황"); //임시 탭 STATE
-
+  const tabs = ["업체별 현황", "점포별 현황"];
+  const [activeTab, setActiveTab] = useState(tabs[0]); //임시 탭 STATE
   return (
     <ContentLayout>
-      <Title text="광고현황" />
       <div className="flex mb-5 gap-1">
         <div className="flex justify-between w-full">
           <div className="flex flex-wrap items-center gap-1.5">
@@ -127,53 +126,41 @@ const AdStatusPage = () => {
         </div>
       </div>
 
-      <div className="flex justify-between items-end mb-4 border-b">
-        <div className="flex">
-          <button
-            className={`px-10 py-2 font-medium ${
-              activeTab === "업체별 현황"
-                ? "bg-gray-700 text-white"
-                : "border-b-2 border-gray-700 text-gray-700"
-            } rounded-t-lg transition`}
-            onClick={() => setActiveTab("업체별 현황")}
-          >
-            업체별 현황
-          </button>
-          <button
-            className={`px-10 py-2 font-medium ${
-              activeTab === "점포별 현황"
-                ? "bg-gray-700 text-white"
-                : "border-b-2 border-gray-700 text-gray-700 hover:bg-gray-100"
-            } rounded-t-lg transition`}
-            onClick={() => setActiveTab("점포별 현황")}
-          >
-            점포별 현황
-          </button>
-        </div>
-        <div className="flex items-center gap-4 px-4 py-2 mb-2 bg-gray-100 rounded-lg text-gray-700">
-          {activeTab === "업체별 현황" && (
-            <>
-              <p>
-                <span className="font-medium">광고수</span>: <b>124</b>
-              </p>
-              <p>
-                <span className="font-medium">업체수</span>: <b>498</b>
-              </p>
-              <p>
-                <span className="font-medium">광고타입</span>: 일반(
-                <b>211</b>), 스탠다드(<b>10</b>), 프리미엄(
-                <b>19</b>)
-              </p>
-            </>
-          )}
+      <ul className="flex mb-7 gap-2">
+        {activeTab === "업체별 현황" && (
+          <>
+            <li className="flex-1 flex items-center justify-center h-14 bg-[#484C56] rounded-[10px] text-white gap-1.5">
+              <span className="text-lg font-medium">광고수 </span>
+              <span className="text-2xl font-semibold">124</span>
+            </li>
+            <li className="flex-1 flex items-center justify-center h-14 bg-[#484C56] rounded-[10px] text-white gap-1.5">
+              <span className="text-lg font-medium">업체수 </span>
+              <span className="text-2xl font-semibold">498</span>
+            </li>
+            <li className="flex-1 flex items-center justify-center h-14 bg-[#484C56] rounded-[10px] text-white gap-1.5">
+              <span className="text-lg font-medium">일반</span>
+              <span className="text-2xl font-semibold">211</span>
+            </li>
+            <li className="flex-1 flex items-center justify-center h-14 bg-[#484C56] rounded-[10px] text-white gap-1.5">
+              <span className="text-lg font-medium">스탠다드 </span>
+              <span className="text-2xl font-semibold">10</span>
+            </li>
+            <li className="flex-1 flex items-center justify-center h-14 bg-[#484C56] rounded-[10px] text-white gap-1.5">
+              <span className="text-lg font-medium">프리미엄 </span>
+              <span className="text-2xl font-semibold">19</span>
+            </li>
+          </>
+        )}
+        {activeTab === "점포별 현황" && (
+          <li className="flex-1 flex items-center justify-center h-14 bg-[#484C56] rounded-[10px] text-white gap-1.5">
+            <span className="text-lg font-medium">전체 점포 </span>
+            <span className="text-2xl font-semibold">111</span>
+          </li>
+        )}
+      </ul>
 
-          {activeTab === "점포별 현황" && (
-            <p>
-              <span className="font-medium">전체 점포</span>: <b>22</b>개점
-            </p>
-          )}
-        </div>
-      </div>
+      <Tab tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
+
       {activeTab === "업체별 현황" ? (
         <>
           <table className="table">

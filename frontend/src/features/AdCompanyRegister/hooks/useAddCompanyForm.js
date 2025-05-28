@@ -1,16 +1,15 @@
 import React, { useMemo, useState } from 'react'
-import useUserStore from '../../../stores/user';
+import { toast } from 'react-toastify';
+import { postAdCompany } from '../../../api/advertisement/advertisement';
 
 const useAddCompanyForm = () => {
-  const { user } = useUserStore();
   const initialFormData = useMemo(() => ({
     business_name: "",
     business_number: "",
     brand_code: "",
     comment: "",
     use_yn: "Y",
-    user_id: user?.user_id || "",
-  }), [user?.user_id]);
+  }), []);
 
   const [formData, setFormData] = useState(initialFormData);
 
@@ -27,14 +26,41 @@ const useAddCompanyForm = () => {
     }
     // setErrors({ ...errors, [name]: '' });
   };
-  
-  /* MultiSelectBox handler */
-  const handleMultiSelectBox = (option) => {
-    let tempOption = [];
-    option.map(item => tempOption.push(item.value));
-    setFormData({ ...formData, brand_code: tempOption });
+
+  /* SelectBox handler */
+  const handleSelectBox = (option, option2) => {
+    const { label, value } = option;
+    const { name } = option2;
+
+    if (name === "level" && value !== "ADMIN") {
+      setFormData(prev => ({ ...prev, [name]: value, brand_code: [], store_code: null }));
+    } else if (name === "level" && value === "ADMIN") {
+      setFormData(prev => ({ ...prev, [name]: value, brand_code: ["EM", "ED"], store_code: null }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   }
-  // console.log(formData);
+
+  const handlePostCompany = async () => {
+    const body = {
+      business_name: formData.business_name,
+      business_number: formData.business_number,
+      brand_code: formData.brand_code,
+      comment: formData.comment,
+      use_yn: formData.use_yn,
+      seq: 1,
+    }
+    try {
+      const response = await postAdCompany(body);
+      const { status_code, data } = response.data;
+      if (status_code === 200) {
+        toast.success("업체 등록에 성공했습니다.");
+      }
+    } catch (err) {      
+      toast.error("업체 등록에 실패했습니다.");
+      throw err;
+    }
+  }
   return {
     initialFormData,
     formData,
@@ -42,7 +68,8 @@ const useAddCompanyForm = () => {
     businessNumber,
     setBusinessNumber,
     handleInput,
-    handleMultiSelectBox,
+    handleSelectBox,
+    handlePostCompany
   }
 }
 

@@ -22,23 +22,48 @@ body {min-width:1400px;}
 
 @layer components {
   /** 기본 테이블 스타일 **/
-  .table {@apply w-full table-fixed border-t-2 border-gray-800 border-collapse bg-white;}
-  .table thead {@apply border-t-2 border-t-gray-800 border-b border-b-slate-400;}
+  .table {@apply w-full table-fixed border-collapse bg-white;}
+  .table.thead-fixed {@apply border-separate [border-spacing:0];}
+  .table.thead-fixed thead {@apply sticky top-0 bg-white;}
+
   .table th, .table td {@apply p-2 text-center;}
-  .table th {@apply text-gray-800  text-base;}
+  .table th {@apply text-gray-800 text-base border-t-2 border-t-gray-800 border-b border-b-slate-400;}
   .table td {@apply border-l border-b border-gray-200 text-gray-600 text-base;}
   .table tr td:first-child {@apply border-l-0;}
   .table tr:nth-child(odd) td {@apply bg-gray-50;}
   .table tr.active td {@apply bg-lime-200;}
   .table tr:not(.active):hover td {@apply bg-lime-50;}
 
+  .table.table-sm th,  .table.table-sm td {@apply text-sm;} 
+
 
   /** 기본 작성 폼 **/
-  .form-container {@apply bg-white max-w-3xl wide:mx-auto;}
+  .form-container {@apply bg-white;}
   .form-group {@apply flex py-3.5 border-b last-of-type:border-none;}
   .form-label {@apply font-semibold w-32 shrink-0 leading-9;}
-  .form-input-group {@apply flex gap-6 items-center;}
+  .form-input-group {@apply flex gap-4 items-center flex-wrap;}
   .input-label {@apply flex items-center gap-2 shrink-0 mr-2 cursor-pointer font-semibold;}
+
+
+  /* .label-text {@apply text-base;} */
+
+
+  /** 기본 탭 **/
+.tabs-wrapper { @apply mb-4 w-full overflow-x-auto border-b border-gray-400;}
+.tabs-wrapper::-webkit-scrollbar {height: 12px;}
+.tabs-wrapper::-webkit-scrollbar-track { background: #f7f7f7;}
+.tabs-wrapper::-webkit-scrollbar-thumb { border: 3px solid #f7f7f7;background-color: #8B817C; border-radius: 9999px;}
+
+.tabs-wrapper {scrollbar-width: auto; scrollbar-color: #8B817C #f7f7f7;}
+
+.tabs-nav { @apply flex gap-2 pb-2;}
+.tab-btn {@apply min-w-36 h-[42px] font-semibold rounded-[10px] transition  text-gray-500 hover:bg-gray-100 bg-stone-100;}
+.tab-btn.is-active {@apply bg-blue-600 text-white;}
+
+/** 검색된 항목수 **/
+.search-count {@apply flex gap-5 items-center pb-2;}
+.search-count .count-number span {@apply text-gray-400 font-medium;}
+.search-count .count-number b {@apply text-gray-500 font-bold;}
 }
 
 
@@ -53,10 +78,12 @@ body {min-width:1400px;}
 
 .input { border:1px solid hsl(0, 0%, 80%); height:38px; background-color: #fff; border-radius: 5px;}
 ::placeholder {color:#747474 !important}
+textarea.input {padding-top: 6px; padding-bottom: 6px; min-height:60px;}
 
 .modal { overflow-y: scroll ;min-height: 100vh;}
 .modal-box {margin:50px 0; overflow-y: visible; max-height: 100% !important;}
 :root:has(:is(.modal-open, .modal:target, .modal-toggle:checked + .modal, .modal[open])) {scrollbar-gutter: unset;}
+
 
 /* react-tooltip 커스텀 */
 .custom-tooltip { z-index: 9999; max-width: 300px; visibility: visible !important; white-space: normal; word-break: keep-all; pointer-events: auto; user-select: text;}
@@ -99,3 +126,13 @@ body {min-width:1400px;}
 .react-time-picker__inputGroup__divider {margin-right: 16px}
 .react-time-picker__inputGroup__hour {width: 35px !important;}
 .react-time-picker__inputGroup__minute {width:35px !important;}
+
+
+
+
+input:disabled,
+input[disabled] {
+  border-color: hsl(0, 0%, 80%);
+  background-color: #f1f1f1 !important;
+  color: #888888 !important;
+} 

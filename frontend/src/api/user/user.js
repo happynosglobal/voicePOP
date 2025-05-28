@@ -1,13 +1,10 @@
+import axios from "axios";
 import apiCall from "../../utils/axiosConfig";
+const { VITE_API_BASE_URL, VITE_API_PREFIX } = import.meta.env;
 
-/**
- * 로그인
- * @param user_id
- * @param password
- * @param brand_code
- * */
+/* 로그인 요청 */
 export const postLogin = (body) => {
-    return apiCall.post("/user/login", body);
+    return axios.post(`${VITE_API_PREFIX}/user/login`, body);
 }
 /* 사용자 조회 */
 export const getUser = (id) => {
@@ -32,4 +29,23 @@ export const patchUser = (id, body) => {
 /* 사용자 삭제 */
 export const deleteUser = (id) => {
     return apiCall.delete(`/user/${id}`,)
+}
+/* 사용자 ID 중복 검사 */
+export const checkUser = (body) => {
+    return apiCall.post(`/user/check`, body)
+}
+
+/* 사용자 등록 신청 */
+export const requestUser = (body) => {
+    return apiCall.post(`/user/request`, body)
+}
+
+/* 사용자 암호 초기화 */
+export const resetPassword = (body) => {
+    return apiCall.post(`/user/reset-password`, body)
+}
+
+/* 사용자 암호 변경 */
+export const changePassword = (body) => {
+    return apiCall.post(`/user/change-password`, body)
 }

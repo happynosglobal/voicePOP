@@ -3,17 +3,18 @@ import useAddCompanyForm from "../../hooks/useAddCompanyForm";
 import Input from "../../../../components/input/Input";
 import { toBusinessNumber } from "../../../../utils/customFormat";
 import { useEffect } from "react";
-const brandList = [
-  { value: "EM", label: "이마트(EM)" },
-  { value: "ED", label: "에브리데이(ED)" },
-]
-const AddCompanyModal = ({ modalRef }) => {
+import LoadingSpinner from "../../../../components/loading/LoadingSpinner";
+import useCodes from "../../../../stores/codes";
+
+const AddCompanyModal = ({ modalRef, getCompanyList }) => {
+  const { brandOptions } = useCodes();
   const {
     formData,
     setFormData,
     handleInput,
-    handleMultiSelectBox,
-    initialFormData
+    handleSelectBox,
+    initialFormData,
+    handlePostCompany
   } = useAddCompanyForm();
 
   const closeModal = () => {
@@ -21,6 +22,16 @@ const AddCompanyModal = ({ modalRef }) => {
       modalRef.current.close();
     }
   };
+
+  const handleSubmitPost = async () => {
+    try {
+      await handlePostCompany();
+      getCompanyList(1);
+      closeModal();
+    } catch (err) {
+      console.error("광고업체 등록 실패:", err);
+    }
+  }
 
   /* 모달창 닫을 때 수행 할 로직 */
   useEffect(() => {
@@ -72,12 +83,11 @@ const AddCompanyModal = ({ modalRef }) => {
           <div className="flex items-center justify-between">
             <label className="font-semibold w-1/4 shrink-0">브랜드</label>
             <Select
-              isMulti
               name="brand_code"
-              options={brandList}
-              value={brandList.filter(option => formData.brand_code.includes(option.value))}
+              options={brandOptions}
+              value={brandOptions.filter(option => formData.brand_code.includes(option.value))}
               className="w-full"
-              onChange={handleMultiSelectBox}
+              onChange={handleSelectBox}
               classNamePrefix="select"
               placeholder="브랜드를 선택하세요"
             />
@@ -107,11 +117,16 @@ const AddCompanyModal = ({ modalRef }) => {
             onClick={closeModal}
           >취소
           </button>
-          <button type="submit" className="btn btn-primary min-w-24">
+          <button
+            type="submit"
+            className="btn btn-primary min-w-24"
+            onClick={handleSubmitPost}
+          >
             등록
           </button>
         </div>
       </div>
+      <LoadingSpinner includeCodesLoading={true} />
     </dialog>
   );
 };
