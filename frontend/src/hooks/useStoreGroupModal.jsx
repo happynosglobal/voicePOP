@@ -2,7 +2,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import useUserStore from "../stores/user";
 import { getGroupDetailList, getGroupList } from "../api/storeGroup/storeGroup";
-import { IoPersonSharp } from "react-icons/io5";
+import { MdManageAccounts } from "react-icons/md";
 
 const useStoreGroupModal = () => {
   const { user } = useUserStore();
@@ -59,12 +59,15 @@ const useStoreGroupModal = () => {
           value: "my-group",
           label: (
             <>
-              <span style={{ color: "#3B82F6", fontWeight: "bold" }}>
+              <div className="relative top-1 inline-flex items-center gap-1 text-green-600 font-semibold">
+                <span className="bg-green-600 items-center justify-center flex h-6 w-6 rounded-lg">
+                  <MdManageAccounts className="text-white text-xl" />
+                </span>
                 My 그룹
-              </span>
-              {/* <IoPersonSharp /> */}
+              </div>
             </>
           ),
+          className: "my-group-wrapper",
           children: groups,
           type: "wrapper",
         },

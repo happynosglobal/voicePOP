@@ -27,15 +27,15 @@ const AdEventDetailModal = ({
 
   return (
     <dialog className="modal" ref={modalRef}>
-      <div className="modal-box bg-white max-w-md">
+      <div className="modal-box bg-white max-w-lg">
         <h3 className="font-semibold text-lg mb-4 border-b pb-4">
           방송 상세 정보
         </h3>
 
-        <div className="flex flex-col gap-3 text-sm">
+        <div className="flex flex-col gap-3">
           <div className="flex justify-between">
             <span className="font-semibold">방송명</span>
-            <span className="text-right break-all max-w-[60%]">
+            <span className="text-right break-all max-w-[80%]">
               {selectedEvent.title}
             </span>
           </div>
@@ -57,24 +57,29 @@ const AdEventDetailModal = ({
           </div>
           <div className="flex justify-between">
             <span className="font-semibold">파일명</span>
-            <span className="text-right break-all max-w-[60%]">
+            <span className="text-right break-all max-w-[80%]">
               {selectedEvent.mediaFilename}
+            </span>
+          </div>
+          <div className="flex justify-between">
+            <span className="font-semibold">대상 점포</span>
+            <span className="text-right break-al">
+              {selectedEvent.stores.length}개 점포
             </span>
           </div>
         </div>
 
-        <div className="mt-6">
-          <span className="font-semibold block mb-1">대상 점포</span>
+        <div className="mt-4">
           {selectedEvent.stores && selectedEvent.stores.length > 0 ? (
             <>
-              <Tooltip
-                id="target-stores"
-                content={selectedEvent.stores.map((i) => i.store_name)}
-                place="bottom"
-              />
-              <span className="text-xs text-gray-500 mt-1 block">
-                총 {selectedEvent.stores.length}개 점포
-              </span>
+              <div className="max-h-56 overflow-y-scroll border p-2 rounded-md text-sm bg-gray-50">
+                {selectedEvent.stores.map((i, idx) => (
+                  <span key={idx}>
+                    {i.store_name}
+                    {idx !== selectedEvent.stores.length - 1 && ", "}
+                  </span>
+                ))}
+              </div>
             </>
           ) : (
             <span className="text-sm text-gray-400">점포 정보 없음</span>
