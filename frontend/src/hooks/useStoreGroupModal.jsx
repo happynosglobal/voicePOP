@@ -59,7 +59,7 @@ const useStoreGroupModal = () => {
           value: "my-group",
           label: (
             <>
-              <div className="relative top-1 inline-flex items-center gap-1 text-green-600 font-semibold">
+              <div className="inline-flex items-center gap-1 text-green-600 font-semibold">
                 <span className="bg-green-600 items-center justify-center flex h-6 w-6 rounded-lg">
                   <MdManageAccounts className="text-white text-xl" />
                 </span>
