@@ -107,7 +107,7 @@ textarea.input {padding-top: 6px; padding-bottom: 6px; min-height:60px;}
 
 .rct-node-parent > .rct-text .rct-title {display: inline-flex; gap:2px; align-items: center;}
 .rct-node-parent > .rct-text .rct-title::before {position: relative; top:4px; content: url("/src/assets/ico_folder.svg");}
-
+.rct-chosen-title::before {position: relative; top:4px; content: url("/src/assets/ico_folder.svg");}
 .my-group-wrapper {background-color: #F4FFDF; }
 
 

@@ -114,11 +114,16 @@ const GroupSelectModal = ({
   const handleMoveToChosenStores = () => {
     const selectedMap = new Map(chosenStores.map((s) => [s.value, s]));
 
-    const extractLabel = (label) => {
-      if (typeof label === "string") return label;
-      if (label?.props?.children) return label.props.children;
-      return "그룹";
-    };
+    // const extractLabel = (label) => {
+    //   if (typeof label === "string") return label;
+    //   if (label?.props?.children) return label.props.children;
+    //   return "그룹";
+    // };
+    
+    // type 그룹일경우 class 붙여서 label 생성
+    const makeGroupLabel = (text) => (
+      <span className="rct-chosen-title">{text}</span>
+    );
 
     const addNode = (node) => {
       if (node.type === "wrapper") {
@@ -133,10 +138,11 @@ const GroupSelectModal = ({
         );
 
         if (allChildrenChecked) {
+          const labelText = extractLabelText(node.label);
           selectedMap.set(node.value, {
             type: "group",
             value: node.value,
-            label: extractLabel(node.label),
+            label: makeGroupLabel(labelText),
           });
           return;
         }
