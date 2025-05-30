@@ -37,8 +37,10 @@ export const getAllStores = async (brand_code) => {
       const nonRegionalData = filteredData
         .filter((store) => !store.group_id)
         .map((store) => ({
+          key: store.id,
           value: store.id,
           label: store.name,
+          type: "store",
         }));
 
       const regionalGroupData = regionalGroupTypes
@@ -46,14 +48,17 @@ export const getAllStores = async (brand_code) => {
           const children = groupedStores
             .filter((store) => store.group_id === group.value)
             .map((store) => ({
+              key: store.id,
               value: `${store.id}_${group.value}`,
               label: store.name,
+              type: "store",
             }));
 
           if (children.length > 0) {
             return {
               value: group.value,
               label: `${group.label} (${children.length})`,
+              type: "group",
               children,
             };
           }
@@ -74,7 +79,6 @@ export const getAllStores = async (brand_code) => {
     console.error(err);
   }
 };
-
 
 export const getGroupInfo = async (id) => {
   try {
@@ -98,6 +102,7 @@ export const getGroupInfo = async (id) => {
       (store) => ({
         value: store.store_code,
         label: store.store_name,
+        type: "store",
       })
     );
 

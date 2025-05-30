@@ -1,8 +1,29 @@
 import { format } from "date-fns";
 import Tooltip from "../../../components/tooltip/Tooltip";
+import { useEffect } from "react";
 
-const AdEventDetailModal = ({ selectedEvent, modalRef, onClose }) => {
-  if (!selectedEvent) return null;
+const AdEventDetailModal = ({
+  selectedEvent,
+  setSelectedEvent,
+  modalRef,
+  onClose,
+}) => {
+  useEffect(() => {
+    const modal = modalRef?.current;
+    if (!modal) return;
+
+    const handleClose = () => {
+      setSelectedEvent(null);
+    };
+
+    modal.addEventListener("close", handleClose);
+
+    return () => {
+      modal.removeEventListener("close", handleClose);
+    };
+  }, [modalRef]);
+
+  /* 모달창 닫을 때 수행 할 로직 */
 
   return (
     <dialog className="modal" ref={modalRef}>

@@ -3,7 +3,6 @@ import ContentLayout from "../../layout/ContentLayout";
 import SearchBar from "./components/SearchBar";
 import DeviceStatsTable from "./components/DeviceStatsTable";
 import { toDate } from "../../utils/customFormat";
-import useCategoryCode from "../../hooks/useCategoryCode";
 import useUserStore from "../../stores/user";
 import { getDeviceStat } from "../../api/device/device";
 import { toast } from "react-toastify";
@@ -16,12 +15,6 @@ const EquipmentStatsPage = () => {
     to_date: toDate(today),
     category_code: "",
   });
-
-  const { categoryOptions, getCategoryCodes } = useCategoryCode();
-
-  useEffect(() => {
-    getCategoryCodes(user?.brand_code);
-  }, [user]);
 
   const [deviceList, setDeviceList] = useState([]);
 
@@ -52,7 +45,6 @@ const EquipmentStatsPage = () => {
       <DeviceStatsTable
         searchParams={searchParams}
         setSearchParams={setSearchParams}
-        categoryOptions={categoryOptions}
         handleGetDeviceStat={handleGetDeviceStat}
         deviceList={deviceList}
       />

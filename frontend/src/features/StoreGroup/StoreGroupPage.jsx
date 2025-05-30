@@ -43,30 +43,40 @@ const StoreGroupPage = () => {
     }));
 
     try {
-      // 그룹 생성
       let groupRes = null;
       if (!id) {
+        // 그룹 생성
         groupRes = await postGroup(groupBody);
       } else if (id) {
+        // 그룹명 수정
         groupRes = await patchGroup(id, groupBody);
       }
 
-      if (groupRes.data.status_code !== 200) {
-        throw new Error("그룹 등록 실패");
-      }
+      // if (groupRes.data.status_code !== 200) {
+      //   throw new Error("그룹 등록 실패");
+      // }
 
       const groupId = groupRes.data.data.id;
 
       if (id) {
-        groupRes = await deleteGroupDetail(id);
+        try {
+          groupRes = await deleteGroupDetail(id);
+        } catch (err) {
+          // 서버에서 등록된 점포들이 없을 경우 406 오류는 무시하고 계속 진행
+          if (err?.response?.status === 406) {
+            console.warn("삭제할 그룹 점포가 없음");
+          } else {
+            throw err;
+          }
+        }
       }
 
-      if (groupRes.data.status_code !== 200) {
-        throw new Error("그룹 내 점포 삭제 실패");
-      }
+      // if (groupRes.data.status_code !== 200) {
+      //   throw new Error("그룹 내 점포 삭제 실패");
+      // }
 
       //그룹 내에 선택된 점포들 등록
-      const groupedStoresRes = await postGroupDetail(groupId, {
+      const groupedStoresRes = await postGroupDetail(id, {
         brand_code: user?.brand_code,
         user_id: user?.user_id,
         item: groupedStores,
@@ -85,6 +95,7 @@ const StoreGroupPage = () => {
   };
 
   const handleDeleteGroup = async (id) => {
+    if (!confirm("정말 삭제하시겠습니까?")) return;
     const groupBody = {
       brand_code: user?.brand_code,
       use_yn: "N",

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 
-const FileUploader = ({ audioFile, setAudioFile }) => {
+const FileUploader = ({ audioFile, setAudioFile, setDuration }) => {
   const [uploadedFile, setUploadedFile] = useState(null); // Dropzone 상태
   const [audioPreviewUrl, setAudioPreviewUrl] = useState(null); // 미리 듣기 URL
 
@@ -38,6 +38,31 @@ const FileUploader = ({ audioFile, setAudioFile }) => {
       }
     };
   }, [audioPreviewUrl]);
+
+  // audio file 재생시간 추출
+  const getAudioDuration = (file) => {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const audio = new Audio(url);
+
+      audio.addEventListener("loadedmetadata", () => {
+        resolve(audio.duration); // 초 단위
+        URL.revokeObjectURL(url);
+      });
+
+      audio.addEventListener("error", (e) => {
+        reject(e);
+      });
+    });
+  };
+  
+  useEffect(() => {
+    if (audioFile) {
+      getAudioDuration(audioFile).then((seconds) => {
+        setDuration(seconds.toFixed(1))
+      });
+    }
+  }, [audioFile]);
 
   return (
     <div className="w-full overflow-hidden">

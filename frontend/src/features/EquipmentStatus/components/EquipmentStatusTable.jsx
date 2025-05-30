@@ -3,38 +3,22 @@ import Tooltip from "../../../components/tooltip/Tooltip";
 import { toDateTime } from "../../../utils/customFormat";
 import EmptyState from "../../../components/emptyState/EmptyState";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
+import Tab from "../../../components/tab/Tab";
 
 const EquipmentStatusTable = ({
   searchParams,
   setSearchParams,
-  categoryOptions,
   handleGetDeviceList,
   deviceList,
 }) => {
   const [activeTab, setActiveTab] = useState("");
 
-  // "전체" 항목 포함한 탭 목록 생성
-  const tabs = useMemo(() => {
-    return [{ code: "", name: "전체" }, ...categoryOptions];
-  }, [categoryOptions]);
-
-  useEffect(() => {
-    if (tabs.length !== 0) {
-      setActiveTab(tabs[0].code);
-    }
-  }, [tabs]);
-
   useEffect(() => {
     handleGetDeviceList();
   }, [searchParams]);
 
-  // 장비 상태별로 그룹화
   const categorizedDevices = useMemo(() => {
-    const group = {
-      미등록: [],
-      미송출: [],
-      송출: [],
-    };
+    const group = { 미등록: [], 미송출: [], 송출: [] };
     deviceList.forEach((device) => {
       const status = device.device_status;
       if (group[status]) group[status].push(device);
@@ -42,19 +26,23 @@ const EquipmentStatusTable = ({
     return group;
   }, [deviceList]);
 
-  const [openTables, setOpenTables] = useState(null);
+  const [openTables, setOpenTables] = useState({
+    미등록: false,
+    미송출: false,
+    송출: false,
+  });
+
+  useEffect(() => {
+    setOpenTables({
+      미등록: categorizedDevices["미등록"].length > 0,
+      미송출: categorizedDevices["미송출"].length > 0,
+      송출: categorizedDevices["송출"].length > 0,
+    });
+  }, [categorizedDevices]);
+
   const toggleTable = (title) => {
     setOpenTables((prev) => ({ ...prev, [title]: !prev[title] }));
   };
-  useEffect(() => {
-    if (!openTables && deviceList.length > 0) {
-      setOpenTables({
-        미등록: categorizedDevices["미등록"].length > 0,
-        미송출: categorizedDevices["미송출"].length > 0,
-        송출: categorizedDevices["송출"].length > 0,
-      });
-    }
-  }, [deviceList, categorizedDevices, openTables, searchParams]);
 
   const renderTable = (title, list, badgeClass) => (
     <div className="flex flex-col bg-white rounded-[10px] overflow-hidden border">
@@ -111,6 +99,12 @@ const EquipmentStatusTable = ({
     </div>
   );
 
+  const sortedTableOrder = useMemo(() => {
+    return categorizedDevices["미등록"].length > 0
+      ? ["미등록", "미송출", "송출"]
+      : ["미송출", "송출", "미등록"];
+  }, [categorizedDevices]);
+
   return (
     <>
       <ul className="flex mb-7 gap-2">
@@ -129,41 +123,28 @@ const EquipmentStatusTable = ({
         </li>
       </ul>
 
-      <div className="tabs-wrapper">
-        <div className="tabs-nav">
-          {tabs.map((option, index) => (
-            <button
-              key={index}
-              className={`tab-btn ${
-                activeTab === option.code ? "is-active" : ""
-              }`}
-              onClick={() => {
-                setActiveTab(option.code);
-                setSearchParams((prev) => ({
-                  ...prev,
-                  category_code: option.code,
-                }));
-              }}
-            >
-              {option.name}
-            </button>
-          ))}
-        </div>
-      </div>
+      <Tab
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        onTabChange={(code) => {
+          setSearchParams((prev) => ({
+            ...prev,
+            category_code: code,
+          }));
+        }}
+      />
 
       <div className="flex flex-col gap-5">
-        {categorizedDevices["미등록"].length === 0 ? (
-          <>
-            {renderTable("미송출", categorizedDevices["미송출"], "badge-ghost")}
-            {renderTable("송출", categorizedDevices["송출"], "badge-success")}
-            {renderTable("미등록", categorizedDevices["미등록"], "badge-error")}
-          </>
-        ) : (
-          <>
-            {renderTable("미등록", categorizedDevices["미등록"], "badge-error")}
-            {renderTable("미송출", categorizedDevices["미송출"], "badge-ghost")}
-            {renderTable("송출", categorizedDevices["송출"], "badge-success")}
-          </>
+        {sortedTableOrder.map((status) =>
+          renderTable(
+            status,
+            categorizedDevices[status],
+            status === "미등록"
+              ? "badge-error"
+              : status === "미송출"
+              ? "badge-ghost"
+              : "badge-success"
+          )
         )}
       </div>
     </>

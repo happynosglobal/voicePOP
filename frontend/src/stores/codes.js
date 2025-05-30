@@ -12,6 +12,7 @@ const useCodes = create(
         storesForTree: [],
         brandOptions: [],
         brandCodes: [],
+        categoryOptions: [],
         isLoading: false,
 
         // 점포 정보 초기화
@@ -23,6 +24,7 @@ const useCodes = create(
             storesForTree: [],
             brandOptions: [],
             brandCodes: [],
+            categoryOptions: [],
             isLoading: false,
           }),
 
@@ -57,6 +59,11 @@ const useCodes = create(
           set({
             brandOptions: options,
             brandCodes: options.map((option) => option.value),
+          }),
+
+        setCategory: (options) =>
+          set({
+            categoryOptions: options,
           }),
       }),
       {

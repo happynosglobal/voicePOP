@@ -42,10 +42,13 @@ const BroadcastRegisterPage = () => {
     setSelectedStore,
     audioFile,
     setAudioFile,
+    duration,
+    setDuration,
     categoryOptions,
     handleInput,
     handleSelectBox,
     isFormValid,
+    isWithinTimeRange,
   } = useBroadcastRegister();
 
   const storeModalRef = useRef(null); // 점포 선택 모달 ref
@@ -54,7 +57,7 @@ const BroadcastRegisterPage = () => {
   const [selectedStartDate, setSelectedStartDate] = useState(today); // 시작날짜선택 STATE
   const [selectedEndDate, setSelectedEndDate] = useState(today); // 종료날짜선택 STATE
 
-  const [tempSelectedStores, setTempSelectedStores] = useState([]);
+  // const [tempSelectedStores, setTempSelectedStores] = useState([]);
 
   /* 계약기간 시작일보다 종료일이 빠르면 시작일로 초기화*/
   useEffect(() => {
@@ -106,6 +109,23 @@ const BroadcastRegisterPage = () => {
   };
   // 광고 방송 등록 handler
   const handleSubmit = async () => {
+    // 방송 시간 범위안에 voice 파일의 반복이 가능한지 계산
+    const isValid = isWithinTimeRange({
+      startTimeStr: formData.start_time,
+      endTimeStr: formData.end_time,
+      duration: Number(duration),
+      gap: formData.gap,
+      repeatCount: formData.repeat_count,
+      repeatInterval: formData.repeat_interval,
+      isGapChecked,
+      isRepeatChecked,
+    });
+
+    if (!isValid) {
+      toast.error("방송 시간을 다시 확인해주세요.");
+      return;
+    }
+
     let masterBroadcastId = null;
     try {
       const body = {
@@ -245,12 +265,12 @@ const BroadcastRegisterPage = () => {
                   <button
                     className="btn btn-sm btn-accent"
                     onClick={() => {
-                      setTempSelectedStores(
-                        selectedStore.map((s) => ({
-                          value: s.store_code,
-                          label: s.store_name,
-                        }))
-                      );
+                      // setTempSelectedStores(
+                      //   selectedStore.map((s) => ({
+                      //     value: s.store_code,
+                      //     label: s.store_name,
+                      //   }))
+                      // );
                       storeModalRef.current.showModal();
                     }}
                   >
@@ -416,7 +436,6 @@ const BroadcastRegisterPage = () => {
           </div>
         </div>
 
-
         <div className="flex w-full items-center justify-center gap-2.5 mt-12">
           <button className="btn min-w-24">취소</button>
           <button
@@ -434,7 +453,7 @@ const BroadcastRegisterPage = () => {
         label={"점포 생성"}
         mode={"add"}
         handleSubmit={handleStoreGroup}
-        initialChosenStores={tempSelectedStores}
+        // initialChosenStores={tempSelectedStores}
       />
       <LoadingSpinner includeCodesLoading={true} />
     </ContentLayout>

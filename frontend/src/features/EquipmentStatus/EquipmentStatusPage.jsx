@@ -3,7 +3,6 @@ import ContentLayout from "../../layout/ContentLayout";
 import Select from "react-select";
 import useUserStore from "../../stores/user";
 import useCodes from "../../stores/codes";
-import useCategoryCode from "../../hooks/useCategoryCode";
 import EquipmentStatusTable from "./components/EquipmentStatusTable";
 import { toast } from "react-toastify";
 import { getDeviceStatus } from "../../api/device/device";
@@ -12,23 +11,12 @@ import LoadingSpinner from "../../components/loading/LoadingSpinner";
 const EquipmentStatusPage = () => {
   const { user } = useUserStore();
   const { storeByBrandCode, isLoading } = useCodes();
-  const { categoryOptions, getCategoryCodes } = useCategoryCode();
 
   const [searchParams, setSearchParams] = useState({
     str_code: user?.store_code || "",
     category_code: "",
     rows_per_page: 1000,
   });
-
-  useEffect(() => {
-    // if (user?.level === "STORE" && user?.store_code) {
-    //   setSearchParams((prev) => ({
-    //     ...prev,
-    //     str_code: user?.store_code,
-    //   }));
-    // }
-    getCategoryCodes(user?.brand_code);
-  }, [user]);
 
   const [deviceList, setDeviceList] = useState([]);
 
@@ -80,7 +68,6 @@ const EquipmentStatusPage = () => {
       <EquipmentStatusTable
         searchParams={searchParams}
         setSearchParams={setSearchParams}
-        categoryOptions={categoryOptions}
         handleGetDeviceList={handleGetDeviceList}
         deviceList={deviceList}
       />

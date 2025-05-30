@@ -159,7 +159,19 @@ const AdStatusPage = () => {
         )}
       </ul>
 
-      <Tab tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
+      <div className="tabs-wrapper">
+        <div className="tabs-nav">
+          {tabs.map((tab) => (
+            <button
+              key={tab}
+              className={`tab-btn ${activeTab === tab ? "is-active" : ""}`}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {activeTab === "업체별 현황" ? (
         <>

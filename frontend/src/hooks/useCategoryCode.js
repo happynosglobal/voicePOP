@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { getCategoryList } from "../api/category/category";
 import { toast } from "react-toastify";
+import useCodes from "../stores/codes";
 
 const useCategoryCode = () => {
+  const { setCategory } = useCodes();
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [categoryOptions4Select, setCategoryOptions4Select] = useState([]);
   const getCategoryCodes = async (brand_code) => {
@@ -14,6 +16,7 @@ const useCategoryCode = () => {
       const res = await getCategoryList(params);
       const { status_code, data } = res.data;
       if (status_code === 200 || status_code === 204) {
+        setCategory(data.items);
         setCategoryOptions(data.items);
         parsingCategories4Select(data.items);
       }

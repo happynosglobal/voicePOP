@@ -26,11 +26,12 @@ const GroupSelectModal = ({
   mode,
   groupId,
   setGroupId,
-  initialChosenStores,
+  // initialChosenStores,
 }) => {
   const { storeByBrandCode, storesForTree, isLoading } = useCodes();
   const { storeGroupListForTree, getStoreGroupListForTree } =
     useStoreGroupModal();
+
   useEffect(() => {
     getStoreGroupListForTree();
   }, []);
@@ -50,7 +51,6 @@ const GroupSelectModal = ({
 
   // 전체 점포 목록 (왼쪽)
   const [allStores, setAllStores] = useState([]);
-
   const [checkedAllStores, setCheckedAllStores] = useState([]);
   const [expandedAllStores, setExpandedAllStores] = useState([]);
 
@@ -63,9 +63,9 @@ const GroupSelectModal = ({
   const [tempCheckedStores, setTempCheckedStores] = useState([]);
 
   // 선택딘 점포 세팅
-  useEffect(() => {
-    setChosenStores(initialChosenStores);
-  }, [initialChosenStores]);
+  // useEffect(() => {
+  //   setChosenStores(initialChosenStores);
+  // }, [initialChosenStores]);
 
   // 권역별 기본 그룹 + 커스텀 그룹 -> 전체점포 Tree 구조에 set
   useEffect(() => {
@@ -112,28 +112,64 @@ const GroupSelectModal = ({
 
   //check된 점포들 선택된 점포로 이동
   const handleMoveToChosenStores = () => {
-    // 이미 선택된 점포에 있는 점포 목록 세팅
-    const selectedSet = new Set(chosenStores.map((store) => store.value));
+    const selectedMap = new Map(chosenStores.map((s) => [s.value, s]));
 
-    checkedAllStores.forEach((value) => {
-      // const baseValue = value.split("_")[0]; // "1001_G1" -> "1001"
-      selectedSet.add(value);
+    const extractLabel = (label) => {
+      if (typeof label === "string") return label;
+      if (label?.props?.children) return label.props.children;
+      return "그룹";
+    };
+
+    const addNode = (node) => {
+      if (node.type === "wrapper") {
+        node.children?.forEach(addNode); // wrapper는 통과
+        return;
+      }
+
+      if (node.type === "group") {
+        const childValues = getLeafValues([node]);
+        const allChildrenChecked = childValues.every((v) =>
+          tempCheckedStores.includes(v)
+        );
+
+        if (allChildrenChecked) {
+          selectedMap.set(node.value, {
+            type: "group",
+            value: node.value,
+            label: extractLabel(node.label),
+          });
+          return;
+        }
+
+        // 자식들 중 일부만 체크된 상태 → store 단위만 추가
+        node.children?.forEach(addNode);
+      }
+
+      if (node.type === "store" && tempCheckedStores.includes(node.value)) {
+        selectedMap.set(node.key || node.value, {
+          type: "store",
+          value: node.key || node.value,
+          label: node.label,
+        });
+      }
+    };
+
+    const traverse = (nodes) => {
+      nodes.forEach(addNode);
+    };
+
+    const nodesToProcess = isSearching ? filteredStores : allStores;
+    traverse(nodesToProcess);
+
+    const sorted = [...selectedMap.values()].sort((a, b) => {
+      if (a.type === "group" && b.type !== "group") return -1;
+      if (a.type !== "group" && b.type === "group") return 1;
+      return 0;
     });
 
-    // 기존 선택된 점포 + 새로 선택된 점포
-    const newChosenStores = [...selectedSet].map((value) => {
-      // 전체 점포 정보에서 value(점포코드)로 label(점포명) 가져오기
-      const matchedStore = storeByBrandCode.find(
-        (store) => store.value === value
-      );
-      return {
-        value,
-        label: matchedStore ? matchedStore.label : `점포 ${value}`, // 점포명 label이 정보에 없을경우 임시로 점포 + 점포코드로 표시
-      };
-    });
+    setChosenStores(sorted);
 
-    setChosenStores(newChosenStores);
-    setCheckedAllStores([]); // 왼쪽 체크 초기화
+    setCheckedAllStores([]);
     setTempCheckedStores([]);
   };
 
@@ -152,7 +188,6 @@ const GroupSelectModal = ({
   const getStoreGroupInfo = async () => {
     try {
       const { groupName, groupedStores } = await getGroupInfo(groupId);
-
       setGroupName(groupName);
       setChosenStores(groupedStores);
     } catch (err) {
@@ -195,78 +230,75 @@ const GroupSelectModal = ({
   }, [modalRef]);
 
   // 점포 검색
+  const extractLabelText = (label) => {
+    if (typeof label === "string") return label;
+    if (label?.props?.children) {
+      return Array.isArray(label.props.children)
+        ? label.props.children.join("")
+        : label.props.children;
+    }
+    return "";
+  };
+
+  const flattenStoreNodes = (nodes) => {
+    let result = [];
+
+    for (const node of nodes) {
+      if (node.type === "store") {
+        result.push(node);
+      } else if (node.children) {
+        result = result.concat(flattenStoreNodes(node.children));
+      }
+    }
+
+    return result;
+  };
+
   const handleSearch = () => {
     setCheckedAllStores([]);
     setTempCheckedStores([]);
-    setIsSearching(true); // 검색 중 상태 ON
-
-    // const combinedStores = [...storeGroupListForTree, ...storesForTree];
-    const combinedStores = [...allStores];
-
-    const filterNodes = (nodes, keyword) => {
-      return nodes
-        .map((node) => {
-          if (node.label.toLowerCase().includes(keyword.toLowerCase())) {
-            return node;
-          }
-
-          if (node.children) {
-            const filteredChildren = filterNodes(node.children, keyword);
-            if (filteredChildren.length > 0) {
-              return {
-                value: node.value,
-                label: `${node.label.split(" (")[0]} (${
-                  filteredChildren.length
-                })`,
-                children: filteredChildren,
-              };
-            }
-          }
-
-          return null;
-        })
-        .filter(Boolean);
-    };
+    setIsSearching(true);
 
     if (searchKeyword.trim() === "") {
       setFilteredStores([]);
       setIsSearching(false);
-    } else {
-      const filtered = filterNodes(combinedStores, searchKeyword);
-      setFilteredStores(filtered); // 검색 결과 (빈 배열 포함)
+      return;
     }
+
+    const keywordLower = searchKeyword.trim().toLowerCase();
+    const allLeafNodes = flattenStoreNodes(allStores);
+
+    // 중복 제거: key 기준으로 Set
+    const uniqueByKey = new Map();
+    for (const node of allLeafNodes) {
+      const label = extractLabelText(node.label).toLowerCase();
+      if (label.includes(keywordLower)) {
+        uniqueByKey.set(node.key, node); // key가 중복되면 마지막 것만 유지됨
+      }
+    }
+
+    setFilteredStores(Array.from(uniqueByKey.values()));
   };
 
   const handleSearchChosen = () => {
     setCheckedChosenStores([]);
     setIsSearchingChosen(true);
 
-    const filterNodes = (nodes, keyword) => {
-      return nodes
-        .map((node) => {
-          if (node.label.toLowerCase().includes(keyword.toLowerCase())) {
-            return node;
-          }
-
-          if (node.children) {
-            const filteredChildren = filterNodes(node.children, keyword);
-            if (filteredChildren.length > 0) {
-              return { ...node, children: filteredChildren };
-            }
-          }
-
-          return null;
-        })
-        .filter(Boolean);
-    };
-
     if (searchChosenKeyword.trim() === "") {
       setFilteredChosenStores([]);
       setIsSearchingChosen(false);
-    } else {
-      const filtered = filterNodes(chosenStores, searchChosenKeyword);
-      setFilteredChosenStores(filtered);
+      return;
     }
+
+    const keywordLower = searchChosenKeyword.trim().toLowerCase();
+
+    const filtered = chosenStores.filter(
+      (node) =>
+        node.type === "store" &&
+        extractLabelText(node.label).toLowerCase().includes(keywordLower)
+    );
+
+    setFilteredChosenStores(filtered);
   };
 
   const getLeafValues = (nodes) => {
@@ -280,6 +312,49 @@ const GroupSelectModal = ({
     });
     return result;
   };
+
+  const findGroupNodeByValue = (nodes, targetValue) => {
+    for (const node of nodes) {
+      if (node.type === "group" && node.value === targetValue) {
+        return node;
+      } else if (node.children) {
+        const found = findGroupNodeByValue(node.children, targetValue);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
+  const getSubmitStoreList = () => {
+    const allLeafNodes = flattenStoreNodes(allStores);
+    const storeMap = new Map();
+
+    chosenStores.forEach((node) => {
+      if (node.type === "store") {
+        storeMap.set(node.value, {
+          value: node.value,
+          label: node.label,
+        });
+      } else if (node.type === "group") {
+        // group.value와 일치하는 group 노드 찾기
+        const groupNode = findGroupNodeByValue(allStores, node.value);
+        if (groupNode && groupNode.children) {
+          groupNode.children.forEach((child) => {
+            if (child.type === "store") {
+              storeMap.set(child.key || child.value, {
+                value: child.key || child.value,
+                label: child.label,
+              });
+            }
+          });
+        }
+      }
+    });
+
+    return Array.from(storeMap.values());
+  };
+  const storeCount = chosenStores.filter((n) => n.type === "store").length;
+  const groupCount = chosenStores.filter((n) => n.type === "group").length;
 
   return (
     <>
@@ -347,7 +422,7 @@ const GroupSelectModal = ({
                 <CheckboxTree
                   nodes={
                     isSearching
-                      ? filteredStores // 검색 중이면 검색 결과 (빈 배열도 허용)
+                      ? filteredStores // 검색 중이면 검색 결과
                       : allStores // 검색 중이 아닐 때 전체 트리
                   }
                   checked={tempCheckedStores}
@@ -391,8 +466,9 @@ const GroupSelectModal = ({
             {/* 오른쪽 (선택된 점포) */}
             <div className="flex-1 flex flex-col overflow-hidden h-full">
               <h4 className="flex mb-2 h-9 px-5 font-medium text-center bg-sky-50 text-sky-600 leading-tight rounded-md justify-end items-center">
-                선택된 점포 : {chosenStores.length}개
+                선택됨: 그룹({groupCount}) 점포({storeCount})
               </h4>
+
               <div className="flex items-center mb-2 gap-2.5">
                 <input
                   name="chosen_store_name"
@@ -474,7 +550,9 @@ const GroupSelectModal = ({
               <button
                 type="submit"
                 className="btn btn-primary min-w-24"
-                onClick={() => handleSubmit(groupName, chosenStores, null)}
+                onClick={() =>
+                  handleSubmit(groupName, getSubmitStoreList(), null)
+                }
                 disabled={addable && !groupName ? true : false}
               >
                 확인
@@ -484,7 +562,9 @@ const GroupSelectModal = ({
                 <button
                   type="submit"
                   className="btn btn-primary min-w-24"
-                  onClick={() => handleSubmit(groupName, chosenStores, groupId)}
+                  onClick={() =>
+                    handleSubmit(groupName, getSubmitStoreList(), groupId)
+                  }
                 >
                   수정
                 </button>

@@ -10,7 +10,6 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import ContentLayout from "../../layout/ContentLayout";
 import CustomDatePicker from "../../components/customDatePicker/CustomDatePicker";
 import useCodes from "../../stores/codes";
-import useCategoryCode from "../../hooks/useCategoryCode";
 import useUserStore from "../../stores/user";
 import {
   getBcMasterList,
@@ -67,7 +66,7 @@ const convertItemsToEvents = (items, selectedDate) => {
 
     const media = item.medias?.[0];
     const playTimeSeconds =
-      media?.play_time_seconds || item.play_time_seconds || 63;
+      media?.play_time_seconds || item.play_time_seconds || "";
     const mediaFilename = media?.media_filename || "음성파일 없음";
     const playDurationMs = playTimeSeconds * 1000;
 
@@ -76,7 +75,7 @@ const convertItemsToEvents = (items, selectedDate) => {
       allEvents.push({
         originalId: id,
         id: `${id}-gap-full`,
-        title: `${baseTitle} (gap: ${gap}s)`,
+        title: `${baseTitle}`,
         category,
         start: baseStart,
         end: baseEnd,
@@ -96,7 +95,7 @@ const convertItemsToEvents = (items, selectedDate) => {
         allEvents.push({
           originalId: id,
           id: `${id}-repeat-${i}`,
-          title: `${baseTitle} (${playTimeSeconds}s)`,
+          title: `${baseTitle}`,
           category,
           start: currentStart,
           end: currentEnd,
@@ -133,7 +132,6 @@ const CustomToolbar = ({
   date,
   onNavigate,
   user,
-  tabs,
   activeTab,
   setActiveTab,
   searchParams,
@@ -186,7 +184,6 @@ const CustomToolbar = ({
       </div>
 
       <Tab
-        tabs={tabs}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onTabChange={(code) => {
@@ -209,31 +206,12 @@ const AdSchedulePage = () => {
     category_code: "",
     rows_per_page: 1000,
   });
-  
+
   const [selectedEvent, setSelectedEvent] = useState(null);
 
   const modalRef = useRef(null);
   const [activeTab, setActiveTab] = useState("");
-  const { categoryOptions, getCategoryCodes } = useCategoryCode();
-
-  const tabs = useMemo(() => {
-    return [{ code: "", name: "전체" }, ...categoryOptions];
-  }, [categoryOptions]);
-
-  useEffect(() => {
-    // if (user?.level === "STORE" && user?.store_code) {
-    //   setSearchParams((prev) => ({
-    //     ...prev,
-    //     str_code: user.store_code,
-    //   }));
-    // }
-    getCategoryCodes(user?.brand_code);
-  }, [user]);
-
-  useEffect(() => {
-    if (tabs.length !== 0) setActiveTab(tabs[0].code);
-  }, [tabs]);
-
+  
   useEffect(() => {
     const getAdList = async () => {
       const tempParams = {
@@ -272,6 +250,7 @@ const AdSchedulePage = () => {
 
     getAdList();
   }, [searchParams, date]);
+
   const handleSelectEvent = async (event) => {
     try {
       const res = await getBcTargetStore(event.originalId, {
@@ -279,12 +258,18 @@ const AdSchedulePage = () => {
       });
       const stores = res.data.data.items;
       setSelectedEvent({ ...event, stores });
-      modalRef.current?.showModal();
     } catch (e) {
       toast.error("점포 정보를 불러오는 데 실패했습니다.");
       console.error(e);
     }
   };
+
+  useEffect(() => {
+    if (selectedEvent) {
+      modalRef.current.showModal();
+    }
+  }, [selectedEvent]);
+  
   return (
     <ContentLayout>
       <Calendar
@@ -330,7 +315,6 @@ const AdSchedulePage = () => {
             <CustomToolbar
               {...props}
               user={user}
-              tabs={tabs}
               activeTab={activeTab}
               setActiveTab={setActiveTab}
               searchParams={searchParams}
@@ -341,11 +325,14 @@ const AdSchedulePage = () => {
           ),
         }}
       />
-      <AdEventDetailModal
-        selectedEvent={selectedEvent}
-        modalRef={modalRef}
-        onClose={() => modalRef.current?.close()}
-      />
+      {selectedEvent && (
+        <AdEventDetailModal
+          selectedEvent={selectedEvent}
+          setSelectedEvent={setSelectedEvent}
+          modalRef={modalRef}
+          onClose={() => modalRef.current?.close()}
+        />
+      )}
     </ContentLayout>
   );
 };

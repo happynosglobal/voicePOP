@@ -12,7 +12,7 @@ const EquipmentSettingPage = () => {
   useEffect(() => {
     getBrandCodes();
   }, []);
-  // const { categoryOptions4Select, getCategoryCodes } = useCategoryCode();
+  
   const {
     formData,
     errors,

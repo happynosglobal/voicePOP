@@ -7,7 +7,6 @@ import Tab from "../../../components/tab/Tab";
 const DeviceManagementTable = ({
   searchParams,
   setSearchParams,
-  categoryOptions,
   handleGetDeviceList,
   handleModifyDeviceStatus,
   deviceList,
@@ -23,17 +22,6 @@ const DeviceManagementTable = ({
 
   const [originalComments, setOriginalComments] = useState({});
 
-  // "전체" 항목 포함한 탭 목록 생성
-  const tabs = useMemo(() => {
-    return [{ code: "", name: "전체" }, ...categoryOptions];
-  }, [categoryOptions]);
-
-  useEffect(() => {
-    if (tabs.length !== 0) {
-      setActiveTab(tabs[0].code);
-    }
-  }, [tabs]);
-
   useEffect(() => {
     handleGetDeviceList();
   }, [searchParams]);
@@ -41,7 +29,6 @@ const DeviceManagementTable = ({
   return (
     <>
       <Tab
-        tabs={tabs}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onTabChange={(code) => {

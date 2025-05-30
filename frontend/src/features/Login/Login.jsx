@@ -9,11 +9,13 @@ import Select from "react-select";
 import { toast } from "react-toastify";
 import useBrandCode from "../../hooks/useBrandCode";
 import { URL_MAPPING } from "../../utils/constant/urls";
+import useCategoryCode from "../../hooks/useCategoryCode";
 
 const Login = () => {
   const { user, logout, setUser } = useUserStore.getState();
   const { fetchStores } = useCodes.getState();
   const { getBrandCodes } = useBrandCode();
+  const { getCategoryCodes } = useCategoryCode();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     user_id: "",
@@ -90,6 +92,7 @@ const Login = () => {
 
         setUser(data, formData.brand_code); // 선택한 브랜드 세팅
         getBrandCodes(); // 브랜드 목록 조회
+        getCategoryCodes(); // MD 카테고리 조회
         fetchStores(formData.brand_code); // 선택한 브랜드의 점포목록
 
         return navigate("/");

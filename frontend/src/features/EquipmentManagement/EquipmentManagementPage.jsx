@@ -13,16 +13,11 @@ import LoadingSpinner from "../../components/loading/LoadingSpinner";
 const EquipmentManagementPage = () => {
   const { user } = useUserStore();
   const { storeByBrandCode, isLoading } = useCodes();
-  const { categoryOptions, getCategoryCodes } = useCategoryCode();
 
   const [searchParams, setSearchParams] = useState({
     str_code: user?.store_code || "",
     category_code: "",
   });
-
-  useEffect(() => {
-    getCategoryCodes(user?.brand_code);
-  }, [user]);
 
   const [deviceList, setDeviceList] = useState([]);
 
@@ -90,7 +85,6 @@ const EquipmentManagementPage = () => {
       <DeviceManagementTable
         searchParams={searchParams}
         setSearchParams={setSearchParams}
-        categoryOptions={categoryOptions}
         handleGetDeviceList={handleGetDeviceList}
         handleModifyDeviceStatus={handleModifyDeviceStatus}
         deviceList={deviceList}

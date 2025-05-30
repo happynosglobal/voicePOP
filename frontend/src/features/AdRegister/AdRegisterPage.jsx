@@ -42,6 +42,8 @@ const AdRegisterPage = () => {
     setSelectedStore,
     audioFile,
     setAudioFile,
+    duration,
+    setDuration,
     categoryOptions,
     companyOptions,
     setCompanyOptions,
@@ -52,6 +54,7 @@ const AdRegisterPage = () => {
     handleInput,
     handleSelectBox,
     isFormValid,
+    isWithinTimeRange,
   } = useAdRegister();
 
   useEffect(() => {
@@ -70,7 +73,7 @@ const AdRegisterPage = () => {
   const [selectedStartDate, setSelectedStartDate] = useState(today); // 시작날짜선택 STATE
   const [selectedEndDate, setSelectedEndDate] = useState(today); // 종료날짜선택 STATE
 
-  const [tempSelectedStores, setTempSelectedStores] = useState([]);
+  // const [tempSelectedStores, setTempSelectedStores] = useState([]);
 
   /* 계약기간 시작일보다 종료일이 빠르면 시작일로 초기화*/
   useEffect(() => {
@@ -122,6 +125,23 @@ const AdRegisterPage = () => {
   };
   // 광고 방송 등록 handler
   const handleSubmit = async () => {
+    // 방송 시간 범위안에 voice 파일의 반복이 가능한지 계산
+    const isValid = isWithinTimeRange({
+      startTimeStr: formData.start_time,
+      endTimeStr: formData.end_time,
+      duration: Number(duration),
+      gap: formData.gap,
+      repeatCount: formData.repeat_count,
+      repeatInterval: formData.repeat_interval,
+      isGapChecked,
+      isRepeatChecked,
+    });
+
+    if (!isValid) {
+      toast.error("방송 시간을 다시 확인해주세요.");
+      return;
+    }
+
     let masterBroadcastId = null;
     try {
       const body = {
@@ -262,12 +282,12 @@ const AdRegisterPage = () => {
                   <button
                     className="btn btn-sm btn-accent"
                     onClick={() => {
-                      setTempSelectedStores(
-                        selectedStore.map((s) => ({
-                          value: s.store_code,
-                          label: s.store_name,
-                        }))
-                      );
+                      // setTempSelectedStores(
+                      //   selectedStore.map((s) => ({
+                      //     value: s.store_code,
+                      //     label: s.store_name,
+                      //   }))
+                      // );
                       storeModalRef.current.showModal();
                     }}
                   >
@@ -457,7 +477,11 @@ const AdRegisterPage = () => {
             방송파일
           </label>
           <div className="w-full flex flex-col gap-5">
-            <FileUploader audioFile={audioFile} setAudioFile={setAudioFile} />
+            <FileUploader
+              audioFile={audioFile}
+              setAudioFile={setAudioFile}
+              setDuration={setDuration}
+            />
           </div>
         </div>
 
@@ -478,7 +502,7 @@ const AdRegisterPage = () => {
         label={"점포 생성"}
         mode={"add"}
         handleSubmit={handleStoreGroup}
-        initialChosenStores={tempSelectedStores}
+        // initialChosenStores={tempSelectedStores}
       />
       <LoadingSpinner includeCodesLoading={true} />
     </ContentLayout>

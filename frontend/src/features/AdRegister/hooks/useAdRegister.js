@@ -34,6 +34,7 @@ const useAdRegister = () => {
   const [formData, setFormData] = useState(initialFormData);
   const [selectedStore, setSelectedStore] = useState([]);
   const [audioFile, setAudioFile] = useState(null);
+  const [duration, setDuration] = useState(null);
   const [companyOptions, setCompanyOptions] = useState([]);
   const [contractOptions, setContractOptions] = useState([]);
 
@@ -106,16 +107,16 @@ const useAdRegister = () => {
   };
 
   const isFormValid = (isGapChecked) => {
+    const isStoreManager = user?.level === "STORE";
     const hasCommonFields =
       formData.title &&
       formData.category_type_seq &&
-      selectedStore.length !== 0 &&
+      (isStoreManager || selectedStore.length !== 0) &&
       formData.contract &&
       formData.start_date &&
       formData.end_date &&
       formData.start_time &&
       formData.end_time &&
-      formData.media_desc &&
       audioFile;
 
     const hasGapField = isGapChecked && formData.gap;
@@ -126,6 +127,38 @@ const useAdRegister = () => {
     return isValid;
   };
 
+  const isWithinTimeRange = ({
+    startTimeStr,
+    endTimeStr,
+    duration,
+    gap,
+    repeatCount,
+    repeatInterval,
+    isGapChecked,
+    isRepeatChecked,
+  }) => {
+    const toSeconds = (timeStr) => {
+      const hour = parseInt(timeStr.slice(0, 2), 10);
+      const min = parseInt(timeStr.slice(2), 10);
+      return hour * 3600 + min * 60;
+    };
+
+    const start = toSeconds(startTimeStr);
+    const end = toSeconds(endTimeStr);
+    const availableSeconds = end - start;
+    if (isGapChecked && !isRepeatChecked) {
+      const totalTimeNeeded = duration + gap;
+      return totalTimeNeeded <= availableSeconds;
+    }
+
+    if (!isGapChecked && isRepeatChecked) {
+      const totalTimeNeeded = repeatCount * (duration + repeatInterval);
+      return totalTimeNeeded <= availableSeconds;
+    }
+
+    return false;
+  };
+
   return {
     formData,
     setFormData,
@@ -133,6 +166,8 @@ const useAdRegister = () => {
     setSelectedStore,
     audioFile,
     setAudioFile,
+    duration,
+    setDuration,
     categoryOptions,
     companyOptions,
     setCompanyOptions,
@@ -143,6 +178,7 @@ const useAdRegister = () => {
     handleInput,
     handleSelectBox,
     isFormValid,
+    isWithinTimeRange,
   };
 };
 

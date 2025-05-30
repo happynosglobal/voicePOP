@@ -27,6 +27,7 @@ const useBroadcastRegister = () => {
   const [formData, setFormData] = useState(initialFormData);
   const [selectedStore, setSelectedStore] = useState([]);
   const [audioFile, setAudioFile] = useState(null);
+  const [duration, setDuration] = useState(null);
 
   useEffect(() => {
     getCategoryCodes(user?.brand_code);
@@ -48,7 +49,7 @@ const useBroadcastRegister = () => {
     const hasCommonFields =
       formData.title &&
       formData.category_type_seq &&
-       (isStoreManager || selectedStore.length !== 0) &&
+      (isStoreManager || selectedStore.length !== 0) &&
       formData.start_date &&
       formData.end_date &&
       formData.start_time &&
@@ -63,6 +64,38 @@ const useBroadcastRegister = () => {
 
     return isValid;
   };
+
+  const isWithinTimeRange = ({
+    startTimeStr,
+    endTimeStr,
+    duration,
+    gap,
+    repeatCount,
+    repeatInterval,
+    isGapChecked,
+    isRepeatChecked,
+  }) => {
+    const toSeconds = (timeStr) => {
+      const hour = parseInt(timeStr.slice(0, 2), 10);
+      const min = parseInt(timeStr.slice(2), 10);
+      return hour * 3600 + min * 60;
+    };
+
+    const start = toSeconds(startTimeStr);
+    const end = toSeconds(endTimeStr);
+    const availableSeconds = end - start;
+    if (isGapChecked && !isRepeatChecked) {
+      const totalTimeNeeded = duration + gap;
+      return totalTimeNeeded <= availableSeconds;
+    }
+
+    if (!isGapChecked && isRepeatChecked) {
+      const totalTimeNeeded = repeatCount * (duration + repeatInterval);
+      return totalTimeNeeded <= availableSeconds;
+    }
+
+    return false;
+  };
   return {
     formData,
     setFormData,
@@ -70,10 +103,13 @@ const useBroadcastRegister = () => {
     setSelectedStore,
     audioFile,
     setAudioFile,
+    duration,
+    setDuration,
     categoryOptions,
     handleInput,
     handleSelectBox,
     isFormValid,
+    isWithinTimeRange,
   };
 };
 
