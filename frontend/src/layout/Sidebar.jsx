@@ -1,5 +1,6 @@
 import React from "react";
 import useSidebar from "./hooks/useSidebar";
+import { Link } from "react-router-dom";
 
 const Sidebar = () => {
   const { menu, handleNavigation, location } = useSidebar();
@@ -34,6 +35,20 @@ const Sidebar = () => {
               </ul>
             </li>
           ))}
+          {/* 임시 대쉬보드 링크 */}
+          <li>
+            <Link
+              to="/dashboard"
+              className="text-white flex items-center gap-2 font-semibold text-lg mb-1"
+            >
+              <img
+                src="/asset/dashboard.png"
+                alt=""
+                className="w-7 h-7 object-cover"
+              />
+              대쉬보드
+            </Link>
+          </li>
         </ul>
       </nav>
     </aside>

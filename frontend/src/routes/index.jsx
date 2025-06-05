@@ -46,7 +46,7 @@ import ChangePassword from "../features/ChangePassword/ChangePassword";
  */
 function Root() {
   const { routes } = useLayout();
-  
+
   return (
     <Routes>
       <Route index path={URL_MAPPING.login} element={<Login />} />
@@ -63,8 +63,8 @@ function Root() {
         {routes.map(({ path, element }) => (
           <Route key={path} path={path} element={element} />
         ))}
-        {/* <Route path={URL_MAPPING.dashboard} element={<DashboardPage />} />
-        <Route
+        <Route path="dashboard" element={<DashboardPage />} />
+        {/*  <Route
           path={URL_MAPPING.equipmentStatus}
           element={<EquipmentStatusPage />}
         />
@@ -100,7 +100,7 @@ function Root() {
           element={<AdCompanyRegisterPage />}
         />
         <Route path={URL_MAPPING.adApproval} element={<AdApprovalPage />} />*/}
-      </Route> 
+      </Route>
     </Routes>
   );
 }
