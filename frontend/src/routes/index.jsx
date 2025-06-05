@@ -64,7 +64,8 @@ function Root() {
           <Route key={path} path={path} element={element} />
         ))}
         <Route path="dashboard" element={<DashboardPage />} />
-        {/*  <Route
+        {/* <Route path={URL_MAPPING.dashboard} element={<DashboardPage />} />
+        <Route
           path={URL_MAPPING.equipmentStatus}
           element={<EquipmentStatusPage />}
         />
@@ -106,76 +107,3 @@ function Root() {
 }
 
 export default Root;
-
-{
-  {
-    /* <Routes>
-<Route index path={"/login"} element={<Login />} />
-<Route path={"/signup"} element={<SignUp />} />
-<Route path="/" element={<DefaultLayout />}>
-    <Route
-        path={URL_MAPPING.dashboard}
-        element={<DashboardPage />}
-    />
-    <Route
-        path={URL_MAPPING.equipmentStatus}
-        element={<EquipmentStatusPage />}
-    />
-    <Route
-        path={URL_MAPPING.broadCastRegister}
-        element={<BroadcastRegisterPage />}
-    />
-    <Route
-        path={URL_MAPPING.reservationManagement}
-        element={<ReservationManagementPage />}
-    />
- 
- 
- 
-    <Route
-        path={URL_MAPPING.adRegister}
-        element={<AdRegisterPage />}
-    />
-    <Route
-        path={URL_MAPPING.adstatus}
-        element={<AdStatusPage />}
-    />
-    <Route
-        path={URL_MAPPING.adSchedule}
-        element={<AdSchedulePage />}
-    />
- 
- 
- 
-    <Route
-        path={URL_MAPPING.userManagement}
-        element={<UserManagementPage />}
-    />
-    <Route
-        path={URL_MAPPING.equipmentManagement}
-        element={<EquipmentManagementPage />}
-    />
-    <Route
-        path={URL_MAPPING.storeGroup}
-        element={<StoreGroupPage />}
-    />
-    <Route
-        path={URL_MAPPING.equipmentStats}
-        element={<EquipmentStatsPage />}
-    />
-    <Route
-        path={URL_MAPPING.adstats}
-        element={<AdStatsPage />}
-    />
-    <Route
-        path={URL_MAPPING.adCompanyRegister}
-        element={<AdCompanyRegisterPage />}
-    />
-    <Route
-        path={URL_MAPPING.adApproval}
-        element={<AdApprovalPage />}
-    />
-</Route>
-</Routes> */
-  }
-}

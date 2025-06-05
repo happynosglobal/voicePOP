@@ -72,7 +72,7 @@ const GroupSelectModal = ({
     if (addable) {
       setAllStores([...storesForTree]);
     } else {
-      setAllStores([...storesForTree, ...storeGroupListForTree]);
+      setAllStores([...storeGroupListForTree, ...storesForTree]);
     }
   }, [storeGroupListForTree, storesForTree]);
 
@@ -119,7 +119,7 @@ const GroupSelectModal = ({
     //   if (label?.props?.children) return label.props.children;
     //   return "그룹";
     // };
-    
+
     // type 그룹일경우 class 붙여서 label 생성
     const makeGroupLabel = (text) => (
       <span className="rct-chosen-title">{text}</span>
@@ -510,6 +510,15 @@ const GroupSelectModal = ({
                   }}
                 >
                   전체해제
+                </button>
+                <button
+                  className="btn btn-error btn-xs"
+                  onClick={() => {
+                    setChosenStores([]);
+                    setCheckedChosenStores([]);
+                  }}
+                >
+                  전체삭제
                 </button>
               </div>
               <div className="flex-1 p-2 h-full border overflow-y-scroll">

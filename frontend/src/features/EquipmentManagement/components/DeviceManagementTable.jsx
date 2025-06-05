@@ -89,6 +89,11 @@ const DeviceManagementTable = ({
                     handleModifyDeviceStatus(updatedList[index]);
                   }}
                   placeholder="알 수 없음"
+                  menuPortalTarget={document.body}
+                  menuPosition="fixed"
+                  styles={{
+                    menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                  }}
                 />
               </td>
               <td className="truncate">

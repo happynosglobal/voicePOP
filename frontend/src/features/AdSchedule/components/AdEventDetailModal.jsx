@@ -1,6 +1,8 @@
 import { format } from "date-fns";
 import Tooltip from "../../../components/tooltip/Tooltip";
 import { useEffect } from "react";
+import { downloadBcMedia } from "../../../api/broadcast/broadcast";
+import { toast } from "react-toastify";
 
 const AdEventDetailModal = ({
   selectedEvent,
@@ -24,7 +26,28 @@ const AdEventDetailModal = ({
   }, [modalRef]);
 
   /* 모달창 닫을 때 수행 할 로직 */
+  const downloadAudio = async () => {
+    if (!selectedEvent?.mediaId) return;
+    const id = selectedEvent.mediaId;
+    try {
+      const response = await downloadBcMedia(id);
+      const { media_file_url, media_file_name } = response.data.data;
 
+      const audioResponse = await fetch(media_file_url);
+      const blob = await audioResponse.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = media_file_name || "download_voice.mp3";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (err) {
+      toast.error("다운로드 실패");
+      console.error(err);
+    }
+  };
   return (
     <dialog className="modal" ref={modalRef}>
       <div className="modal-box bg-white max-w-lg">
@@ -37,6 +60,12 @@ const AdEventDetailModal = ({
             <span className="font-semibold">방송명</span>
             <span className="text-right break-all max-w-[80%]">
               {selectedEvent.title}
+            </span>
+          </div>
+          <div className="flex justify-between">
+            <span className="font-semibold">MD</span>
+            <span className="text-right break-all max-w-[80%]">
+              {selectedEvent.categoryLabel}
             </span>
           </div>
           <div className="flex justify-between">
@@ -57,7 +86,12 @@ const AdEventDetailModal = ({
           </div>
           <div className="flex justify-between">
             <span className="font-semibold">파일명</span>
-            <span className="text-right break-all max-w-[80%]">
+            <span
+              className={`text-right break-all max-w-[80%] ${
+                selectedEvent.mediaId ? "hover:underline cursor-pointer" : ""
+              }`}
+              onClick={selectedEvent.mediaId ? downloadAudio : undefined}
+            >
               {selectedEvent.mediaFilename}
             </span>
           </div>

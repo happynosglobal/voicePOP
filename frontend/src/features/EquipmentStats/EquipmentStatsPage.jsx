@@ -6,6 +6,7 @@ import { toDate } from "../../utils/customFormat";
 import useUserStore from "../../stores/user";
 import { getDeviceStat } from "../../api/device/device";
 import { toast } from "react-toastify";
+import { exportDataToExcel } from "../../utils/exportExcel/exportExcel";
 const EquipmentStatsPage = () => {
   const { user } = useUserStore();
   const today = useMemo(() => new Date(), []);
@@ -34,12 +35,26 @@ const EquipmentStatsPage = () => {
     }
   };
 
+  const exportToExcel = async () => {
+    try {
+      const response = await getDeviceStat({ brand_code: user?.brand_code });
+      const { status, data } = response;
+      if (status === 200) {
+        exportDataToExcel(data.data, "deviceStats", "장비통계");
+      }
+    } catch (err) {
+      toast.error("다운로드에 실패했습니다.");
+      console.error(err);
+    }
+  };
+
   return (
     <ContentLayout>
       <SearchBar
         searchParams={searchParams}
         setSearchParams={setSearchParams}
         handleGetDeviceStat={handleGetDeviceStat}
+        exportToExcel={exportToExcel}
       />
 
       <DeviceStatsTable

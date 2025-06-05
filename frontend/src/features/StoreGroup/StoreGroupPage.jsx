@@ -76,7 +76,7 @@ const StoreGroupPage = () => {
       // }
 
       //그룹 내에 선택된 점포들 등록
-      const groupedStoresRes = await postGroupDetail(id, {
+      const groupedStoresRes = await postGroupDetail(groupId, {
         brand_code: user?.brand_code,
         user_id: user?.user_id,
         item: groupedStores,

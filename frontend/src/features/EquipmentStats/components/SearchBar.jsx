@@ -3,7 +3,7 @@ import CustomDatePicker from "../../../components/customDatePicker/CustomDatePic
 import { RiFileExcel2Line } from "react-icons/ri";
 import { toDate } from "../../../utils/customFormat";
 
-const SearchBar = ({ searchParams, setSearchParams, handleGetDeviceStat }) => {
+const SearchBar = ({ searchParams, setSearchParams, handleGetDeviceStat, exportToExcel }) => {
   const today = useMemo(() => new Date(), []);
   const [selectedStartDate, setSelectedStartDate] = useState(today);
   const [selectedEndDate, setSelectedEndDate] = useState(today);
@@ -57,7 +57,7 @@ const SearchBar = ({ searchParams, setSearchParams, handleGetDeviceStat }) => {
             검색
           </button>
         </div>
-        <button className="btn btn-sm btn-success">
+        <button className="btn btn-sm btn-success" onClick={exportToExcel}>
           <RiFileExcel2Line className="text-xl" /> 엑셀다운로드
         </button>
       </div>

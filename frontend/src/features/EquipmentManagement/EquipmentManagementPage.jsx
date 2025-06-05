@@ -9,10 +9,12 @@ import useCodes from "../../stores/codes";
 import { toast } from "react-toastify";
 import { getDeviceList, postDeviceStatus } from "../../api/device/device";
 import LoadingSpinner from "../../components/loading/LoadingSpinner";
+import { exportDataToExcel } from "../../utils/exportExcel/exportExcel";
 
 const EquipmentManagementPage = () => {
   const { user } = useUserStore();
   const { storeByBrandCode, isLoading } = useCodes();
+  const storeOptions = [{ value: "", label: "모든 점포" }, ...storeByBrandCode];
 
   const [searchParams, setSearchParams] = useState({
     str_code: user?.store_code || "",
@@ -21,9 +23,9 @@ const EquipmentManagementPage = () => {
 
   const [deviceList, setDeviceList] = useState([]);
 
-  const handleSelectBox = (option, option2) => {
+  const handleSelectBox = (option, meta) => {
     const { label, value } = option;
-    const { name } = option2;
+    const { name } = meta;
 
     setSearchParams((prev) => ({ ...prev, [name]: value }));
   };
@@ -63,6 +65,18 @@ const EquipmentManagementPage = () => {
     }
   };
 
+  const exportToExcel = async () => {
+    try {
+      const response = await getDeviceList({ brand_code: user?.brand_code });
+      const { status, data } = response;
+      if (status === 200) {
+         exportDataToExcel(data.data, "deviceManagement", "장비관리");
+      }
+    } catch (err) {
+      toast.error("다운로드에 실패했습니다.");
+      console.error(err);
+    }
+  };
   return (
     <ContentLayout>
       <div className="flex mb-5 gap-1">
@@ -70,13 +84,18 @@ const EquipmentManagementPage = () => {
           <div className="flex flex-wrap items-center gap-1.5">
             <Select
               name="str_code"
-              options={[{ value: "", label: "모든 점포" }, ...storeByBrandCode]}
+              options={storeOptions}
               className="min-w-64"
-              onChange={handleSelectBox}
-              defaultValue={{ value: "", label: "모든 점포" }}
+              value={storeOptions.find(
+                (opt) => opt.value === searchParams.str_code
+              )}
+              onChange={(option, meta) => {
+                if (user?.level !== "STORE") handleSelectBox(option, meta);
+              }}
+              isDisabled={user?.level === "STORE"}
             />
           </div>
-          <button className="btn btn-sm btn-success">
+          <button className="btn btn-sm btn-success" onClick={exportToExcel}>
             <RiFileExcel2Line className="text-xl" /> 엑셀다운로드
           </button>
         </div>

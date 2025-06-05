@@ -21,7 +21,9 @@ const Sidebar = () => {
                 {(group.children || []).map((item) => (
                   <li key={item.code} className="w-full">
                     <button
-                      onClick={() => handleNavigation(item.url, item.type)}
+                      onClick={() =>
+                        handleNavigation(item.url, item.type, item.name)
+                      }
                       className={`block w-full text-left pl-8 py-2.5 rounded-[5px] leading-none cursor-pointer ${
                         location.pathname === item.url
                           ? "bg-accent font-medium text-black"

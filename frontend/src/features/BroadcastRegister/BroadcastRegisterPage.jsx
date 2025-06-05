@@ -209,7 +209,7 @@ const BroadcastRegisterPage = () => {
         throw new Error("마스터 방송과 오디오 파일 매핑 실패");
       }
       toast.success("방송 등록이 완료되었습니다!");
-      navigate("/equipment-status");
+      navigate("/");
     } catch (error) {
       console.error("방송 등록 중 오류 발생:", error);
       toast.error("방송 등록 중 오류가 발생했습니다.");
@@ -369,7 +369,7 @@ const BroadcastRegisterPage = () => {
                 className="checkbox"
                 checked={isGapChecked}
                 onChange={() => {
-                  setIsGapChecked(!isGapChecked);
+                  setIsGapChecked(true);
                   setIsRepeatChecked(false);
                 }}
               />
@@ -397,7 +397,7 @@ const BroadcastRegisterPage = () => {
                 label="횟수 / 간격"
                 checked={isRepeatChecked}
                 onChange={() => {
-                  setIsRepeatChecked(!isRepeatChecked);
+                  setIsRepeatChecked(true);
                   setIsGapChecked(false);
                 }}
               />
@@ -421,7 +421,7 @@ const BroadcastRegisterPage = () => {
                 (option) => option.value === formData.repeat_interval
               )}
               onChange={handleSelectBox}
-              isDisabled={!isRepeatChecked}
+              isDisabled={!isRepeatChecked || formData.repeat_count === 1}
             />
           </div>
         </div>
@@ -432,7 +432,11 @@ const BroadcastRegisterPage = () => {
             방송파일
           </label>
           <div className="w-full flex flex-col gap-5">
-            <FileUploader audioFile={audioFile} setAudioFile={setAudioFile} />
+            <FileUploader
+              audioFile={audioFile}
+              setAudioFile={setAudioFile}
+              setDuration={setDuration}
+            />
           </div>
         </div>
 

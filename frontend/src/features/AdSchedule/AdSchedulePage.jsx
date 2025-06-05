@@ -29,13 +29,6 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
-const categoryColors = {
-  1: "#22C55E",
-  2: "#FB923C",
-  3: "#6366F1",
-  4: "#06B6D4",
-};
-
 const convertItemsToEvents = (items, selectedDate) => {
   const allEvents = [];
 
@@ -43,6 +36,7 @@ const convertItemsToEvents = (items, selectedDate) => {
     const id = item.id;
     const baseTitle = item.title;
     const category = item.category_type_seq;
+    const categoryLabel = item.category_type_name;
 
     const parseTime = (timeStr) => {
       const hour = parseInt(timeStr.slice(0, 2), 10);
@@ -65,18 +59,21 @@ const convertItemsToEvents = (items, selectedDate) => {
     const count = item.repeat_count > 0 ? item.repeat_count : 0;
 
     const media = item.medias?.[0];
+    const mediaId = media?.id;
     const playTimeSeconds =
       media?.play_time_seconds || item.play_time_seconds || "";
-    const mediaFilename = media?.media_filename || "음성파일 없음";
+    const mediaFilename = media?.media_filename || "미디어 정보를 불러 올수 없습니다";
     const playDurationMs = playTimeSeconds * 1000;
 
     // GAP이 설정된 방송 : 하나의 이벤트만 생성
     if (gap > 0) {
       allEvents.push({
         originalId: id,
+        mediaId: mediaId,
         id: `${id}-gap-full`,
         title: `${baseTitle}`,
         category,
+        categoryLabel,
         start: baseStart,
         end: baseEnd,
         gap,
@@ -94,9 +91,11 @@ const convertItemsToEvents = (items, selectedDate) => {
 
         allEvents.push({
           originalId: id,
+          mediaId: mediaId,
           id: `${id}-repeat-${i}`,
           title: `${baseTitle}`,
           category,
+          categoryLabel,
           start: currentStart,
           end: currentEnd,
           gap,
@@ -112,9 +111,11 @@ const convertItemsToEvents = (items, selectedDate) => {
     else {
       allEvents.push({
         originalId: id,
+        mediaId: mediaId,
         id: `${id}-single`,
         title: baseTitle,
         category,
+        categoryLabel,
         start: baseStart,
         end: baseEnd,
         gap,
@@ -139,10 +140,11 @@ const CustomToolbar = ({
   setDate,
 }) => {
   const { storeByBrandCode } = useCodes();
+  const storeOptions = [{ value: "", label: "모든 점포" }, ...storeByBrandCode];
 
-  const handleSelectBox = (option, option2) => {
+  const handleSelectBox = (option, meta) => {
     const { label, value } = option;
-    const { name } = option2;
+    const { name } = meta;
     setSearchParams((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -167,18 +169,15 @@ const CustomToolbar = ({
         <div className="flex flex-wrap items-center gap-1.5">
           <Select
             name="str_code"
-            options={[{ value: "", label: "모든 점포" }, ...storeByBrandCode]}
+            options={storeOptions}
             className="min-w-64"
+            value={storeOptions.find(
+              (opt) => opt.value === searchParams.str_code
+            )}
             onChange={(option, meta) => {
               if (user?.level !== "STORE") handleSelectBox(option, meta);
             }}
-            value={
-              [{ value: "", label: "모든 점포" }, ...storeByBrandCode].find(
-                (opt) => opt.value === searchParams.str_code
-              ) || { value: "", label: "모든 점포" }
-            }
             isDisabled={user?.level === "STORE"}
-            defaultValue={{ value: "", label: "모든 점포" }}
           />
         </div>
       </div>
@@ -201,6 +200,16 @@ const AdSchedulePage = () => {
   const { user } = useUserStore();
   const [date, setDate] = useState(new Date());
   const [events, setEvents] = useState([]);
+
+  const { categoryOptions } = useCodes();
+
+  const categoryColorMap = useMemo(() => {
+    return categoryOptions.reduce((acc, cur) => {
+      acc[cur.code] = cur.color_code;
+      return acc;
+    }, {});
+  }, [categoryOptions]);
+
   const [searchParams, setSearchParams] = useState({
     str_code: user?.store_code || "",
     category_code: "",
@@ -211,7 +220,7 @@ const AdSchedulePage = () => {
 
   const modalRef = useRef(null);
   const [activeTab, setActiveTab] = useState("");
-  
+
   useEffect(() => {
     const getAdList = async () => {
       const tempParams = {
@@ -234,7 +243,7 @@ const AdSchedulePage = () => {
             params
           );
         } else {
-          // 모든 점포 조회
+          // 모든 점포의 방송 조회
           response = await getBcMasterList(params);
         }
 
@@ -269,7 +278,27 @@ const AdSchedulePage = () => {
       modalRef.current.showModal();
     }
   }, [selectedEvent]);
-  
+  // 화면 렌더링 시에 현재 시간선이 화면 중앙에 오게
+  useEffect(() => {
+    const scrollToCurrentTimeCenter = () => {
+      const content = document.querySelector(".rbc-time-content");
+      if (!content) return;
+
+      const now = new Date();
+      const minutesSinceStart = (now.getHours() - 9) * 60 + now.getMinutes();
+      const totalMinutes = (22 - 9) * 60;
+      const scrollHeight = content.scrollHeight;
+
+      const currentPosition = (minutesSinceStart / totalMinutes) * scrollHeight;
+
+      const scrollTo = currentPosition - content.clientHeight / 2;
+
+      content.scrollTop = Math.max(0, scrollTo); // 음수 방지
+    };
+
+    setTimeout(scrollToCurrentTimeCenter, 300);
+  }, []);
+
   return (
     <ContentLayout>
       <Calendar
@@ -303,11 +332,11 @@ const AdSchedulePage = () => {
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
-            backgroundColor: categoryColors[event.category] || "#888888",
+            backgroundColor: categoryColorMap[event.category] || "#888888",
             color: "#fff",
             borderRadius: "6px",
             padding: "4px 10px",
-            border: "1px solid #fff",
+            border: event.mediaId ? "1px solid #fff" : "2px solid #ff4d4f",
           },
         })}
         components={{

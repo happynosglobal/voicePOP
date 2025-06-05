@@ -8,9 +8,16 @@ import useCodes from "../stores/codes";
 
 const DefaultLayout = () => {
   const navigate = useNavigate();
-  const { logout } = useUserStore();
-  const { resetStores } = useCodes();
+  const { user, logout } = useUserStore();
+  const { allStoreCode, isLoading, fetchStores, resetStores } = useCodes();
   const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    // 로그인 후 점포코드가 없을 때 다시 점포코드 로드
+    if (user && isLoading && allStoreCode.length === 0) {
+      fetchStores(user?.brand_code);
+    }
+  }, [user, isLoading, allStoreCode]);
 
   useEffect(() => {
     const token = Cookies.get("token");

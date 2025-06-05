@@ -11,6 +11,7 @@ import LoadingSpinner from "../../components/loading/LoadingSpinner";
 const EquipmentStatusPage = () => {
   const { user } = useUserStore();
   const { storeByBrandCode, isLoading } = useCodes();
+  const storeOptions = [{ value: "", label: "모든 점포" }, ...storeByBrandCode];
 
   const [searchParams, setSearchParams] = useState({
     str_code: user?.store_code || "",
@@ -20,9 +21,9 @@ const EquipmentStatusPage = () => {
 
   const [deviceList, setDeviceList] = useState([]);
 
-  const handleSelectBox = (option, option2) => {
+  const handleSelectBox = (option, meta) => {
     const { label, value } = option;
-    const { name } = option2;
+    const { name } = meta;
 
     setSearchParams((prev) => ({ ...prev, [name]: value }));
   };
@@ -49,18 +50,15 @@ const EquipmentStatusPage = () => {
           <div className="flex flex-wrap items-center gap-1.5">
             <Select
               name="str_code"
-              options={[{ value: "", label: "모든 점포" }, ...storeByBrandCode]}
+              options={storeOptions}
               className="min-w-64"
+              value={storeOptions.find(
+                (opt) => opt.value === searchParams.str_code
+              )}
               onChange={(option, meta) => {
                 if (user?.level !== "STORE") handleSelectBox(option, meta);
               }}
-              value={
-                [{ value: "", label: "모든 점포" }, ...storeByBrandCode].find(
-                  (opt) => opt.value === searchParams.str_code
-                ) || { value: "", label: "모든 점포" }
-              }
               isDisabled={user?.level === "STORE"}
-              defaultValue={{ value: "", label: "모든 점포" }}
             />
           </div>
         </div>

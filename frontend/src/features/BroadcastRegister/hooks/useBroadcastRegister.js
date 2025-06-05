@@ -38,10 +38,22 @@ const useBroadcastRegister = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSelectBox = (option, option2) => {
+  const handleSelectBox = (option, meta) => {
     const { label, value } = option;
-    const { name } = option2;
-    setFormData({ ...formData, [name]: value });
+    const { name } = meta;
+
+    if (name === "repeat_count" && value === 1) {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+        repeat_interval: 1,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
   const isFormValid = (isGapChecked) => {

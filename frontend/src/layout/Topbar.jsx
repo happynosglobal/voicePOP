@@ -4,11 +4,9 @@ import useUserStore from "../stores/user";
 import { Link } from "react-router-dom";
 import { LuLogOut } from "react-icons/lu";
 import useCodes from "../stores/codes";
-import { getStoreCodes } from "../api/storeGroup/storeGroup";
 import { useEffect, useRef, useState } from "react";
 import { getStoreNameByCode } from "../hooks/useStoreCode";
 import Logo from "../components/logo/Logo";
-import AddUserModal from "../features/UserManagement/components/AddUserModal";
 import MyInfo from "../features/MyInfo/MyInfo";
 
 const Topbar = () => {
@@ -26,14 +24,28 @@ const Topbar = () => {
 
   const getLevelName = (level) => {
     return level === "ADMIN"
-      ? "전체 관리자"
+      ? "전체관리자"
       : level === "AD_ADMIN"
-      ? "광고 관리자"
+      ? "광고관리자"
       : level === "BROADCAST_ADMIN"
-      ? "방송 관리자"
-      : "점포 관리자";
+      ? "방송관리자"
+      : "점포관리자";
   };
 
+  const getUserLevelInfo = () => {
+    const level = user?.level || "";
+    const brand = user?.brand_code || "";
+    const store = getStoreNameByCode(user?.store_code) || "";
+    const levelName = getLevelName(user?.level);
+
+    if (level === "STORE" && !getStoreNameByCode(user?.store_code)) return;
+
+    if (level === "STORE") {
+      return `(${store})`;
+    } else {
+      return `(${brand} ${levelName})`;
+    }
+  };
   const openModal = () => {
     setIsOpen(true);
   };
@@ -55,15 +67,10 @@ const Topbar = () => {
             <IoPersonSharp className="text-xl" />
           </div>
           <p className="text-gray-800 font-medium leading-none">
-            <button
-              className="hover:underline"
-              onClick={openModal}
-            >
+            <button className="hover:underline" onClick={openModal}>
               {user?.user_name}
               <span className="text-gray-800 text-sm leading-none">
-                {`(${user?.brand_code} ${
-                  getStoreNameByCode(user?.store_code) || ""
-                } ${getLevelName(user?.level)})`}
+                {getUserLevelInfo()}
               </span>
             </button>
           </p>

@@ -226,7 +226,7 @@ const AdRegisterPage = () => {
         throw new Error("마스터 방송과 오디오 파일 매핑 실패");
       }
       toast.success("방송 등록이 완료되었습니다!");
-      navigate("/equipment-status");
+      navigate("/");
     } catch (error) {
       console.error("방송 등록 중 오류 발생:", error);
       toast.error("방송 등록 중 오류가 발생했습니다.");
@@ -414,7 +414,7 @@ const AdRegisterPage = () => {
                 className="checkbox"
                 checked={isGapChecked}
                 onChange={() => {
-                  setIsGapChecked(!isGapChecked);
+                  setIsGapChecked(true);
                   setIsRepeatChecked(false);
                 }}
               />
@@ -442,7 +442,7 @@ const AdRegisterPage = () => {
                 label="횟수 / 간격"
                 checked={isRepeatChecked}
                 onChange={() => {
-                  setIsRepeatChecked(!isRepeatChecked);
+                  setIsRepeatChecked(true);
                   setIsGapChecked(false);
                 }}
               />
@@ -466,7 +466,7 @@ const AdRegisterPage = () => {
                 (option) => option.value === formData.repeat_interval
               )}
               onChange={handleSelectBox}
-              isDisabled={!isRepeatChecked}
+              isDisabled={!isRepeatChecked || formData.repeat_count === 1}
             />
           </div>
         </div>

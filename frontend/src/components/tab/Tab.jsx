@@ -13,10 +13,10 @@ const Tab = ({ activeTab, setActiveTab, onTabChange }) => {
   );
 
   useEffect(() => {
-    if (tabs.length > 0) {
+    if (!activeTab && tabs.length > 0) {
       setActiveTab(tabs[0].code);
     }
-  }, [tabs]);
+  }, [tabs, activeTab]);
 
   const handleClick = (code) => {
     setActiveTab(code);
@@ -51,7 +51,6 @@ const Tab = ({ activeTab, setActiveTab, onTabChange }) => {
   //     setActiveTab(savedTab);
   //   }
   // }, [tabs, setActiveTab]);
-
 
   return (
     <div className="tabs-wrapper">

@@ -107,7 +107,11 @@ textarea.input {padding-top: 6px; padding-bottom: 6px; min-height:60px;}
 
 .rct-node-parent > .rct-text .rct-title {display: inline-flex; gap:2px; align-items: center;}
 .rct-node-parent > .rct-text .rct-title::before {position: relative; top:4px; content: url("/asset/ico_folder.svg");}
+.rct-chosen-title {display: inline-flex; gap:2px; align-items: center;}
 .rct-chosen-title::before {position: relative; top:4px; content: url("/asset/ico_folder.svg");}
+.rct-node.my-group-wrapper > .rct-text > label > .rct-checkbox {display: none !important;}
+.rct-node.my-group-wrapper input[type="checkbox"] {pointer-events: none;}
+.rct-node.my-group-wrapper > .rct-text > label {pointer-events: none;}
 .my-group-wrapper {background-color: #F4FFDF; }
 
 
