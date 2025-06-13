@@ -34,6 +34,8 @@ body {min-width:1400px;}
   .table tr.active td {@apply bg-lime-200;}
   .table tr:not(.active):hover td {@apply bg-lime-50;}
 
+  .table tfoot td {@apply !bg-sky-50 text-sky-600; }
+
   .table.table-sm th,  .table.table-sm td {@apply text-sm;} 
 
 

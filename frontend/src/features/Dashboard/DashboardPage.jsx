@@ -150,7 +150,7 @@ const DashboardPage = () => {
   });
 
   //미송출 현황 차트
-  //랜덤 숫자
+  //랜덤 숫자 (임시)
   const generateRandomData = (length, min, max) =>
     Array.from(
       { length },
