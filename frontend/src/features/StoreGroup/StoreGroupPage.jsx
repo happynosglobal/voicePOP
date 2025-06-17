@@ -15,8 +15,11 @@ import { toDate } from "../../utils/customFormat";
 import { toast } from "react-toastify";
 import EmptyState from "../../components/emptyState/EmptyState";
 
+import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
+
 const StoreGroupPage = () => {
   const { user } = useUserStore();
+  const [expandedIndex, setExpandedIndex] = useState(null); // 점포 토글 스테이트
   const groupModalRef = useRef(null); // 점포 선택 모달 ref
 
   const { page, setPage, total, limit, storeGroupList, getStoreGroupList } =
@@ -136,7 +139,7 @@ const StoreGroupPage = () => {
             <th className="w-2/12">그룹명</th>
             <th className="w-1/12">점포수</th>
             <th>점포</th>
-            <th className="w-2/12">생성일</th>
+            <th className=" wide:w-1/12">생성일</th>
             <th className="w-1/12">생성자</th>
             <th className="w-20">삭제</th>
           </tr>
@@ -159,12 +162,30 @@ const StoreGroupPage = () => {
                   </button>
                 </td>
                 <td>{item.count}</td>
-                <td className="truncate">
-                  <Tooltip
-                    id={item.id}
-                    content={item.store_names}
-                    place="left"
-                  />
+                <td>
+                  {item.count > 0 && (
+                    <div
+                      className="flex cursor-pointer gap-2"
+                      onClick={() =>
+                        setExpandedIndex(expandedIndex === index ? null : index)
+                      }
+                    >
+                      <div
+                        className={`flex-1 text-left break-keep max-h-40 overflow-y-auto  ${
+                          expandedIndex === index
+                            ? "p-2 border bg-white"
+                            : "truncate "
+                        }`}
+                      >
+                        {item.store_names.join(", ")}
+                      </div>
+                      {expandedIndex === index ? (
+                        <IoIosArrowUp className="text-2xl" />
+                      ) : (
+                        <IoIosArrowDown className="text-2xl" />
+                      )}
+                    </div>
+                  )}
                 </td>
                 <td>{toDate(item.created_at)}</td>
                 <td>{item.creater}</td>
