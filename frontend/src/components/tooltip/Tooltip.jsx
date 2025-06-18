@@ -1,6 +1,6 @@
 import { Tooltip as ReactTooltip } from "react-tooltip";
 
-const CustomTooltip = ({ id, content, place = "right" }) => {
+const Tooltip = ({ id, content, place = "right" }) => {
   // content가 배열이면 쉼표(,)로 구분된 문자열로 변환
   const tooltipContent = Array.isArray(content) ? content.join(", ") : content;
 
@@ -27,4 +27,4 @@ const CustomTooltip = ({ id, content, place = "right" }) => {
   );
 };
 
-export default CustomTooltip;
+export default Tooltip;

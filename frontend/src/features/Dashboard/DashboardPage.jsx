@@ -1,47 +1,53 @@
 import { useState } from "react";
 import ContentLayout from "../../layout/ContentLayout";
-import { GiProgression } from "react-icons/gi";
-import { LuClipboardList } from "react-icons/lu";
-import { MdOutlineBroadcastOnPersonal } from "react-icons/md";
 import ReactApexChart from "react-apexcharts";
 import { Link } from "react-router-dom";
+import Tooltip from "../../components/tooltip/Tooltip";
+
+const dummyCate = [
+  { label: "텍스트 길어짐 테스트 하겠습니다.", value: 1424, total: 10500 },
+  { label: "농산", value: 112, total: 345 },
+  { label: "축산", value: 10, total: 100 },
+  { label: "수산", value: 22, total: 400 },
+  { label: "델리", value: 33, total: 300 },
+  { label: "델리(수수료)", value: 10, total: 100 },
+  { label: "EM 농산 수수료", value: 40, total: 124 },
+  { label: "EM 수산 수수료", value: 66, total: 78 },
+];
 
 const DashboardPage = () => {
-  // 상단 카드 박스
-  const StatCard = ({ bgClass, icon, iconBg, title, children }) => (
+  // 타이틀
+  const Title = ({ label, iconSrc, size, bgColor = "#ffffff" }) => (
     <div
-      className={`flex flex-1 p-3.5 ${bgClass} rounded-[20px] flex-col justify-between`}
+      className={`${size === "lg" ? "" : "mb-2.5"} flex items-center gap-1.5 `}
     >
-      <div className="flex items-center gap-2 mb-2.5">
-        <div
-          className={`w-12 h-12 ${iconBg} rounded-[20px] flex items-center justify-center`}
-        >
-          {icon}
-        </div>
-        <h2 className="text-xl font-semibold">{title}</h2>
-        <span className="block py-0.5 px-2 text-gray-500 text-sm font-semibold leading-tight bg-white/60 rounded-[30px]">
-          월
-        </span>
+      <div
+        className={`${
+          size === "lg" ? "w-12 h-12 rounded-[20px]" : "w-8 h-8 rounded-xl"
+        }  flex items-center justify-center`}
+        style={{ backgroundColor: bgColor }}
+      >
+        <img src={iconSrc} alt="아이콘" />
       </div>
-      {children}
+      <h2 className={`${size === "lg" ? "text-xl" : "text-lg "} font-semibold`}>
+        {label}
+      </h2>
     </div>
   );
 
-  // 카드 박스 지표
-  const StatItem = ({ label, value, valueColor = "text-gray-900" }) => (
-    <li className="flex-1 text-center flex flex-col gap-1 border-r border-gray-100 last:border-r-0">
-      <span className="text-gray-600 text-sm font-semibold">{label}</span>
-      <span className={`text-3xl font-bold ${valueColor}`}>{value}</span>
-    </li>
-  );
-
-  //차트 타이틀
-  const Title = ({ label, iconSrc }) => (
-    <div className="flex items-center gap-1.5 mb-2.5">
-      <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-white">
-        <img src={iconSrc} alt="아이콘" />
-      </div>
-      <h2 className="text-lg font-semibold">{label}</h2>
+  // 상단 정보
+  const StatusInfo = ({ value, total, percent, bgColor }) => (
+    <div className="flex gap-4 items-center">
+      <span className="text-gray-900 text-2xl font-bold">
+        {value}
+        {total && ` / ${total}`}
+      </span>
+      <span
+        className="px-2.5 py-1.5  rounded-[30px] text-sm font-bold"
+        style={{ backgroundColor: bgColor }}
+      >
+        {percent}%
+      </span>
     </div>
   );
 
@@ -63,46 +69,23 @@ const DashboardPage = () => {
     series: [
       {
         name: "장비가동률",
-        type: "line",
         data: [
           80, 82, 86, 91, 95, 98, 100, 98, 95, 91, 87, 84, 81, 80, 82, 86, 90,
           94, 98, 99, 98, 95, 91, 88, 85, 83, 81, 80, 81, 84, 87,
-        ],
-      },
-      {
-        name: "광고달성률",
-        type: "area",
-        data: [
-          0, 3, 5, 9, 13, 16, 20, 23, 26, 29, 33, 36, 39, 42, 45, 49, 52, 55,
-          58, 61, 64, 67, 70, 72, 74, 76, 77, 78, 79, 80, 80,
         ],
       },
     ],
     options: {
       chart: {
         type: "line",
-        toolbar: {
-          show: false,
-        },
+        toolbar: { show: false },
       },
-      colors: ["#FB923C", "#487DEE"],
+      colors: ["#487DEE"],
       stroke: {
         curve: "straight",
         width: 4,
       },
-      fill: {
-        type: ["solid", "gradient"],
-        gradient: {
-          shade: "light",
-          type: "vertical",
-          shadeIntensity: 0.4,
-          gradientToColors: ["#489BEE"],
-          inverseColors: false,
-          opacityFrom: 0.8,
-          opacityTo: 0.1,
-          stops: [0, 100],
-        },
-      },
+      fill: { type: "solid" },
       dataLabels: { enabled: false },
       legend: { show: false },
       markers: {
@@ -110,12 +93,12 @@ const DashboardPage = () => {
         hover: { sizeOffset: 6 },
       },
       xaxis: {
-        categories: Array.from({ length: 31 }, (_, i) => (i + 1).toString()),
+        categories: Array.from({ length: 31 }, (_, i) => `${i + 1}`),
         labels: {
           style: {
             fontFamily: "Pretendard",
             fontSize: "12px",
-            fontWeight: "500",
+            fontWeight: 500,
             colors: ["#6B7280"],
           },
         },
@@ -126,7 +109,7 @@ const DashboardPage = () => {
           style: {
             fontFamily: "Pretendard",
             fontSize: "12px",
-            fontWeight: "500",
+            fontWeight: 500,
             colors: ["#6B7280"],
           },
         },
@@ -167,6 +150,14 @@ const DashboardPage = () => {
         name: "AS접수",
         data: generateRandomData(31, 20, 130),
       },
+      {
+        name: "정지",
+        data: generateRandomData(31, 20, 130),
+      },
+      {
+        name: "고장",
+        data: generateRandomData(31, 20, 130),
+      },
     ],
     options: {
       chart: {
@@ -174,7 +165,7 @@ const DashboardPage = () => {
           show: false,
         },
       },
-      colors: ["#06B6D4", "#F87171"],
+      colors: ["#06B6D4", "#7DC600", "#F87171", "#484C56"],
       plotOptions: {
         bar: {
           horizontal: false,
@@ -187,7 +178,7 @@ const DashboardPage = () => {
       },
       stroke: {
         show: true,
-        width: 2,
+        width: 1,
         colors: ["transparent"],
       },
       legend: {
@@ -237,67 +228,46 @@ const DashboardPage = () => {
 
   return (
     <ContentLayout>
-      <div className="flex gap-2.5">
-        {/* 광고 수익 카드 */}
-        <StatCard
-          bgClass="bg-[#FFDC45]"
-          icon={<GiProgression className="text-2xl text-amber-700" />}
-          iconBg="bg-white"
-          title="광고수익"
-        >
-          <div className="text-right p-4">
-            <span className="text-gray-900 text-5xl font-bold pr-2">
-              122,116,000
-            </span>
-            <span className="text-gray-600 text-sm font-semibold">천원</span>
-          </div>
-        </StatCard>
-
-        {/* 광고 편성표 카드 */}
-        <StatCard
-          bgClass="bg-sky-200"
-          icon={<LuClipboardList className="text-3xl text-white" />}
-          iconBg="bg-blue-400"
-          title="광고 편성표"
-        >
-          <ul className="bg-white/90 rounded-[20px] flex justify-between gap-2.5 items-center p-2.5">
-            <StatItem label="광고수" value="11,999" />
-            <StatItem label="업체수" value="145,666" />
-          </ul>
-        </StatCard>
-
-        {/* 방송 현황 카드 */}
-        <StatCard
-          bgClass="bg-lime-300"
-          icon={
-            <MdOutlineBroadcastOnPersonal className="text-3xl text-white" />
-          }
-          iconBg="bg-lime-500"
-          title="방송현황"
-        >
-          <ul className="bg-white/90 rounded-[20px] flex justify-between gap-2.5 items-center p-2.5">
-            <StatItem label="송출" value="123,999" />
-            <StatItem
-              label="미송출"
-              value="123,450"
-              valueColor="text-red-600"
-            />
-            <StatItem
-              label="미등록"
-              value="456,789"
-              valueColor="text-red-600"
-            />
-          </ul>
-        </StatCard>
+      <div className="flex gap-2.5 bg-yellow-300 rounded-[20px] p-3.5">
+        <div className="flex-1 h-24 px-4 py-2 bg-white/90 rounded-[20px] flex justify-between items-center">
+          <Title
+            label="송출"
+            iconSrc="/asset/ico_broadcast.svg"
+            size="lg"
+            bgColor="#484C56"
+          />
+          <StatusInfo value={100} total={1000} bgColor="#E6E7EB" percent={10} />
+        </div>
+        <div className="flex-1 h-24 px-4 py-2 bg-white/90 rounded-[20px] flex justify-between items-center">
+          <Title
+            label="미송출"
+            iconSrc="/asset/ico_unbroadcast.svg"
+            size="lg"
+            bgColor="#6EABF7"
+          />
+          <StatusInfo value={890} bgColor="#BFDBFE" percent={80} />
+        </div>
+        <div className="flex-1 h-24 px-4 py-2 bg-white/90 rounded-[20px] flex justify-between items-center">
+          <Title
+            label="미등록"
+            iconSrc="/asset/ico_unregistered.svg"
+            size="lg"
+            bgColor="#7DC600"
+          />
+          <StatusInfo value={10} bgColor="#BEF264" percent={10} />
+        </div>
       </div>
 
-      <div className="flex gap-2.5 mt-2.5">
+      <div className="flex gap-2.5 mt-2.5 h-[310px]">
         {/* 실시간 송출 현황 */}
-        <div className="p-3.5 rounded-[20px] bg-gray-100 w-4/5 relative">
-          <Title label="실시간 송출 현황" iconSrc="/asset/ico_live.svg" />
-          <div className="absolute top-3.5 right-5 flex gap-5 items-center">
-            <Legend label="장비가동률" value="82" color="#FB923C" />
-            <Legend label="광고달성률" value="84" color="#487DEE" />
+        <div className="p-3.5 rounded-[20px] w-4/5 relative border border-sky-base-300 shrink-0">
+          <Title
+            label="실시간 송출 현황"
+            iconSrc="/asset/ico_broadcast_sm.svg"
+            bgColor="#484C56"
+          />
+          <div className="absolute top-3.5 right-5 px-2.5 h-9 flex gap-5 items-center rounded-[40px] bg-gray-100">
+            <Legend label="장비가동률" value="82" color="#487DEE" />
           </div>
 
           <div id="chart" className="rounded-[20px] bg-white pr-5">
@@ -309,53 +279,56 @@ const DashboardPage = () => {
           </div>
         </div>
         {/* 예약 내역 */}
-        <div className="p-3.5 border rounded-[20px] bg-gray-100 flex-1">
-          <div className="h-full flex flex-col">
+        <div className="p-3.5 rounded-[20px] bg-gray-100 flex-1 overflow-hidden">
+          <div className="h-full flex flex-col overflow-hidden">
             <Title label="예약 내역" iconSrc="/asset/ico_resv.svg" />
-            <ul className="flex flex-col justify-between flex-1 gap-2.5">
-              <li className="flex-1 bg-white rounded-[20px] p-2.5 flex gap-3.5 items-center justify-between">
-                <span className="h-full w-24 rounded-3xl flex items-center justify-center text-center bg-sky-200 text-gray-900 font-semibold">
-                  광고
-                </span>
-                <span className="w-4 h-0.5 bg-sky-100"></span>
-                <span className="flex-1 text-gray-900 text-2xl font-bold">
-                  12,345
-                </span>
-              </li>
-              <li className="flex-1  bg-white rounded-[20px] p-2.5 flex gap-3.5 items-center justify-between">
-                <span className="h-full w-24 rounded-3xl flex items-center justify-center text-center bg-lime-300 text-gray-900 font-semibold ">
-                  방송
-                </span>
-                <span className="w-4 h-0.5 bg-lime-100"></span>
-                <span className="flex-1 text-gray-900 text-2xl font-bold">
-                  120
-                </span>
-              </li>
-            </ul>
+            <div className="flex-1 bg-white p-5 pr-3 rounded-[20px] overflow-hidden">
+              <ul class="flex flex-1 flex-col h-full overflow-y-auto">
+                {dummyCate.map((item, index) => (
+                  <li
+                    key={index}
+                    className="flex gap-2.5 py-3 border-b border-b-gray-100 last:border-b-0 items-center justify-between"
+                  >
+                    <span className="text-gray-500 font-semibold truncate max-w-4/6">
+                      <Tooltip id={index} content={item.label} place="left" />
+                    </span>
+                    <span className="font-bold text-gray-900 shrink-0 pr-2">
+                      {item.value} / {item.total}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </div>
 
       <div className="flex gap-2.5 mt-2.5">
         {/* 미송출 현황 */}
-        <div className="p-3.5 rounded-[20px] bg-gray-100 w-4/5 relative">
-          <Title label="미송출 현황" iconSrc="/asset/ico_missed.svg" />
-          <div className="absolute top-3.5 right-5 flex gap-5 items-center">
+        <div className="p-3.5 rounded-[20px] w-4/5 relative border border-sky-base-300 shrink-0">
+          <Title
+            label="미송출 현황"
+            iconSrc="/asset/ico_unbroadcast_sm.svg"
+            bgColor="#6EABF7"
+          />
+          <div className="absolute top-3.5 right-5 px-2.5 h-9 flex gap-5 items-center rounded-[40px] bg-gray-100">
             <Legend label="미확인" color="#06B6D4" />
-            <Legend label="AS접수" color="#F87171" />
+            <Legend label="AS접수" color="#7DC600" />
+            <Legend label="정지" color="#F87171" />
+            <Legend label="고장" color="#484C56" />
           </div>
           <div id="chart" className="rounded-[20px] bg-white pr-3">
             <ReactApexChart
               options={missedData.options}
               series={missedData.series}
               type="bar"
-              height={190}
+              height={230}
             />
           </div>
         </div>
 
         {/* 사용자 관리 */}
-        <div className="p-3.5 border rounded-[20px] bg-gray-100 flex-1">
+        <div className="p-3.5 rounded-[20px] bg-gray-100 flex-1 overflow-hidden">
           <div className="h-full flex flex-col">
             <Title label="사용자 관리" iconSrc="/asset/ico_user.svg" />
             <div className="flex-1 bg-white rounded-[20px] flex items-center justify-center flex-col text-center gap-2.5">
