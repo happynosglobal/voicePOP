@@ -21,7 +21,7 @@ const dummyBroadcast = [
     repeatCount: 100,
     repeatInterval: 0,
     registrant: "084100",
-    file: "새우깡CM송.mp3",
+    file: "VOICE20231128102917데모데이인사말VOICE20231128102917데모데이인사말VOICE20231128102917데모데이인사말.mp3",
     status: "방송중",
   },
   {

@@ -88,7 +88,7 @@ textarea.input {padding-top: 6px; padding-bottom: 6px; min-height:60px;}
 
 
 /* react-tooltip 커스텀 */
-.custom-tooltip { z-index: 9999; max-width: 300px; visibility: visible !important; white-space: normal; word-break: keep-all; pointer-events: auto; user-select: text;}
+.custom-tooltip { z-index: 9999; max-width: 300px; visibility: visible !important; white-space: normal; word-break: break-all;      pointer-events: auto; overflow-wrap: break-word; user-select: text;}
 
 /* react-datepicker 커스텀 */
 .react-datepicker-wrapper {width:100%;}
