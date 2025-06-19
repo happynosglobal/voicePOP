@@ -5,8 +5,8 @@ export const postBcMaster = (body) => {
   return apiCall.post(`/content/master`, body);
 };
 /* 방송 마스터 수정 */
-export const putBcMaster = (id, body) => {
-  return apiCall.put(`/content/master/${id}`, body);
+export const patchBcMaster = (id, body) => {
+  return apiCall.patch(`/content/master/${id}`, body);
 };
 /* 방송 마스터 조회 */
 export const getBcMaster = (id) => {
@@ -32,6 +32,10 @@ export const getBcTargetStore = (id, params) => {
 export const postBcTargetStore = (body) => {
   return apiCall.post(`/content/store`, body);
 };
+/* 방송 대상 점포 수정 */
+export const putBcTargetStore = (id, body) => {
+  return apiCall.put(`/content/store/${id}`, body);
+};
 
 /* 방송 음성파일 등록 */
 export const postBcMedia = (body) => {
@@ -53,4 +57,8 @@ export const downloadBcMedia = (id) => {
 /* 방송 음성파일 방송에 매핑 */
 export const postAudioMapping = (id, body) => {
   return apiCall.post(`/content/schedule/${id}`, body);
+};
+/* 방송 음성파일 방송 매핑 삭제 */
+export const deleteAudioMapping = (id) => {
+  return apiCall.delete(`/content/schedule/${id}`);
 };

@@ -56,13 +56,17 @@ const DeviceStatsTable = ({
               <td>{item.broken}</td>
               <td>{item.unconfirmed}</td>
               <td>
-                <div className="relative w-full flex wide:gap-0 gap-1 items-center justify-between">
+                <div className="relative w-full flex gap-1 items-center justify-between">
                   <progress
-                    className="progress w-3/4"
+                    className="progress w-[70%]"
                     value={item.running_rate}
                     max="100"
-                  ></progress>
-                  <p className="text-right text-sm w-1/4">{`${item.running_rate}%`}</p>
+                  />
+                  <p className="text-right text-sm w-[30%]">
+                    {Number.isInteger(item.running_rate)
+                      ? `${item.running_rate}%`
+                      : `${Number(item.running_rate).toFixed(1)}%`}
+                  </p>
                 </div>
               </td>
             </tr>

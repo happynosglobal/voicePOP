@@ -1,3 +1,4 @@
+// 권한 드롭리스트 옵션
 export const levelOptions = [
   { value: "ADMIN", label: "전체 관리자" },
   { value: "AD_ADMIN", label: "광고 관리자" },
@@ -5,6 +6,7 @@ export const levelOptions = [
   { value: "STORE", label: "점포 관리자" },
 ];
 
+// 방송 Gap
 export const gapOptions = [
   // 1초 ~ 60초
   ...Array.from({ length: 60 }, (_, i) => ({
@@ -21,11 +23,13 @@ export const gapOptions = [
   }),
 ];
 
+// 방송 반복 횟수
 export const repeatOptions = Array.from({ length: 100 }, (_, i) => ({
   value: i + 1,
-  label: `${i + 1}회`
+  label: `${i + 1}회`,
 }));
 
+// 방송 반복 간격
 export const repeatInterval = [
   { value: 1, label: "1초" },
   { value: 3, label: "3초" },

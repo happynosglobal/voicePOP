@@ -13,7 +13,7 @@ const UserTable = ({
   setPage,
   openModal,
 }) => {
-  const allStores = useCodes((state) => state.allStoreCode); // 여기서 직접 상태 구독
+  const allStores = useCodes((state) => state.allStoreCode);
 
   const getStoreNameByCode = (store_code) => {
     if (!store_code) return "";
@@ -95,7 +95,6 @@ const UserTable = ({
       {userList.length === 0 && (
         <EmptyState text="일치하는 검색 결과가 없습니다." />
       )}
-      {/* <!--페이지 네이션 --> */}
       <Pagination page={page} total={total} limit={limit} setPage={setPage} />
     </div>
   );

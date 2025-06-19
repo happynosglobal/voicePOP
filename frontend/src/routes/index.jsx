@@ -3,21 +3,6 @@ import { URL_MAPPING } from "../utils/constant/urls";
 import Login from "../features/Login/Login";
 import SignUp from "../features/SignUp/SignUp";
 import DefaultLayout from "../layout/DefaultLayout";
-import UserManagementPage from "../features/UserManagement/UserManagementPage";
-import AdApprovalPage from "../features/AdApproval/AdApprovalPage";
-import AdCompanyRegisterPage from "../features/AdCompanyRegister/AdCompanyRegisterPage";
-import AdRegisterPage from "../features/AdRegister/AdRegisterPage";
-import AdSchedulePage from "../features/AdSchedule/AdSchedulePage";
-import AdStatsPage from "../features/AdStats/AdStatsPage";
-import AdStatusPage from "../features/AdStatus/AdStatusPage";
-import BroadcastRegisterPage from "../features/BroadcastRegister/BroadcastRegisterPage";
-import DashboardPage from "../features/Dashboard/DashboardPage";
-import EquipmentManagementPage from "../features/EquipmentManagement/EquipmentManagementPage";
-import EquipmentStatsPage from "../features/EquipmentStats/EquipmentStatsPage";
-import EquipmentStatusPage from "../features/EquipmentStatus/EquipmentStatusPage";
-import ReservationManagementPage from "../features/ReservationManagement/ReservationManagementPage";
-import StoreGroupPage from "../features/StoreGroup/StoreGroupPage";
-import SelectBrand from "../features/Login/SelectBrand";
 import useLayout from "../layout/hooks/useLayout";
 import EquipmentSettingPage from "../features/EquipmentSetting/EquipmentSettingPage";
 import NotFoundPage from "../features/NotFound/NotFoundPage";
@@ -32,7 +17,7 @@ import ChangePassword from "../features/ChangePassword/ChangePassword";
  * [대시보드] - DashboardPage.jsx
  * [장비현황] - EquipmentStatusPage.jsx
  * [방송등록] - BroadcastRegisterPage.jsx
- * [예약관리] - ReservationManagementPage.jsx
+ * [예약관리] - BroadcastManagementPage.jsx
  * [광고등록] - AdRegisterPage.jsx
  * [광고현황] - AdStatusPage.jsx
  * [광고스케줄] - AdSchedulePage.jsx
@@ -50,57 +35,15 @@ function Root() {
   return (
     <Routes>
       <Route index path={URL_MAPPING.login} element={<Login />} />
-      {/* <Route index path={"/login/select"} element={<SelectBrand />} /> */}
       <Route path={URL_MAPPING.signUp} element={<SignUp />} />
       <Route path={URL_MAPPING.resetPw} element={<ForgotPassword />} />
       <Route path={URL_MAPPING.changePw} element={<ChangePassword />} />
-      <Route
-        path={URL_MAPPING.equipmentSetting}
-        element={<EquipmentSettingPage />}
-      />
+      <Route path={URL_MAPPING.equipmentSetting} element={<EquipmentSettingPage />} />
       <Route path="*" element={<NotFoundPage />} />
       <Route path="/" element={<DefaultLayout />}>
         {routes.map(({ path, element }) => (
           <Route key={path} path={path} element={element} />
         ))}
-        <Route path="dashboard" element={<DashboardPage />} />
-        {/* <Route path={URL_MAPPING.dashboard} element={<DashboardPage />} />
-        <Route
-          path={URL_MAPPING.equipmentStatus}
-          element={<EquipmentStatusPage />}
-        />
-        <Route
-          path={URL_MAPPING.broadCastRegister}
-          element={<BroadcastRegisterPage />}
-        />
-        <Route
-          path={URL_MAPPING.reservationManagement}
-          element={<ReservationManagementPage />}
-        />
-
-        <Route path={URL_MAPPING.adRegister} element={<AdRegisterPage />} />
-        <Route path={URL_MAPPING.adstatus} element={<AdStatusPage />} />
-        <Route path={URL_MAPPING.adSchedule} element={<AdSchedulePage />} />
-
-        <Route
-          path={URL_MAPPING.userManagement}
-          element={<UserManagementPage />}
-        />
-        <Route
-          path={URL_MAPPING.equipmentManagement}
-          element={<EquipmentManagementPage />}
-        />
-        <Route path={URL_MAPPING.storeGroup} element={<StoreGroupPage />} />
-        <Route
-          path={URL_MAPPING.equipmentStats}
-          element={<EquipmentStatsPage />}
-        />
-        <Route path={URL_MAPPING.adstats} element={<AdStatsPage />} />
-        <Route
-          path={URL_MAPPING.adCompanyRegister}
-          element={<AdCompanyRegisterPage />}
-        />
-        <Route path={URL_MAPPING.adApproval} element={<AdApprovalPage />} />*/}
       </Route>
     </Routes>
   );

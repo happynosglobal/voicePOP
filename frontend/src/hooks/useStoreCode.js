@@ -5,7 +5,7 @@ import {
   getStoreCodes,
 } from "../api/storeGroup/storeGroup";
 import useCodes from "../stores/codes";
-
+// 그룹 ID별 label
 const regionalGroupTypes = [
   { value: "G1", label: "판매1담당" },
   { value: "G2", label: "판매2담당" },

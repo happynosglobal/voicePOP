@@ -3,7 +3,6 @@ import useUserStore from "../../stores/user";
 import { useNavigate } from "react-router-dom";
 import { postLogin, postUserBrand } from "../../api/user/user";
 import useCodes from "../../stores/codes";
-import Cookies from "js-cookie";
 import Logo from "../../components/logo/Logo";
 import Select from "react-select";
 import { toast } from "react-toastify";
@@ -28,9 +27,13 @@ const Login = () => {
   const [brandOptions, setBrandOptions] = useState([]);
 
   useEffect(() => {
-    const token = Cookies.get("token");
+    const token = sessionStorage.getItem("token");
     if (token && user) {
-      navigate("/");
+      if (user.level === "ADMIN") {
+        navigate(URL_MAPPING.dashboard);
+      } else {
+        navigate("/");
+      }
     }
   }, [user]);
 
@@ -77,8 +80,8 @@ const Login = () => {
       const { status_code, data } = response.data;
 
       if (status_code === 200) {
-        Cookies.set("token", data.token);
-        Cookies.set("refresh_token", data.refresh_token);
+        sessionStorage.setItem("token", data.token);
+        sessionStorage.setItem("refresh_token", data.refresh_token);
         // 가입 후 최초 로그인 시 비밀번호 변경 진행
         if (!data.last_changed_time) {
           return navigate(URL_MAPPING.changePw, {
@@ -92,10 +95,13 @@ const Login = () => {
 
         setUser(data, formData.brand_code); // 선택한 브랜드 세팅
         getBrandCodes(); // 브랜드 목록 조회
-        getCategoryCodes(); // MD 카테고리 조회
+        getCategoryCodes(formData.brand_code); // MD 카테고리 조회
         fetchStores(formData.brand_code); // 선택한 브랜드의 점포목록
-
-        return navigate("/");
+        // if (data.level === "ADMIN") {
+        //   navigate(URL_MAPPING.dashboard);
+        // } else {
+        //   navigate("/");
+        // }
       }
     } catch (err) {
       setError("로그인에 실패했습니다.");

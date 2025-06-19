@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { persist, devtools, createJSONStorage } from "zustand/middleware";
-import Cookies from "js-cookie";
 
 const useUserStore = create(
   persist(
@@ -35,14 +34,14 @@ const useUserStore = create(
       },
 
       logout: () => {
-        Cookies.remove("token");
-        Cookies.remove("refresh_token");
+        sessionStorage.removeItem("token");
+        sessionStorage.removeItem("refresh_token");
         set({ user: null });
       },
     })),
     {
       name: "user-storage",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => sessionStorage),
     }
   )
 );

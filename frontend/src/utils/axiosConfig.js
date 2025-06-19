@@ -1,6 +1,5 @@
 import axios from "axios";
 import { useLoadingStore } from "../stores/loading";
-import Cookies from "js-cookie";
 import useUserStore from "../stores/user";
 
 const { VITE_API_BASE_URL, VITE_API_PREFIX } = import.meta.env;
@@ -21,7 +20,7 @@ apiCall.interceptors.request.use(
   (config) => {
     useLoadingStore.getState().setLoading(true);
 
-    const token = Cookies.get("token");
+    const token = sessionStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

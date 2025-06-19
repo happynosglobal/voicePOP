@@ -10,41 +10,41 @@ import EquipmentManagementPage from "../../features/EquipmentManagement/Equipmen
 import EquipmentSettingPage from "../../features/EquipmentSetting/EquipmentSettingPage";
 import EquipmentStatsPage from "../../features/EquipmentStats/EquipmentStatsPage";
 import EquipmentStatusPage from "../../features/EquipmentStatus/EquipmentStatusPage";
-import ReservationManagementPage from "../../features/ReservationManagement/ReservationManagementPage";
+import BroadcastManagementPage from "../../features/BroadcastManagement/BroadcastManagementPage";
 import StoreGroupPage from "../../features/StoreGroup/StoreGroupPage";
 import UserManagementPage from "../../features/UserManagement/UserManagementPage";
- 
+
 export const URL_MAPPING = {
   login: "/login",
   signUp: "/signup",
   resetPw: "/help/pw/reset",
   changePw: "/help/pw/change",
- 
+
   equipmentStatus: "/broadcast/device-status",
-  broadCastRegister: "/broadcast/register",
-  reservationManagement: "/broadcast/management",
+  broadcastRegister: "/broadcast/register",
+  broadcastManagement: "/broadcast/management",
   adSchedule: "/broadcast/schedule",
- 
-  adRegister: "/advertisement/resiter",
+
+  adRegister: "/advertisement/register",
   adstatus: "/advertisement/status",
- 
+
   dashboard: "/status",
   userManagement: "/manager/user-management",
   equipmentManagement: "/manager/equipment-management",
   storeGroup: "/manager/store-group",
   equipmentStats: "/manager/equipment-stats",
   adstats: "/manager/ad-stats",
-  adCompanyRegister: "/manager/ad-company-resiter",
+  adCompanyRegister: "/manager/ad-company-register",
   adApproval: "/manager/ad-approval",
- 
+
   equipmentSetting: "equipment-setting",
 };
- 
+
 export const ROUTE_COMPONENTS = {
   [URL_MAPPING.dashboard]: DashboardPage,
   [URL_MAPPING.equipmentStatus]: EquipmentStatusPage,
-  [URL_MAPPING.broadCastRegister]: BroadcastRegisterPage,
-  [URL_MAPPING.reservationManagement]: ReservationManagementPage,
+  [URL_MAPPING.broadcastRegister]: BroadcastRegisterPage,
+  [URL_MAPPING.broadcastManagement]: BroadcastManagementPage,
   [URL_MAPPING.adRegister]: AdRegisterPage,
   [URL_MAPPING.adstatus]: AdStatusPage,
   [URL_MAPPING.adSchedule]: AdSchedulePage,
@@ -57,4 +57,3 @@ export const ROUTE_COMPONENTS = {
   [URL_MAPPING.adApproval]: AdApprovalPage,
   [URL_MAPPING.equipmentSetting]: EquipmentSettingPage,
 };
- 

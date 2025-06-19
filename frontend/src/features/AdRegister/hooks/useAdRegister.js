@@ -20,8 +20,8 @@ const useAdRegister = () => {
       contract: "",
       start_date: toDate(today),
       end_date: toDate(today),
-      start_time: "0900",
-      end_time: "2200",
+      start_time: "",
+      end_time: "",
       gap: 3, // 초단위
       repeat_count: 1,
       repeat_interval: 1, // 초단위

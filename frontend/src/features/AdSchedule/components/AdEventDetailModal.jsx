@@ -1,5 +1,4 @@
 import { format } from "date-fns";
-import Tooltip from "../../../components/tooltip/Tooltip";
 import { useEffect } from "react";
 import { downloadBcMedia } from "../../../api/broadcast/broadcast";
 import { toast } from "react-toastify";

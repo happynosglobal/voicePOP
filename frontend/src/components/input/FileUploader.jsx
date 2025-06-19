@@ -1,16 +1,29 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useDropzone } from "react-dropzone";
 
-const FileUploader = ({ audioFile, setAudioFile, setDuration }) => {
-  const [uploadedFile, setUploadedFile] = useState(null); // Dropzone 상태
-  const [audioPreviewUrl, setAudioPreviewUrl] = useState(null); // 미리 듣기 URL
+const FileUploader = ({
+  audioFile,
+  setAudioFile,
+  setDuration,
+  audioPreviewUrl,
+  setAudioPreviewUrl,
+}) => {
+  const [uploadedFile, setUploadedFile] = useState(null);
+  const tempPreviewUrlRef = useRef(null);
 
   const onDrop = (acceptedFiles) => {
     if (acceptedFiles.length > 0) {
       const file = acceptedFiles[0];
       setUploadedFile(file);
       setAudioFile(file);
-      setAudioPreviewUrl(URL.createObjectURL(file)); // Blob URL 생성
+
+      if (tempPreviewUrlRef.current) {
+        URL.revokeObjectURL(tempPreviewUrlRef.current);
+      }
+
+      const blobUrl = URL.createObjectURL(file);
+      tempPreviewUrlRef.current = blobUrl;
+      setAudioPreviewUrl(blobUrl);
     }
   };
 
@@ -18,51 +31,61 @@ const FileUploader = ({ audioFile, setAudioFile, setDuration }) => {
     setUploadedFile(null);
     setAudioFile(null);
     setAudioPreviewUrl(null);
+    if (tempPreviewUrlRef.current) {
+      URL.revokeObjectURL(tempPreviewUrlRef.current);
+      tempPreviewUrlRef.current = null;
+    }
   };
 
-  // Dropzone 훅
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     maxFiles: 1,
     onDrop,
-    accept: {
-      "audio/*": [],
-    },
-    maxSize: 5 * 1024 * 1024, // 5MB 제한
+    accept: { "audio/*": [] },
+    maxSize: 5 * 1024 * 1024,
   });
 
-  // 컴포넌트 언마운트 시 URL 해제
+  useEffect(() => {
+    if (audioFile) {
+      setUploadedFile(audioFile);
+    } else {
+      setUploadedFile(null);
+      setAudioPreviewUrl(null);
+    }
+  }, [audioFile]);
+
   useEffect(() => {
     return () => {
-      if (audioPreviewUrl) {
-        URL.revokeObjectURL(audioPreviewUrl);
+      if (tempPreviewUrlRef.current) {
+        URL.revokeObjectURL(tempPreviewUrlRef.current);
       }
     };
-  }, [audioPreviewUrl]);
+  }, []);
 
-  // audio file 재생시간 추출
   const getAudioDuration = (file) => {
     return new Promise((resolve, reject) => {
       const url = URL.createObjectURL(file);
       const audio = new Audio(url);
-
       audio.addEventListener("loadedmetadata", () => {
-        resolve(audio.duration); // 초 단위
+        resolve(audio.duration);
         URL.revokeObjectURL(url);
       });
-
-      audio.addEventListener("error", (e) => {
-        reject(e);
-      });
+      audio.addEventListener("error", reject);
     });
   };
-  
+
   useEffect(() => {
     if (audioFile) {
-      getAudioDuration(audioFile).then((seconds) => {
-        setDuration(seconds.toFixed(1))
-      });
+      if (audioFile.size > 0 && audioPreviewUrl?.startsWith("blob:")) {
+        getAudioDuration(audioFile)
+          .then((seconds) => {
+            setDuration(seconds.toFixed(1));
+          })
+          .catch((err) => {
+            console.error("오디오 재생시간 추출 실패", err);
+          });
+      }
     }
-  }, [audioFile]);
+  }, [audioFile, audioPreviewUrl]);
 
   return (
     <div className="w-full overflow-hidden">
@@ -92,10 +115,12 @@ const FileUploader = ({ audioFile, setAudioFile, setDuration }) => {
               삭제
             </button>
           </div>
-          {/* 오디오 플레이어 추가 */}
           {audioPreviewUrl && (
             <audio controls className="w-full mt-2">
-              <source src={audioPreviewUrl} type={uploadedFile.type} />
+              <source
+                src={audioPreviewUrl}
+                type={uploadedFile.type || "audio/mpeg"}
+              />
               브라우저가 audio 태그를 지원하지 않습니다.
             </audio>
           )}

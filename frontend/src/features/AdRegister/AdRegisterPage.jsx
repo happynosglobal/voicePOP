@@ -67,6 +67,8 @@ const AdRegisterPage = () => {
     }
   }, [formData.company]);
 
+  const START_TIME = import.meta.env.VITE_BROADCAST_TIME_DEFAULT_START;
+  const END_TIME = import.meta.env.VITE_BROADCAST_TIME_DEFAULT_END;
   const storeModalRef = useRef(null); // 점포 선택 모달 ref
 
   const today = useMemo(() => new Date(), []);
@@ -89,25 +91,26 @@ const AdRegisterPage = () => {
   const [isGapChecked, setIsGapChecked] = useState(true); //GAP
   const [isRepeatChecked, setIsRepeatChecked] = useState(false); //반복 횟수
 
-  const [startTime, setStartTime] = useState("09:00"); // 시작 시간
-  const [endTime, setEndTime] = useState("22:00"); // 종료 시간
+  const [startTime, setStartTime] = useState(START_TIME); // 시작 시간
+  const [endTime, setEndTime] = useState(END_TIME); // 종료 시간
 
   // 시간선택 handler
   const handleTimePicker = (time, name) => {
     if (name === "start") {
-      setFormData({
-        ...formData,
-        start_time: time.replace(":", ""),
-      });
       setStartTime(time);
     } else {
-      setFormData({
-        ...formData,
-        end_time: time.replace(":", ""),
-      });
       setEndTime(time);
     }
   };
+
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      start_time: startTime.replace(":", ""),
+      end_time: endTime.replace(":", ""),
+    }));
+  }, [startTime, endTime]);
+
   // 점포 선택 handler
   const handleStoreGroup = (_, store) => {
     const formattedStores = store.map(({ value, label }) => ({
@@ -225,7 +228,7 @@ const AdRegisterPage = () => {
       if (mappingRes.data.status_code !== 200) {
         throw new Error("마스터 방송과 오디오 파일 매핑 실패");
       }
-      toast.success("방송 등록이 완료되었습니다!");
+      toast.success("방송 등록이 완료되었습니다");
       navigate("/");
     } catch (error) {
       console.error("방송 등록 중 오류 발생:", error);

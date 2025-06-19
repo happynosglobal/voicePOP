@@ -1,6 +1,5 @@
 import React from "react";
 import useSidebar from "./hooks/useSidebar";
-import { Link } from "react-router-dom";
 
 const Sidebar = () => {
   const { menu, handleNavigation, location } = useSidebar();
@@ -36,7 +35,7 @@ const Sidebar = () => {
                 ))}
               </ul>
             </li>
-          ))}         
+          ))}
         </ul>
       </nav>
     </aside>

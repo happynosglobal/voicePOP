@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { toDate } from "../../../utils/customFormat";
 import useUserStore from "../../../stores/user";
-import useCategoryCode from "../../../hooks/useCategoryCode";
+import useCodes from "../../../stores/codes";
 
 const useBroadcastRegister = () => {
   const { user } = useUserStore();
@@ -13,8 +13,8 @@ const useBroadcastRegister = () => {
       category_type_seq: "",
       start_date: toDate(today),
       end_date: toDate(today),
-      start_time: "0900",
-      end_time: "2200",
+      start_time: "",
+      end_time: "",
       gap: 3, // 초단위
       repeat_count: 1,
       repeat_interval: 1, // 초단위
@@ -22,16 +22,13 @@ const useBroadcastRegister = () => {
     [today]
   );
 
-  const { categoryOptions, getCategoryCodes } = useCategoryCode();
+  const { categoryOptions } = useCodes();
 
   const [formData, setFormData] = useState(initialFormData);
   const [selectedStore, setSelectedStore] = useState([]);
   const [audioFile, setAudioFile] = useState(null);
   const [duration, setDuration] = useState(null);
-
-  useEffect(() => {
-    getCategoryCodes(user?.brand_code);
-  }, [user]);
+  const [audioPreviewUrl, setAudioPreviewUrl] = useState(null);
 
   const handleInput = (e) => {
     const { name, value } = e.target;
@@ -117,6 +114,8 @@ const useBroadcastRegister = () => {
     setAudioFile,
     duration,
     setDuration,
+    audioPreviewUrl,
+    setAudioPreviewUrl,
     categoryOptions,
     handleInput,
     handleSelectBox,

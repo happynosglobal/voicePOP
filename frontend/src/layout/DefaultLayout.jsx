@@ -3,7 +3,6 @@ import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import { Outlet, useNavigate } from "react-router-dom";
 import useUserStore from "../stores/user";
-import Cookies from "js-cookie";
 import useCodes from "../stores/codes";
 
 const DefaultLayout = () => {
@@ -20,7 +19,7 @@ const DefaultLayout = () => {
   }, [user, isLoading, allStoreCode]);
 
   useEffect(() => {
-    const token = Cookies.get("token");
+    const token = sessionStorage.getItem("token");
     if (!token) {
       logout();
       resetStores();

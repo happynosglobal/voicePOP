@@ -79,8 +79,8 @@ const AdApprovalPage = () => {
                 <td>{item.contractPeriod}</td>
                 <td>
                   <div className="flex justify-center gap-2">
-                    <button class="btn btn-xs btn-primary">승인</button>
-                    <button class="btn btn-xs btn-error">반려</button>
+                    <button className="btn btn-xs btn-primary">승인</button>
+                    <button className="btn btn-xs btn-error">반려</button>
                   </div>
                 </td>
               </tr>

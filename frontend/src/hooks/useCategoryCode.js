@@ -11,7 +11,7 @@ const useCategoryCode = () => {
     try {
       const params = {
         use_yn: "Y",
-        brand_code,
+        brand_code: brand_code,
       };
       const res = await getCategoryList(params);
       const { status_code, data } = res.data;

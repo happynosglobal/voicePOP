@@ -89,7 +89,7 @@ const StoreGroupPage = () => {
         throw new Error("그룹 내 점포 등록 실패");
       }
       getStoreGroupList(1);
-      toast.success("그룹 생성이 완료되었습니다!");
+      toast.success("그룹 생성이 완료되었습니다");
       groupModalRef.current.close();
     } catch (error) {
       console.error("그룹 생성 중 오류 발생:", error);
@@ -112,7 +112,7 @@ const StoreGroupPage = () => {
       }
 
       getStoreGroupList(1);
-      toast.success("그룹 삭제가 완료되었습니다!");
+      toast.success("그룹 삭제가 완료되었습니다");
       groupModalRef.current.close();
     } catch (error) {
       console.error("그룹 삭제 중 오류 발생:", error);
