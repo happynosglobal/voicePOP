@@ -3,6 +3,9 @@ import { toDate, toGapFormat, toTimeFormat } from "../../../utils/customFormat";
 import EmptyState from "../../../components/emptyState/EmptyState";
 import Pagination from "../../../components/pagination/Pagination";
 import useCodes from "../../../stores/codes";
+import { downloadBcMedia } from "../../../api/broadcast/broadcast";
+import { toast } from "react-toastify";
+import { getErrorMessage } from "../../../utils/constant/messages";
 
 const BroadcastManagementTable = ({
   title,
@@ -18,6 +21,30 @@ const BroadcastManagementTable = ({
 }) => {
   const allStoreCnt = useCodes((state) => state.storeByBrandCode)?.length;
 
+  const getRowNumber = (index) => limit * (page - 1) + index + 1;
+
+  const downloadAudio = async (id) => {
+    if (!id) return;
+    try {
+      const response = await downloadBcMedia(id);
+      const { media_file_url, media_file_name } = response.data.data;
+
+      const audioResponse = await fetch(media_file_url);
+      const blob = await audioResponse.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = media_file_name || "download_voice.mp3";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (err) {
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
+      console.error(err);
+    }
+  };
   return (
     <div className="mb-10">
       <h3 className="mb-2 text-gray-800 text-xl font-semibold">
@@ -59,7 +86,7 @@ const BroadcastManagementTable = ({
                   onChange={(e) => handleCheckBox(item.id, e.target.checked)}
                 />
               </td>
-              <td>{index + 1}</td>
+              <td>{getRowNumber(index)}</td>
               <td>
                 <div
                   className="truncate hover:underline cursor-pointer w-full"
@@ -89,11 +116,16 @@ const BroadcastManagementTable = ({
               <td>{item.repeat_count ? `${item.repeat_count}회` : "-"}</td>
               <td>{toGapFormat(item.repeat_interval)}</td>
               <td>{item.creater}</td>
-              <td className="truncate">
-                <Tooltip
-                  id={item.id}
-                  content={item.medias?.[0].media_filename}
-                />
+              <td>
+                <div
+                  className="truncate hover:underline cursor-pointer w-full"
+                  onClick={() => downloadAudio(item?.medias[0].id)}
+                >
+                  <Tooltip
+                    id={item.id}
+                    content={item.medias?.[0].media_filename}
+                  />
+                </div>
               </td>
             </tr>
           ))}

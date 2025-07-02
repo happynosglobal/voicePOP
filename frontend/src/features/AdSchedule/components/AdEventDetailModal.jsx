@@ -2,6 +2,7 @@ import { format } from "date-fns";
 import { useEffect } from "react";
 import { downloadBcMedia } from "../../../api/broadcast/broadcast";
 import { toast } from "react-toastify";
+import { getErrorMessage } from "../../../utils/constant/messages";
 
 const AdEventDetailModal = ({
   selectedEvent,
@@ -9,22 +10,7 @@ const AdEventDetailModal = ({
   modalRef,
   onClose,
 }) => {
-  useEffect(() => {
-    const modal = modalRef?.current;
-    if (!modal) return;
 
-    const handleClose = () => {
-      setSelectedEvent(null);
-    };
-
-    modal.addEventListener("close", handleClose);
-
-    return () => {
-      modal.removeEventListener("close", handleClose);
-    };
-  }, [modalRef]);
-
-  /* 모달창 닫을 때 수행 할 로직 */
   const downloadAudio = async () => {
     if (!selectedEvent?.mediaId) return;
     const id = selectedEvent.mediaId;
@@ -43,10 +29,27 @@ const AdEventDetailModal = ({
       document.body.removeChild(link);
       window.URL.revokeObjectURL(blobUrl);
     } catch (err) {
-      toast.error("다운로드 실패");
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
       console.error(err);
     }
   };
+  
+  /* 모달창 닫을 때 수행 할 로직 */
+  useEffect(() => {
+    const modal = modalRef?.current;
+    if (!modal) return;
+
+    const handleClose = () => {
+      setSelectedEvent(null);
+    };
+
+    modal.addEventListener("close", handleClose);
+
+    return () => {
+      modal.removeEventListener("close", handleClose);
+    };
+  }, [modalRef]);
   return (
     <dialog className="modal" ref={modalRef}>
       <div className="modal-box bg-white max-w-lg">

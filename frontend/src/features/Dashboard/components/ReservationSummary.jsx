@@ -57,7 +57,7 @@ const ReservationSummary = () => {
           <ul className="flex flex-1 flex-col h-full overflow-y-auto">
             {categoryOptions.map((cat, index) => {
               const count = categoryCounts[cat.code] || 0;
-              if (count === 0) return null; // 예약된 방송 없는 카테고리는 표시하지 않음
+              // if (count === 0) return null; // 예약된 방송 없는 카테고리는 표시하지 않을경우 주석 해제
 
               return (
                 <li

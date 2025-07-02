@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { dummyUserList } from "../dummy/data";
 import { getUsers } from "../../../api/user/user";
 import { removeEmptyString } from "../../../utils/customFormat";
 

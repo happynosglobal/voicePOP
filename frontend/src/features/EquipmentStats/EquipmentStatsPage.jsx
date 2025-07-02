@@ -7,6 +7,7 @@ import useUserStore from "../../stores/user";
 import { getDeviceStat } from "../../api/device/device";
 import { toast } from "react-toastify";
 import { exportDataToExcel } from "../../utils/exportExcel/exportExcel";
+import { getErrorMessage } from "../../utils/constant/messages";
 const EquipmentStatsPage = () => {
   const { user } = useUserStore();
   const today = useMemo(() => new Date(), []);
@@ -30,7 +31,8 @@ const EquipmentStatsPage = () => {
         setDeviceList(data.data);
       }
     } catch (err) {
-      toast.error("장비 조회에 실패했습니다.");
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
       console.error(err);
     }
   };
@@ -43,7 +45,8 @@ const EquipmentStatsPage = () => {
         exportDataToExcel(data.data, "deviceStats", "장비통계");
       }
     } catch (err) {
-      toast.error("다운로드에 실패했습니다.");
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
       console.error(err);
     }
   };

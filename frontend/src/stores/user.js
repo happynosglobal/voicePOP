@@ -34,13 +34,13 @@ const useUserStore = create(
       },
 
       logout: () => {
-        sessionStorage.removeItem("token");
-        sessionStorage.removeItem("refresh_token");
+        sessionStorage.removeItem("access");
+        sessionStorage.removeItem("refresh");
         set({ user: null });
       },
     })),
     {
-      name: "user-storage",
+      name: "user",
       storage: createJSONStorage(() => sessionStorage),
     }
   )

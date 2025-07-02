@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { getStoreCodes } from "../../../api/storeGroup/storeGroup";
 import useCategoryCode from "../../../hooks/useCategoryCode";
 import { postSettingDevice } from "../../../api/device/device";
+import { getErrorMessage } from "../../../utils/constant/messages";
 
 const useEquipmentSettingForm = () => {
   const navigate = useNavigate();
@@ -18,9 +19,8 @@ const useEquipmentSettingForm = () => {
     name: "",
     memo: "",
   };
-
   const { categoryOptions4Select, getCategoryCodes } = useCategoryCode();
-
+  
   const [formData, setFormData] = useState(initialFormData);
   const [errors, setErrors] = useState({});
   const [storeList, setStoreList] = useState([]);
@@ -60,6 +60,7 @@ const useEquipmentSettingForm = () => {
       brand_code: brand_code,
       category_code: "",
       str_code: null,
+      str_name: "",
     }));
     const params = { store_type: brand_code };
     try {
@@ -70,7 +71,8 @@ const useEquipmentSettingForm = () => {
         setStores(data);
       }
     } catch (err) {
-      toast.error("점포 정보를 불러오는 중 오류가 발생했습니다.");
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
     } finally {
       useLoadingStore.getState().setLoading(false);
     }
@@ -107,10 +109,9 @@ const useEquipmentSettingForm = () => {
         navigate("/login");
       }
     } catch (err) {
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
       console.error(err);
-      toast.error(
-        err.response.data.message || "장비 등록 중 오류가 발생했습니다."
-      );
     }
   };
   return {

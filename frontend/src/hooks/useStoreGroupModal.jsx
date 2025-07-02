@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import useUserStore from "../stores/user";
 import { getGroupDetailList, getGroupList } from "../api/storeGroup/storeGroup";
 import { MdManageAccounts } from "react-icons/md";
+import { getErrorMessage } from "../utils/constant/messages";
 
 const useStoreGroupModal = () => {
   const { user } = useUserStore();
@@ -72,9 +73,10 @@ const useStoreGroupModal = () => {
           type: "wrapper",
         },
       ]);
-    } catch (error) {
-      console.error("그룹 및 점포 조회 오류:", error);
-      toast.error("그룹 및 점포 조회 오류:");
+    } catch (err) {
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
+      console.error("그룹 및 점포 조회 오류:", err);
     }
   };
 

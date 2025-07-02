@@ -4,6 +4,7 @@ import { URL_MAPPING } from "../../utils/constant/urls";
 import { useNavigate } from "react-router-dom";
 import { resetPassword } from "../../api/user/user";
 import { toast } from "react-toastify";
+import { getErrorMessage } from "../../utils/constant/messages";
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
@@ -28,11 +29,8 @@ const ForgotPassword = () => {
         navigate(URL_MAPPING.login);
       }
     } catch (err) {
-      if (err.response.status === 401) {
-        toast.error("입력하신 정보를 다시 확인해주세요.");
-      } else {
-        toast.error("비밀번호 초기화에 실패했습니다. 관리자에게 문의하세요");
-      }
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
       console.error(err);
     }
   };

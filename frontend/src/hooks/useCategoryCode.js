@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { getCategoryList } from "../api/category/category";
 import { toast } from "react-toastify";
 import useCodes from "../stores/codes";
+import { getErrorMessage } from "../utils/constant/messages";
 
 const useCategoryCode = () => {
   const { setCategory } = useCodes();
@@ -21,7 +22,8 @@ const useCategoryCode = () => {
         parsingCategories4Select(data.items);
       }
     } catch (err) {
-      toast.error("카테고리 목록을 불러오는데 실패했습니다.");
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
       console.error(err);
     }
   };

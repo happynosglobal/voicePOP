@@ -22,6 +22,7 @@ import {
 import { removeEmptyString, toDate } from "../../utils/customFormat";
 import AdEventDetailModal from "./components/AdEventDetailModal";
 import AdScheduleToolbar from "./components/AdScheduleToolbar";
+import { getErrorMessage } from "../../utils/constant/messages";
 
 const locales = { "en-US": enUS };
 const localizer = dateFnsLocalizer({
@@ -206,8 +207,9 @@ const AdSchedulePage = () => {
           setEvents(events);
         }
       } catch (err) {
-        toast.error("방송 조회에 실패했습니다.");
         console.error(err);
+        const errMsg = getErrorMessage(err?.response?.data?.message);
+        toast.error(errMsg);
       }
     };
 
@@ -222,9 +224,10 @@ const AdSchedulePage = () => {
       });
       const stores = response.data.data.items;
       setSelectedEvent({ ...event, stores });
-    } catch (e) {
-      toast.error("점포 정보를 불러오는 데 실패했습니다.");
-      console.error(e);
+    } catch (err) {
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
+      console.error(err);
     }
   };
   // 광고 이벤트 상세 모달창 열기
@@ -233,27 +236,6 @@ const AdSchedulePage = () => {
       modalRef.current.showModal();
     }
   }, [selectedEvent]);
-
-  // 화면 렌더링 시에 현재 시간선이 화면 중앙에 오게
-  // useEffect(() => {
-  //   const scrollToCurrentTimeCenter = () => {
-  //     const content = document.querySelector(".rbc-time-content");
-  //     if (!content) return;
-
-  //     const now = new Date();
-  //     const minutesSinceStart = (now.getHours() - 9) * 60 + now.getMinutes();
-  //     const totalMinutes = (22 - 9) * 60;
-  //     const scrollHeight = content.scrollHeight;
-
-  //     const currentPosition = (minutesSinceStart / totalMinutes) * scrollHeight;
-
-  //     const scrollTo = currentPosition - content.clientHeight / 2;
-
-  //     content.scrollTop = Math.max(0, scrollTo); // 음수 방지
-  //   };
-
-  //   setTimeout(scrollToCurrentTimeCenter, 300);
-  // }, []);
 
   // 달력영역 휠로 시간슬롯 줌 인/아웃
   const [timeSlots, setTimeSlots] = useState(5);
@@ -291,6 +273,23 @@ const AdSchedulePage = () => {
       calendarEl.removeEventListener("wheel", handleWheelZoom);
     };
   }, [handleWheelZoom]);
+
+  // 렌더링시에 현재시간선에 스크롤 위치
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      const nowIndicator = document.querySelector(
+        ".rbc-current-time-indicator"
+      );
+      if (nowIndicator) {
+        nowIndicator.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }
+    }, 300);
+
+    return () => clearTimeout(timeout);
+  }, []);
 
   return (
     <ContentLayout>

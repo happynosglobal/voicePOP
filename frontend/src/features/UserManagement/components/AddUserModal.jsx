@@ -11,9 +11,11 @@ import { useEffect, useRef, useState } from "react";
 import { levelOptions } from "../../../utils/constant/options";
 import LoadingSpinner from "../../../components/loading/LoadingSpinner";
 import PwChangeModal from "../../../components/modal/PwChangeModal";
-import { patchUser } from "../../../api/user/user";
+import { patchUser, resetPassword } from "../../../api/user/user";
 import { toast } from "react-toastify";
 import { useLoadingStore } from "../../../stores/loading";
+import { getErrorMessage } from "../../../utils/constant/messages";
+import Dropdown from "../../../components/dropdown/Dropdown";
 
 const AddUserModal = ({
   modalRef,
@@ -101,7 +103,28 @@ const AddUserModal = ({
         toast.success("암호가 성공적으로 변경되었습니다");
       }
     } catch (err) {
-      toast.error("비밀번호 변경에 실패했습니다. 관리자에게 문의하세요");
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
+      console.error(err);
+    }
+  };
+
+  const handleSubmitResetPw = async () => {
+    if (!confirm("초기화 하시겠습니까?")) return;
+    const body = {
+      user_id: formData.user_id,
+      name: formData.user_name,
+      email: formData.email,
+    };
+    try {
+      const response = await resetPassword(body);
+      const { status, data } = response;
+      if (status === 200 && data.status_code === 200) {
+        toast.success(data.message);
+      }
+    } catch (err) {
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
       console.error(err);
     }
   };
@@ -255,7 +278,7 @@ const AddUserModal = ({
             </div>
             <div className="flex justify-between">
               <label className="py-2 font-semibold w-1/4 shrink-0">권한</label>
-              <Select
+              <Dropdown
                 name="level"
                 options={levelOptions}
                 className="w-full"
@@ -271,7 +294,7 @@ const AddUserModal = ({
                 관리브랜드
               </label>
               {formData.level !== "STORE" ? (
-                <Select
+                <Dropdown
                   isMulti
                   name="brand_code"
                   options={brandOptions}
@@ -285,7 +308,7 @@ const AddUserModal = ({
                   isDisabled={formData.level === "ADMIN" ? true : false} // 전체관리자는 disabled
                 />
               ) : (
-                <Select
+                <Dropdown
                   name="brand_code"
                   options={brandOptions}
                   value={brandOptions.filter(
@@ -304,7 +327,7 @@ const AddUserModal = ({
               <label className="py-2 font-semibold w-1/4 shrink-0">
                 관리점포
               </label>
-              <Select
+              <Dropdown
                 name="store_code"
                 options={storeList}
                 value={storeList.filter(
@@ -429,6 +452,8 @@ const AddUserModal = ({
       <PwChangeModal
         modalRef={pwChangeModalRef}
         handleSubmitChangePw={handleSubmitChangePw}
+        handleSubmitResetPw={handleSubmitResetPw}
+        hasResetButton={true}
       />
     </>
   );

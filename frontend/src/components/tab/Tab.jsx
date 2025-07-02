@@ -23,8 +23,6 @@ const Tab = ({ activeTab, setActiveTab, onTabChange }) => {
     if (onTabChange) {
       onTabChange(code);
     }
-
-    // localStorage.setItem("lastActiveTab", code);
   };
 
   // activeTab이 바뀔 때 해당 버튼으로 가로 스크롤 (세로 이동은 막기)
@@ -34,23 +32,10 @@ const Tab = ({ activeTab, setActiveTab, onTabChange }) => {
       target.scrollIntoView({
         behavior: "auto",
         inline: "center",
-        block: "nearest", // 세로 스크롤 방지
+        block: "nearest",
       });
     }
   }, [activeTab]);
-
-  // 컴포넌트 초기 진입 시, 저장된 탭 복원
-  // useEffect(() => {
-  //   const savedTab = localStorage.getItem("lastActiveTab");
-  //   if (
-  //     savedTab &&
-  //     tabs.some((tab) =>
-  //       typeof tab === "object" ? tab.code === savedTab : tab === savedTab
-  //     )
-  //   ) {
-  //     setActiveTab(savedTab);
-  //   }
-  // }, [tabs, setActiveTab]);
 
   return (
     <div className="tabs-wrapper">

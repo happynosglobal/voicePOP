@@ -5,6 +5,7 @@ import {
   getStoreCodes,
 } from "../api/storeGroup/storeGroup";
 import useCodes from "../stores/codes";
+import { getErrorMessage } from "../utils/constant/messages";
 // 그룹 ID별 label
 const regionalGroupTypes = [
   { value: "G1", label: "판매1담당" },
@@ -75,7 +76,8 @@ export const getAllStores = async (brand_code) => {
       };
     }
   } catch (err) {
-    toast.error("점포 정보를 불러오는데 실패했습니다.");
+    const errMsg = getErrorMessage(err?.response?.data?.message);
+    toast.error(errMsg);
     console.error(err);
   }
 };
@@ -108,7 +110,8 @@ export const getGroupInfo = async (id) => {
 
     return { groupName, groupedStores };
   } catch (err) {
-    toast.error("점포 상세 정보를 불러오는데 실패했습니다.");
+    const errMsg = getErrorMessage(err?.response?.data?.message);
+    toast.error(errMsg);
     console.error(err);
   }
 };

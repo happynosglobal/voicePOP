@@ -1,21 +1,28 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { getStoreCodes } from "../../../api/storeGroup/storeGroup";
 import { checkUser, requestUser } from "../../../api/user/user";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { useLoadingStore } from "../../../stores/loading";
 import { userIdRegex } from "../../../utils/validation";
+import { getErrorMessage } from "../../../utils/constant/messages";
+import useBrandCode from "../../../hooks/useBrandCode";
+import useCodes from "../../../stores/codes";
 
 const useSignUpForm = () => {
   const navigate = useNavigate();
+  const { getBrandCodes } = useBrandCode();
+  const { brandOptions, brandCodes } = useCodes();
+
+  const companyOptions = [...brandOptions, { value: "etc", label: "기타" }]; // 회사명 드롭박스 옵션
+
   const initialFormData = {
     user_id: "",
     user_name: "",
+    company_code: "",
     company_id: "",
     required_level: "ADMIN",
-    brand_code: ["EM", "ED", "NB"],
-    // password: '',
-    // confirm_password: '',
+    brand_code: [],
     store_code: null,
     email: "",
   };
@@ -28,7 +35,7 @@ const useSignUpForm = () => {
   /* 신청ID 중복확인 */
   const checkIdDuplicate = async () => {
     const { user_id } = formData;
-  
+
     // 정규식 유효성 검사
     const { error } = userIdRegex.validate(user_id);
     if (error) {
@@ -36,13 +43,13 @@ const useSignUpForm = () => {
       setIsIdChecked(false);
       return;
     }
-  
+
     // 중복 확인 요청
     try {
       const body = { user_id };
       const res = await checkUser(body);
       const { status_code } = res.data;
-  
+
       if (status_code === 200) {
         setIsIdChecked(false);
         setErrors((prev) => ({ ...prev, user_id: "사용자가 존재합니다." }));
@@ -51,8 +58,9 @@ const useSignUpForm = () => {
         setErrors((prev) => ({ ...prev, user_id: "" }));
       }
     } catch (err) {
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
       console.error(err);
-      toast.error("중복체크 중 오류가 발생했습니다.");
       setIsIdChecked(false);
     }
   };
@@ -79,24 +87,7 @@ const useSignUpForm = () => {
   const handleSelectBox = (option, option2) => {
     const { label, value } = option;
     const { name } = option2;
-
-    if (name === "required_level" && value !== "ADMIN") {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-        brand_code: [],
-        store_code: null,
-      }));
-    } else if (name === "required_level" && value === "ADMIN") {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-        brand_code: ["EM", "ED", "NB"],
-        store_code: null,
-      }));
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   /* MultiSelectBox handler */
@@ -123,7 +114,8 @@ const useSignUpForm = () => {
         setStores(data);
       }
     } catch (err) {
-      toast.error("점포 정보를 불러오는 중 오류가 발생했습니다.");
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
     } finally {
       useLoadingStore.getState().setLoading(false);
     }
@@ -142,7 +134,7 @@ const useSignUpForm = () => {
     const body = formData;
     try {
       const response = await requestUser(body);
-      const { status_code, data } = response.data;
+      const { status_code } = response.data;
       if (status_code === 200) {
         toast.success(
           "사용자 등록 신청을 완료했습니다. 관리자에게 문의하세요."
@@ -178,7 +170,62 @@ const useSignUpForm = () => {
     return isValid;
   };
 
+  // 최초 렌더링시 brand 코드값 세팅
+  useEffect(() => {
+    if (brandOptions.length > 0 && brandCodes.length > 0) {
+      setFormData((prev) => ({
+        ...prev,
+        brand_code: brandCodes,
+        company_code: brandCodes[0],
+      }));
+    }
+  }, [brandOptions, brandCodes]);
+
+  useEffect(() => {
+    const level = formData.required_level;
+    const companyCode = formData.company_code;
+
+    if (!companyCode) return;
+
+    // etc인 경우는 무조건 초기화 후 종료
+    if (companyCode === "etc") {
+      setFormData((prev) => ({
+        ...prev,
+        company_id: "",
+        brand_code: [],
+        store_code: null,
+      }));
+      return;
+    }
+
+    const matched = brandOptions.find((option) => option.value === companyCode);
+    if (!matched) return;
+
+    if (level === "ADMIN") {
+      setFormData((prev) => ({
+        ...prev,
+        company_id: matched.label,
+        brand_code: brandCodes,
+        store_code: null,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        company_id: matched.label,
+        brand_code: [companyCode],
+        store_code: null,
+      }));
+
+      if (level === "STORE") {
+        handleClickBrand(companyCode);
+      }
+    }
+  }, [formData.company_code, formData.required_level]);
+
   return {
+    brandOptions,
+    getBrandCodes,
+    companyOptions,
     formData,
     errors,
     isIdChecked,

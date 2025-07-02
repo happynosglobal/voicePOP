@@ -88,7 +88,7 @@ const BroadcastIssueChart = () => {
             plotOptions: {
               bar: {
                 horizontal: false,
-                columnWidth: "55%",
+                columnWidth: "70%",
                 borderRadius: 0,
               },
             },

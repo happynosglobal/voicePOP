@@ -16,6 +16,7 @@ import { toast } from "react-toastify";
 import EmptyState from "../../components/emptyState/EmptyState";
 
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
+import { getErrorMessage } from "../../utils/constant/messages";
 
 const StoreGroupPage = () => {
   const { user } = useUserStore();
@@ -25,11 +26,13 @@ const StoreGroupPage = () => {
   const { page, setPage, total, limit, storeGroupList, getStoreGroupList } =
     useHandleStoreGroup();
 
+  const [groupId, setGroupId] = useState(null); //선택된 그룹 ID
+
   useEffect(() => {
     getStoreGroupList();
   }, [page]);
 
-  const [groupId, setGroupId] = useState(null);
+  const getRowNumber = (index) => limit * (page - 1) + index + 1;
 
   const handleSubmit = async (name, stores, id) => {
     const groupBody = {
@@ -91,9 +94,10 @@ const StoreGroupPage = () => {
       getStoreGroupList(1);
       toast.success("그룹 생성이 완료되었습니다");
       groupModalRef.current.close();
-    } catch (error) {
-      console.error("그룹 생성 중 오류 발생:", error);
-      toast.error("그룹 생성 중 오류가 발생했습니다.");
+    } catch (err) {
+      const errMsg = getErrorMessage(err.response.data.message);
+      toast.error(errMsg);
+      console.error("그룹 생성 중 오류 발생:", err);
     }
   };
 
@@ -114,9 +118,10 @@ const StoreGroupPage = () => {
       getStoreGroupList(1);
       toast.success("그룹 삭제가 완료되었습니다");
       groupModalRef.current.close();
-    } catch (error) {
-      console.error("그룹 삭제 중 오류 발생:", error);
-      toast.error("그룹 삭제 중 오류가 발생했습니다.");
+    } catch (err) {
+      const errMsg = getErrorMessage(err.response.data.message);
+      toast.error(errMsg);
+      console.error("그룹 삭제 중 오류 발생:", err);
     }
   };
   return (
@@ -147,9 +152,8 @@ const StoreGroupPage = () => {
         {storeGroupList.length > 0 && (
           <tbody>
             {storeGroupList.map((item, index) => (
-              // <tr key={item.id} onClick={() => handleRowClick(item.id)}>
               <tr key={index}>
-                <td>{index + 1}</td>
+                <td>{getRowNumber(index)}</td>
                 <td>
                   <button
                     className="hover:underline"

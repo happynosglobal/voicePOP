@@ -36,6 +36,10 @@ export const postBcTargetStore = (body) => {
 export const putBcTargetStore = (id, body) => {
   return apiCall.put(`/content/store/${id}`, body);
 };
+/* 방송 대상 점포 삭제 */
+export const deleteBcTargetStore = (id) => {
+  return apiCall.delete(`/content/store/${id}`);
+};
 
 /* 방송 음성파일 등록 */
 export const postBcMedia = (body) => {
@@ -61,4 +65,13 @@ export const postAudioMapping = (id, body) => {
 /* 방송 음성파일 방송 매핑 삭제 */
 export const deleteAudioMapping = (id) => {
   return apiCall.delete(`/content/schedule/${id}`);
+};
+
+/* 방송 스케줄 타임테이블 등록 */
+export const postBcTimeTable = (id) => {
+  return apiCall.post(`/content/timetable/${id}`);
+};
+/* 방송 스케줄 타임테이블 삭제 */
+export const deleteBcTimeTable = (id) => {
+  return apiCall.delete(`/content/timetable/${id}`);
 };

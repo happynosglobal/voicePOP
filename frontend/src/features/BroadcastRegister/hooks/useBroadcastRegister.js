@@ -2,9 +2,15 @@ import React, { useEffect, useMemo, useState } from "react";
 import { toDate } from "../../../utils/customFormat";
 import useUserStore from "../../../stores/user";
 import useCodes from "../../../stores/codes";
+import { getStoreNameByCode } from "../../../hooks/useStoreCode";
 
 const useBroadcastRegister = () => {
   const { user } = useUserStore();
+  const myStore = {
+    store_code: user.store_code,
+    store_name: getStoreNameByCode(user.store_code),
+  };
+
   const today = useMemo(() => new Date(), []);
 
   const initialFormData = useMemo(
@@ -25,7 +31,9 @@ const useBroadcastRegister = () => {
   const { categoryOptions } = useCodes();
 
   const [formData, setFormData] = useState(initialFormData);
-  const [selectedStore, setSelectedStore] = useState([]);
+  const [selectedStore, setSelectedStore] = useState(() => {
+    return user?.level === "STORE" ? [myStore] : [];
+  });
   const [audioFile, setAudioFile] = useState(null);
   const [duration, setDuration] = useState(null);
   const [audioPreviewUrl, setAudioPreviewUrl] = useState(null);
@@ -106,6 +114,9 @@ const useBroadcastRegister = () => {
     return false;
   };
   return {
+    today,
+    myStore,
+    initialFormData,
     formData,
     setFormData,
     selectedStore,

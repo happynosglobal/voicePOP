@@ -1,21 +1,23 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useUserStore from "../../stores/user";
 import { useNavigate } from "react-router-dom";
 import { postLogin, postUserBrand } from "../../api/user/user";
 import useCodes from "../../stores/codes";
 import Logo from "../../components/logo/Logo";
-import Select from "react-select";
 import { toast } from "react-toastify";
 import useBrandCode from "../../hooks/useBrandCode";
 import { URL_MAPPING } from "../../utils/constant/urls";
 import useCategoryCode from "../../hooks/useCategoryCode";
+import { getAccessToken } from "../../hooks/useAuth";
+import Select from "react-select";
 
 const Login = () => {
-  const { user, logout, setUser } = useUserStore.getState();
+  const { user, setUser } = useUserStore.getState();
   const { fetchStores } = useCodes.getState();
   const { getBrandCodes } = useBrandCode();
   const { getCategoryCodes } = useCategoryCode();
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     user_id: "",
     password: "",
@@ -26,8 +28,10 @@ const Login = () => {
   const [isBrandFixed, setIsBrandFixed] = useState(false);
   const [brandOptions, setBrandOptions] = useState([]);
 
+  const brandRef = useRef(null);
+
   useEffect(() => {
-    const token = sessionStorage.getItem("token");
+    const token = getAccessToken();
     if (token && user) {
       if (user.level === "ADMIN") {
         navigate(URL_MAPPING.dashboard);
@@ -49,15 +53,16 @@ const Login = () => {
         }));
 
         setBrandOptions(options);
+        setFormData((prev) => ({
+          ...prev,
+          brand_code: options[0].value,
+        }));
 
         if (options.length === 1) {
-          setFormData((prev) => ({
-            ...prev,
-            brand_code: options[0].value,
-          }));
           setIsBrandFixed(true);
         } else {
           setIsBrandFixed(false);
+          brandRef.current?.focus();
         }
       } else {
         toast.error(data.message);
@@ -80,8 +85,8 @@ const Login = () => {
       const { status_code, data } = response.data;
 
       if (status_code === 200) {
-        sessionStorage.setItem("token", data.token);
-        sessionStorage.setItem("refresh_token", data.refresh_token);
+        sessionStorage.setItem("access", data.token);
+        sessionStorage.setItem("refresh", data.refresh_token);
         // 가입 후 최초 로그인 시 비밀번호 변경 진행
         if (!data.last_changed_time) {
           return navigate(URL_MAPPING.changePw, {
@@ -112,7 +117,9 @@ const Login = () => {
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <div className="card max-w-md bg-white shadow-xl px-6 py-10 w-full">
           <h2 className="flex justify-center items-center text-3xl font-bold mb-6">
-            <Logo />
+            <a href={URL_MAPPING.login}>
+              <Logo />
+            </a>
           </h2>
           <div className="form-control">
             <label className="label">
@@ -135,6 +142,11 @@ const Login = () => {
                   setBrandOptions([]);
                 }}
                 onBlur={handleGetBrandOptions}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleGetBrandOptions();
+                  }
+                }}
               />
             </div>
           </div>
@@ -146,8 +158,8 @@ const Login = () => {
             <Select
               options={brandOptions}
               className="min-w-56"
-              isClearable={!isBrandFixed}
               isDisabled={isBrandFixed}
+              ref={brandRef}
               placeholder="브랜드를 선택해주세요."
               value={
                 brandOptions.find((opt) => opt.value === formData.brand_code) ||
@@ -159,6 +171,7 @@ const Login = () => {
                   brand_code: selected?.value || "",
                 }));
               }}
+              isSearchable={false}
             />
           </div>
 

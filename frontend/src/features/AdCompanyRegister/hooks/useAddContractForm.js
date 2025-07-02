@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react'
 import { toDate } from '../../../utils/customFormat';
 import { getAdTypeList, patchAdContract, postAdContract } from '../../../api/advertisement/advertisement';
 import { toast } from 'react-toastify';
+import { getErrorMessage } from '../../../utils/constant/messages';
 
 const useAddContractForm = () => {
   const today = useMemo(() => (new Date()), []);
@@ -33,7 +34,8 @@ const useAddContractForm = () => {
         }
       })
       .catch(err => {
-        toast.error("광고타입을 불러오는데 실패했습니다.");
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
         console.error(err)
       });
   }
@@ -65,9 +67,8 @@ const useAddContractForm = () => {
         toast.success("계약 등록에 성공했습니다.");
       }
     } catch (err) {
-      toast.error("계약 등록 중 오류가 발생했습니다.\n계약기간을 확인해주세요.", {
-        style: { whiteSpace: "pre-line" },
-      });
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
       throw new Error(err);
     }
   }
@@ -80,9 +81,8 @@ const useAddContractForm = () => {
         toast.success("계약 수정에 성공했습니다.");
       }
     } catch (err) {
-      toast.error("계약 등록 중 오류가 발생했습니다.\n계약기간을 확인해주세요.", {
-        style: { whiteSpace: "pre-line" },
-      });
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
       throw new Error(err);
     }
   }

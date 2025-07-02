@@ -5,6 +5,7 @@ import useAddContractForm from "../../hooks/useAddContractForm";
 import { toDate } from "../../../../utils/customFormat";
 import Input from "../../../../components/input/Input";
 import LoadingSpinner from "../../../../components/loading/LoadingSpinner";
+import Dropdown from "../../../../components/dropdown/Dropdown";
 
 const AddContractModal = ({ activeRow, modalRef, getContractList, mode, selectedContract, setSelectedContract }) => {
   const {
@@ -112,7 +113,7 @@ const AddContractModal = ({ activeRow, modalRef, getContractList, mode, selected
         <div className="flex flex-col gap-6">
           <div className="flex items-center justify-between">
             <label className="font-semibold w-1/4 shrink-0">광고타입</label>
-            <Select
+            <Dropdown
               name="ad_type"
               options={adTypes}
               value={adTypes.filter(option => option.value === formData.ad_type)}

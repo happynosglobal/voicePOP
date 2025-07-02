@@ -1,19 +1,11 @@
-import { useState } from "react";
 import ContentLayout from "../../layout/ContentLayout";
-import ReactApexChart from "react-apexcharts";
-import { Link } from "react-router-dom";
-import Tooltip from "../../components/tooltip/Tooltip";
 import DeviceStatusSection from "./components/DeviceStatusSection";
-import ChartTitle from "./components/ChartTitle";
-import ChartLegend from "./components/ChartLegend";
 import LiveStatusChart from "./components/LiveStatusChart";
 import ReservationSummary from "./components/ReservationSummary";
 import BroadcastIssueChart from "./components/BroadcastIssueChart";
 import UserRequestSummary from "./components/UserRequestSummary";
 
 const DashboardPage = () => {
-  //미송출 현황 차트
-  //랜덤 숫자 (임시)
 
   return (
     <ContentLayout>

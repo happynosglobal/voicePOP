@@ -37,7 +37,7 @@ export const URL_MAPPING = {
   adCompanyRegister: "/manager/ad-company-register",
   adApproval: "/manager/ad-approval",
 
-  equipmentSetting: "equipment-setting",
+  equipmentSetting: "/equipment-setting",
 };
 
 export const ROUTE_COMPONENTS = {

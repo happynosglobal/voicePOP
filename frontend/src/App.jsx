@@ -14,7 +14,7 @@ function App() {
         <ToastContainer
           autoClose={3000}
           style={{
-            top: "100px", // 화면 상단에서 10px 떨어진 위치
+            top: "100px",
           }}
         />
       </BrowserRouter>

@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import Select from 'react-select'
 import Input from '../../../components/input/Input';
 import useCodes from '../../../stores/codes';
+import Dropdown from '../../../components/dropdown/Dropdown';
 
 const SearchBar = ({
   searchParams,
@@ -14,18 +15,19 @@ const SearchBar = ({
 
   return (
     <div className="flex mb-5 gap-1.5">
-      <Select
+      <Dropdown
         name="brand_code"
+        className="min-w-36"
         options={[
           { value: "", label: "모든 브랜드" },
           ...brandOptions
         ]}
-        className="min-w-32"
         onChange={handleSelectBox}
         defaultValue={{ value: "", label: "모든 브랜드" }}
       />
-      <Select
+      <Dropdown
         name="keyword_type"
+        className="min-w-32"
         options={[
           { value: "number", label: "사업자번호" },
           { value: "name", label: "사업자명" },
@@ -43,7 +45,7 @@ const SearchBar = ({
           onChange={handleInput}
         />
       </div>
-      <button className="btn btn-sm btn-accent" onClick={getCompanyList}>검색</button>
+      <button className="btn btn-sm btn-accent" onClick={()=>getCompanyList(1)}>검색</button>
       <button
         className="btn btn-sm btn-primary"
         onClick={() => companyModalRef.current.showModal()}

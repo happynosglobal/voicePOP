@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import useUserStore from '../../../stores/user';
 import { getGroupDetailList, getGroupList } from '../../../api/storeGroup/storeGroup';
 import { toast } from 'react-toastify';
+import { getErrorMessage } from '../../../utils/constant/messages';
 
 const useHandleStoreGroup = () => {
   const { user } = useUserStore();
@@ -27,9 +28,10 @@ const useHandleStoreGroup = () => {
         setTotal(data.data.count);
         setPage(data.data.page);
       }
-    } catch (error) {
-      console.error("그룹 및 점포 조회 오류:", error);
-      toast.error("그룹 및 점포 조회 오류:");
+    } catch (err) {
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
+      console.error("그룹 및 점포 조회 오류:", err);
     }
   };
 

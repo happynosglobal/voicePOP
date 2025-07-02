@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { dummyUserInfo } from "../dummy/data";
 import { getStoreCodes } from "../../../api/storeGroup/storeGroup";
 import {
   checkUser,
@@ -12,9 +11,10 @@ import { toast } from "react-toastify";
 import { useLoadingStore } from "../../../stores/loading";
 import useCodes from "../../../stores/codes";
 import { userIdRegex } from "../../../utils/validation";
+import { getErrorMessage } from "../../../utils/constant/messages";
 
 const useAddUser = () => {
-  const {brandCodes, brandOptions} = useCodes();
+  const { brandCodes, brandOptions } = useCodes();
   const initialFormData = {
     user_id: "",
     user_name: "",
@@ -37,7 +37,7 @@ const useAddUser = () => {
   /* 신청ID 중복확인 */
   const checkIdDuplicate = async () => {
     const { user_id } = formData;
-  
+
     // 정규식 유효성 검사
     const { error } = userIdRegex.validate(user_id);
     if (error) {
@@ -45,13 +45,13 @@ const useAddUser = () => {
       setIsIdChecked(false);
       return;
     }
-  
+
     // 중복 확인 요청
     try {
       const body = { user_id };
       const res = await checkUser(body);
       const { status_code } = res.data;
-  
+
       if (status_code === 200) {
         setIsIdChecked(false);
         setErrors((prev) => ({ ...prev, user_id: "사용자가 존재합니다." }));
@@ -60,8 +60,9 @@ const useAddUser = () => {
         setErrors((prev) => ({ ...prev, user_id: "" }));
       }
     } catch (err) {
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
       console.error(err);
-      toast.error("중복체크 중 오류가 발생했습니다.");
       setIsIdChecked(false);
     }
   };
@@ -100,7 +101,7 @@ const useAddUser = () => {
       setFormData((prev) => ({
         ...prev,
         [name]: value,
-        brand_code: ["EM", "ED", "NB"],
+        brand_code: brandCodes,
         store_code: null,
       }));
     } else {
@@ -132,7 +133,8 @@ const useAddUser = () => {
         setStores(data);
       }
     } catch (err) {
-      toast.error("점포 정보를 불러오는 중 오류가 발생했습니다.");
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
     } finally {
       useLoadingStore.getState().setLoading(false);
     }
@@ -211,7 +213,8 @@ const useAddUser = () => {
         });
       }
     } catch (err) {
-      toast.error(err?.response.data.message || "");
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
       throw err;
     } finally {
       useLoadingStore.getState().setLoading(false);
@@ -236,7 +239,8 @@ const useAddUser = () => {
         toast.success("사용자 등록에 성공했습니다.");
       }
     } catch (err) {
-      toast.error(err?.response.data.message || "");
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
     }
   };
 
@@ -258,7 +262,8 @@ const useAddUser = () => {
         toast.success("사용자 수정에 성공했습니다.");
       }
     } catch (err) {
-      toast.error(err?.response.data.message || "");
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
     }
   };
 
@@ -270,7 +275,8 @@ const useAddUser = () => {
         toast.success("사용자 삭제에 성공했습니다.");
       }
     } catch (err) {
-      toast.error(err?.response.data.message || "");
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
     }
   };
   return {

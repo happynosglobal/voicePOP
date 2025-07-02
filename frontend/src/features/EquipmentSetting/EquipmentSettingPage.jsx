@@ -5,6 +5,7 @@ import useBrandCode from "../../hooks/useBrandCode";
 import useEquipmentSettingForm from "./hooks/useEquipmentSettingForm";
 import Logo from "../../components/logo/Logo";
 import useCodes from "../../stores/codes";
+import Dropdown from "../../components/dropdown/Dropdown";
 
 const EquipmentSettingPage = () => {
   const { brandOptions, getBrandCodes } = useBrandCode();
@@ -57,10 +58,10 @@ const EquipmentSettingPage = () => {
 
         <div className="form-control mt-4">
           <label className="label">
-            <span className="label-text font-semibold">설치 브랜드</span>
+            <span className="label-text font-semibold">업태 선택</span>
           </label>
           <div className="flex gap-4">
-            <Select
+            <Dropdown
               name="brand_code"
               options={brandOptions}
               value={brandOptions.filter(
@@ -69,26 +70,7 @@ const EquipmentSettingPage = () => {
               className="w-full"
               classNamePrefix="select"
               onChange={(option) => handleClickBrand(option.value)}
-              placeholder="브랜드를 선택하세요"
-            />
-          </div>
-        </div>
-
-        <div className="form-control mt-4">
-          <label className="label">
-            <span className="label-text font-semibold">설치 부서</span>
-          </label>
-          <div className="flex gap-4">
-            <Select
-              name="category_code"
-              options={categoryOptions4Select}
-              value={categoryOptions4Select.filter(
-                (option) => option.value === formData.category_code[0]
-              )}
-              className="w-full"
-              classNamePrefix="select"
-              onChange={handleSelectBox}
-              placeholder="부서를 선택하세요"
+              placeholder="업태를 선택하세요"
             />
           </div>
         </div>
@@ -97,7 +79,7 @@ const EquipmentSettingPage = () => {
           <label className="label">
             <span className="label-text font-semibold">설치 점포</span>
           </label>
-          <Select
+          <Dropdown
             name="str_code"
             options={storeList}
             value={storeList.filter(
@@ -107,6 +89,25 @@ const EquipmentSettingPage = () => {
             onChange={handleSelectBox}
             placeholder="점포를 선택하세요"
           />
+        </div>
+
+        <div className="form-control mt-4">
+          <label className="label">
+            <span className="label-text font-semibold">설치 부서</span>
+          </label>
+          <div className="flex gap-4">
+            <Dropdown
+              name="category_code"
+              options={categoryOptions4Select}
+              value={categoryOptions4Select.filter(
+                (option) => option.value === formData.category_code
+              )}
+              className="w-full"
+              classNamePrefix="select"
+              onChange={handleSelectBox}
+              placeholder="부서를 선택하세요"
+            />
+          </div>
         </div>
 
         <div className="form-control mt-4">

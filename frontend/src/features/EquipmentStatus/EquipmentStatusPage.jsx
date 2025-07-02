@@ -7,6 +7,9 @@ import EquipmentStatusTable from "./components/EquipmentStatusTable";
 import { toast } from "react-toastify";
 import { getDeviceStatus } from "../../api/device/device";
 import LoadingSpinner from "../../components/loading/LoadingSpinner";
+import { removeEmptyString } from "../../utils/customFormat";
+import { getErrorMessage } from "../../utils/constant/messages";
+import Dropdown from "../../components/dropdown/Dropdown";
 
 const EquipmentStatusPage = () => {
   const { user } = useUserStore();
@@ -29,8 +32,9 @@ const EquipmentStatusPage = () => {
   };
 
   const handleGetDeviceList = async () => {
-    const params = searchParams;
-    params.brand_code = user?.brand_code;
+    const tempParams = searchParams;
+    tempParams.brand_code = user?.brand_code;
+    const params = removeEmptyString(tempParams);
     try {
       const response = await getDeviceStatus(params);
       const { status, data } = response;
@@ -38,7 +42,8 @@ const EquipmentStatusPage = () => {
         setDeviceList(data.data.items);
       }
     } catch (err) {
-      toast.error("장비 조회에 실패했습니다.");
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
       console.error(err);
     }
   };
@@ -48,7 +53,7 @@ const EquipmentStatusPage = () => {
       <div className="flex mb-5 gap-1">
         <div className="flex justify-between w-full">
           <div className="flex flex-wrap items-center gap-1.5">
-            <Select
+            <Dropdown
               name="str_code"
               options={storeOptions}
               className="min-w-64"

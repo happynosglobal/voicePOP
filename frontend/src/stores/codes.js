@@ -71,7 +71,7 @@ const useCodes = create(
       }
     ),
     {
-      name: "codes-storage",
+      name: "codes",
       storage: createJSONStorage(() => sessionStorage),
     }
   )

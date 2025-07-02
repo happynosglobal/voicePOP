@@ -15,6 +15,8 @@ const UserTable = ({
 }) => {
   const allStores = useCodes((state) => state.allStoreCode);
 
+  const getRowNumber = (index) => limit * (page - 1) + index + 1;
+  
   const getStoreNameByCode = (store_code) => {
     if (!store_code) return "";
     const match = allStores.find((store) => store.id === store_code);
@@ -40,7 +42,7 @@ const UserTable = ({
           <tbody>
             {userList.map((item, index) => (
               <tr key={index} className="hover">
-                <td>{index + 1}</td>
+                <td>{getRowNumber(index)}</td>
                 <td>
                   <button
                     className="hover:underline"

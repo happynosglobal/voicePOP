@@ -59,13 +59,16 @@ const ContractTable = ({
                 <td>{toPriceFormat(item.ad_type_base_price)}</td>
                 <td>
                   {toDate(item.contract_from)}
-                  <br />
-                  ~ {toDate(item.contract_to)}
+                  <br />~ {toDate(item.contract_to)}
                 </td>
                 <td>
                   <span
                     className={`font-semibold ${
-                      item.status === "승인" ? "text-green-600" : "text-red-600"
+                      item.status === "승인"
+                        ? "text-green-600"
+                        : item.status === "반려"
+                        ? "text-red-600"
+                        : "text-sky-600"
                     }`}
                   >
                     {item.status}

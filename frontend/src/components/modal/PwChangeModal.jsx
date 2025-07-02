@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import Input from "../../components/input/Input";
 import { passwordRegex } from "../../utils/validation";
-import { toast } from "react-toastify";
-import { changePassword } from "../../api/user/user";
-import { useNavigate } from "react-router-dom";
-import { URL_MAPPING } from "../../utils/constant/urls";
+import LoadingSpinner from "../loading/LoadingSpinner";
 
-const PwChangeModal = ({ modalRef, handleSubmitChangePw }) => {
+const PwChangeModal = ({
+  modalRef,
+  handleSubmitChangePw,
+  handleSubmitResetPw,
+  hasResetButton,
+}) => {
   const [formData, setFormData] = useState({
     password1: "",
     password2: "",
@@ -115,11 +117,21 @@ const PwChangeModal = ({ modalRef, handleSubmitChangePw }) => {
           </button>
           <button
             className="btn btn-primary min-w-24"
-            onClick={() => handleSubmitChangePw(formData.password1, formData.password2)}
+            onClick={() =>
+              handleSubmitChangePw(formData.password1, formData.password2)
+            }
             disabled={!isFormValid()}
           >
             비밀번호 변경
           </button>
+          {hasResetButton && (
+            <button
+              className="btn btn-error min-w-24"
+              onClick={() => handleSubmitResetPw()}
+            >
+              비밀번호 초기화
+            </button>
+          )}
         </div>
 
         <button
@@ -129,6 +141,7 @@ const PwChangeModal = ({ modalRef, handleSubmitChangePw }) => {
           ✕
         </button>
       </div>
+      <LoadingSpinner includeCodesLoading={true} />
     </dialog>
   );
 };

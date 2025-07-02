@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { dummyContractList } from '../dummy/data';
 import { getAdContractList } from '../../../api/advertisement/advertisement';
 import { toast } from 'react-toastify';
+import { getErrorMessage } from '../../../utils/constant/messages';
 
 const useHandleContract = () => {
   const limit = 10;
@@ -25,8 +25,9 @@ const useHandleContract = () => {
         setTotal(data.data.count);
       }
     } catch (err) {
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
       console.error(err);
-      toast.error("광고계약 목록을 불러오는데 실패했습니다.");
     }
   }
 

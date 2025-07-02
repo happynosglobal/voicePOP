@@ -3,10 +3,11 @@ import useUserStore from '../stores/user';
 import { getBrandList } from '../api/brand/brand';
 import { toast } from 'react-toastify';
 import useCodes from '../stores/codes';
+import { getErrorMessage } from '../utils/constant/messages';
 
 const useBrandCode = () => {
-  const {setBrand} = useCodes();
-  const [brandOptions, setBrandOptions] = useState([]);
+  const {setBrand} = useCodes(); // store에 브랜드 목록을 value, label로 캐싱
+  const [brandOptions, setBrandOptions] = useState([]); // 브랜드 목록 value, label 값
   /* 전체 브랜드 목록 조회 */
   const getBrandCodes = () => {
     const params = {
@@ -23,15 +24,11 @@ const useBrandCode = () => {
         }
       })
       .catch(err => {
-        toast.error("브랜드 목록을 불러오는데 실패했습니다.");
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
         console.error(err)
       });
   }
-
-  // useEffect(() => {
-  //   getBrandCodes();
-  // }, []);
-
 
   return {
     brandOptions,

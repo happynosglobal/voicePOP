@@ -4,7 +4,11 @@ const { VITE_API_BASE_URL, VITE_API_PREFIX } = import.meta.env;
 
 /* 로그인 요청 */
 export const postLogin = (body) => {
-    return axios.post(`${VITE_API_PREFIX}/user/login`, body);
+    return apiCall.post(`/user/login`, body);
+}
+/* 토큰 재인증 */
+export const reissueToken = (body) => {
+    return apiCall.post(`/auth/refresh`, body);
 }
 /* 사용자 조회 */
 export const getUser = (id) => {

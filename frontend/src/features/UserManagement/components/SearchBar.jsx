@@ -4,6 +4,7 @@ import { RiFileExcel2Line } from "react-icons/ri";
 import { levelOptions } from "../../../utils/constant/options";
 import useBrandCode from "../../../hooks/useBrandCode";
 import useCodes from "../../../stores/codes";
+import Dropdown from "../../../components/dropdown/Dropdown";
 
 const SearchBar = ({
   setUserId,
@@ -29,7 +30,7 @@ const SearchBar = ({
     <div className="flex mb-5 gap-1">
       <div className="flex justify-between w-full">
         <div className="flex flex-wrap items-center gap-1.5">
-          <Select
+          <Dropdown
             name="level"
             options={[{ value: "", label: "모든 관리자" }, ...levelOptions]}
             className="min-w-32"
@@ -37,14 +38,14 @@ const SearchBar = ({
             defaultValue={{ value: "", label: "모든 관리자" }}
           />
 
-          <Select
+          <Dropdown
             name="brand_code"
             options={[{ value: "", label: "모든 브랜드" }, ...brandOptions]}
             className="min-w-32"
             onChange={handleSelectBox}
             defaultValue={{ value: "", label: "모든 브랜드" }}
           />
-          <Select
+          <Dropdown
             name="status"
             options={[
               { value: "", label: "모든 상태" },
@@ -61,7 +62,7 @@ const SearchBar = ({
           <div className="mx-5 h-5 w-px bg-gray-300"></div>
           <div className="flex items-center gap-2">
             <label className="font-semibold">검색 조건</label>
-            <Select
+            <Dropdown
               name="keyword_type"
               options={[
                 { value: "user_id", label: "ID" },

@@ -5,6 +5,7 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import useCodes from "../../../stores/codes";
 import CustomDatePicker from "../../../components/customDatePicker/CustomDatePicker";
 import Tab from "../../../components/tab/Tab";
+import Dropdown from "../../../components/dropdown/Dropdown";
 
 const AdScheduleToolbar = ({
   label,
@@ -46,7 +47,7 @@ const AdScheduleToolbar = ({
           오늘
         </button>
         <div className="flex flex-wrap items-center gap-1.5">
-          <Select
+          <Dropdown
             name="str_code"
             options={storeOptions}
             className="min-w-64"

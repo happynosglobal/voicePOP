@@ -19,7 +19,10 @@ import useUserStore from "../../stores/user";
 import {
   deleteAudioMapping,
   deleteBcMaster,
+  deleteBcTargetStore,
+  deleteBcTimeTable,
   downloadBcMedia,
+  postBcTimeTable,
   patchBcMaster,
   postAudioMapping,
   postBcMaster,
@@ -33,21 +36,25 @@ import { useLocation, useNavigate } from "react-router-dom";
 import LoadingSpinner from "../../components/loading/LoadingSpinner";
 import { IoMdCloseCircle } from "react-icons/io";
 import { getStoreNameByCode } from "../../hooks/useStoreCode";
+import { getErrorMessage } from "../../utils/constant/messages";
+import Dropdown from "../../components/dropdown/Dropdown";
+import { URL_MAPPING } from "../../utils/constant/urls";
 
 const BroadcastRegisterPage = () => {
-  // navigate('/broadcast/register', { state: { title:"방송수정", mode: 'edit', id: event.originalId, broadcastData: data } });
   const location = useLocation();
   const { mode, bcId, broadcastData } = location?.state || {};
 
   const START_TIME = import.meta.env.VITE_BROADCAST_TIME_DEFAULT_START;
   const END_TIME = import.meta.env.VITE_BROADCAST_TIME_DEFAULT_END;
-  const today = useMemo(() => new Date(), []);
 
   const { user } = useUserStore();
   const navigate = useNavigate();
   const { storeByBrandCode, isLoading } = useCodes();
 
   const {
+    today,
+    myStore,
+    initialFormData,
     formData,
     setFormData,
     selectedStore,
@@ -82,8 +89,8 @@ const BroadcastRegisterPage = () => {
   useEffect(() => {
     if (mode && bcId) {
       if (broadcastData) {
-        const stores = broadcastData.stores;
-        const media = broadcastData.medias[0];
+        const stores = broadcastData?.stores;
+        const media = broadcastData?.medias?.[0];
         // 대상점포 설정
         setSelectedStore(
           stores.map(({ store_code, store_name }) => ({
@@ -109,21 +116,21 @@ const BroadcastRegisterPage = () => {
           setIsRepeatChecked(true);
         }
         // 방송파일 설정
-        setDuration(media.play_time_seconds);
+        setDuration(media?.play_time_seconds);
         if (media?.media_filename) {
           const dummyFile = new File(["placeholder"], media.media_filename, {
             type: "audio/mpeg",
             lastModified: new Date().getTime(),
           });
           Object.defineProperty(dummyFile, "size", {
-            value: media.media_file_size,
+            value: media?.media_file_size,
           });
 
           setAudioFile(dummyFile);
-          setDuration(media.play_time_seconds);
+          setDuration(media?.play_time_seconds);
         }
 
-        downloadBcMedia(media.id)
+        downloadBcMedia(media?.id)
           .then((res) => {
             const downloadUrl = res.data.data.media_file_url; // 미디어 파일 url
             setAudioPreviewUrl(downloadUrl);
@@ -146,9 +153,21 @@ const BroadcastRegisterPage = () => {
           repeat_interval: broadcastData.repeat_interval || 1,
         }));
       } else {
-        navigate("/");
+        navigate(URL_MAPPING.broadcastManagement);
         toast.error("방송정보를 불러오는데 실패했습니다.");
       }
+    } else {
+      setSelectedStore(user?.level === "STORE" ? [myStore] : []);
+      setAudioFile(null);
+      setAudioPreviewUrl(null);
+      setDuration(null);
+      setIsGapChecked(true);
+      setIsRepeatChecked(false);
+      setSelectedStartDate(today);
+      setSelectedEndDate(today);
+      setStartTime(START_TIME);
+      setEndTime(END_TIME);
+      setFormData(initialFormData);
     }
   }, [mode, bcId, broadcastData]);
 
@@ -190,6 +209,7 @@ const BroadcastRegisterPage = () => {
 
   // 대상 점포 제거 핸들러
   const handleRemoveStore = (store) => {
+    if (user?.level === "STORE") return;
     setSelectedStore((prev) =>
       prev.filter((item) => item.store_code !== store.store_code)
     );
@@ -226,15 +246,7 @@ const BroadcastRegisterPage = () => {
 
       masterBroadcastId = broadcastRes.data.data.id;
 
-      const storeList =
-        user?.level === "STORE"
-          ? [
-              {
-                store_code: user?.store_code,
-                store_name: getStoreNameByCode(user?.store_code),
-              },
-            ]
-          : selectedStore; // 점포관리자면 본인의 점포만 대상으로 요청
+      const storeList = user?.level === "STORE" ? [myStore] : selectedStore; // 점포관리자면 본인의 점포만 대상으로 요청
 
       // 방송 대상 점포 등록
       const targetStoreRes = await postBcTargetStore({
@@ -247,8 +259,6 @@ const BroadcastRegisterPage = () => {
       if (targetStoreRes.status !== 200) {
         throw new Error("방송 대상 점포 저장 실패");
       }
-
-      const targetStoresId = targetStoreRes.data.data.id;
 
       // 오디오 파일 업로드
       const audioFormData = new FormData();
@@ -278,75 +288,92 @@ const BroadcastRegisterPage = () => {
       if (mappingRes.data.status_code !== 200) {
         throw new Error("마스터 방송과 오디오 파일 매핑 실패");
       }
+
+      // 방송 타임테이블 등록
+      await postBcTimeTable(masterBroadcastId);
+
       toast.success("방송 등록이 완료되었습니다");
-      navigate("/");
-    } catch (error) {
-      console.error("방송 등록 중 오류 발생:", error);
-      toast.error("방송 등록 중 오류가 발생했습니다.");
-      // 실패 시 마스터 방송 삭제
+      navigate(URL_MAPPING.broadcastManagement);
+    } catch (err) {
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
+      console.error("방송 등록 중 오류 발생:", err);
+      // 방송등록 실패시 등록정보 삭제
       if (masterBroadcastId) {
-        try {
-          await deleteBcMaster(masterBroadcastId);
-        } catch (err) {
-          console.error("마스터 방송 삭제 중 오류:", err);
-        }
+        Promise.allSettled([
+          deleteBcMaster(masterBroadcastId),
+          deleteBcTargetStore(masterBroadcastId),
+          deleteAudioMapping(masterBroadcastId),
+          deleteBcTimeTable(masterBroadcastId),
+        ]);
       }
     }
   };
 
-const handleEditRegister = async () => {
-  try {
-    const masterId = broadcastData.id;
-    const media = broadcastData.medias[0];
+  const handleEditRegister = async () => {
+    try {
+      const masterId = broadcastData.id;
+      const media = broadcastData.medias[0];
 
-    const body = {
-      type: "normal",
-      title: formData.title,
-      category_type_seq: formData.category_type_seq,
-      start_time: formData.start_time,
-      end_time: formData.end_time,
-      start_date: formData.start_date,
-      end_date: formData.end_date,
-      user_id: user?.user_id,
-      brand_code: user?.brand_code,
-    };
+      const body = {
+        type: "normal",
+        title: formData.title,
+        category_type_seq: formData.category_type_seq,
+        start_time: formData.start_time,
+        end_time: formData.end_time,
+        start_date: formData.start_date,
+        end_date: formData.end_date,
+        user_id: user?.user_id,
+        brand_code: user?.brand_code,
+      };
 
-    if (isGapChecked) body.gap = formData.gap;
-    if (isRepeatChecked) {
-      body.repeat_count = formData.repeat_count;
-      body.repeat_interval = formData.repeat_interval;
+      if (isGapChecked) {
+        body.gap = formData.gap;
+        body.repeat_count = 0;
+        body.repeat_interval = 0;
+      }
+      if (isRepeatChecked) {
+        body.gap = 0;
+        body.repeat_count = formData.repeat_count;
+        body.repeat_interval = formData.repeat_interval;
+      }
+
+      await patchBcMaster(masterId, body);
+
+      const storeList = user?.level === "STORE" ? [myStore] : selectedStore;
+
+      await putBcTargetStore(masterId, {
+        brand_code: user?.brand_code,
+        item: storeList,
+      });
+
+      const isAudioChanged = !(
+        audioFile instanceof File &&
+        audioFile.size === media.media_file_size &&
+        audioFile.name === media.media_filename
+      );
+
+      if (isAudioChanged) {
+        await deleteAudioMapping(masterId);
+        const audioForm = new FormData();
+        audioForm.append("media_type", "sound");
+        audioForm.append("media_filename", audioFile);
+        audioForm.append("media_desc", " ");
+        const audioRes = await postBcMedia(audioForm);
+        const audioId = audioRes.data.data.id;
+        await postAudioMapping(masterId, {
+          mst_medias: [{ id: audioId, broad_seq: 1 }],
+        });
+      }
+      await postBcTimeTable(masterId);
+      toast.success("방송 수정 완료");
+      navigate(URL_MAPPING.broadcastManagement);
+    } catch (err) {
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
+      console.error("수정 실패:", err);
     }
-
-    await patchBcMaster(masterId, body);
-
-    const storeList = (user?.level === "STORE")
-      ? [{ store_code: user?.store_code, store_name: getStoreNameByCode(user?.store_code) }]
-      : selectedStore;
-
-    await putBcTargetStore(masterId, {
-      brand_code: user?.brand_code,
-      item: storeList,
-    });
-
-    const isAudioChanged = !(audioFile instanceof File && audioFile.size === media.media_file_size);
-    if (isAudioChanged) {
-      await deleteAudioMapping(masterId);
-      const audioForm = new FormData();
-      audioForm.append("media_type", "sound");
-      audioForm.append("media_filename", audioFile);
-      audioForm.append("media_desc", " ");
-      const audioRes = await postBcMedia(audioForm);
-      const audioId = audioRes.data.data.id;
-      await postAudioMapping(masterId, { mst_medias: [{ id: audioId, broad_seq: 1 }] });
-    }
-
-    toast.success("방송 수정 완료!");
-    navigate("/");
-  } catch (err) {
-    console.error("수정 실패:", err);
-    toast.error("수정 중 오류 발생");
-  }
-};
+  };
 
   // 방송 등록 핸들러
   const handleSubmit = async () => {
@@ -366,11 +393,11 @@ const handleEditRegister = async () => {
       toast.error("방송 시간을 다시 확인해주세요.");
       return;
     }
-  if (mode === 'edit') {
-    handleEditRegister();
-  } else {
-    handleNewRegister();
-  }
+    if (mode === "edit") {
+      handleEditRegister();
+    } else {
+      handleNewRegister();
+    }
   };
 
   return (
@@ -405,10 +432,10 @@ const handleEditRegister = async () => {
             ))}
           </div>
         </div>
-        {user.level !== "STORE" && (
-          <div className="form-group">
-            <label className="form-label">적용점포</label>
-            <div className="w-full">
+        <div className="form-group">
+          <label className="form-label">적용점포</label>
+          <div className="w-full">
+            {user?.level !== "STORE" && (
               <div className="mb-2 flex justify-between items-center gap-2">
                 <div className="space-x-2">
                   <button
@@ -439,7 +466,7 @@ const handleEditRegister = async () => {
                       handleStoreGroup("", []);
                     }}
                   >
-                    초기화
+                    전체삭제
                   </button>
                 </div>
                 <p className="text-gray-500 text-right leading-tight">
@@ -447,27 +474,29 @@ const handleEditRegister = async () => {
                   <b className="text-gray-900">{selectedStore.length}</b>개
                 </p>
               </div>
-              {selectedStore.length !== 0 && (
-                <div className="p-2 border rounded-[10px] max-h-48 min-h-16 overflow-y-auto">
-                  <div className="grid grid-cols-7 gap-2">
-                    {selectedStore.map((store, index) => (
-                      <button
-                        key={index}
-                        className="flex items-center justify-between gap-1 bg-gray-200 text-gray-700 px-2.5 py-0.5 rounded text-sm hover:bg-gray-300 text-left"
-                      >
-                        {store.store_name}
+            )}
+            {selectedStore.length !== 0 && (
+              <div className="p-2 border rounded-[10px] max-h-48 min-h-16 overflow-y-auto">
+                <div className="grid grid-cols-7 gap-2">
+                  {selectedStore.map((store, index) => (
+                    <button
+                      key={index}
+                      className="flex items-center justify-between gap-1 bg-gray-200 text-gray-700 px-2.5 py-0.5 rounded text-sm hover:bg-gray-300 text-left"
+                    >
+                      {store.store_name}
+                      {user?.level !== "STORE" && (
                         <IoMdCloseCircle
                           className="flex-shrink-0"
                           onClick={() => handleRemoveStore(store)}
                         />
-                      </button>
-                    ))}
-                  </div>
+                      )}
+                    </button>
+                  ))}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
-        )}
+        </div>
         <div className="form-group">
           <label className="form-label">기간 설정</label>
           <div className="flex items-center">
@@ -523,7 +552,7 @@ const handleEditRegister = async () => {
                 }}
               />
             </label>
-            <Select
+            <Dropdown
               name="gap"
               className="min-w-32"
               options={gapOptions}
@@ -534,9 +563,46 @@ const handleEditRegister = async () => {
               isDisabled={!isGapChecked}
             />
           </div>
+          <div className="form-input-group gap-2 ml-10">
+            <div className="form-input-group gap-2">
+              <label className="input-label">
+                <CheckBox
+                  name="repeat_count"
+                  className="checkbox"
+                  label="횟수 / 간격"
+                  checked={isRepeatChecked}
+                  onChange={() => {
+                    setIsRepeatChecked(true);
+                    setIsGapChecked(false);
+                  }}
+                />
+              </label>
+              <Dropdown
+                name="repeat_count"
+                className="min-w-24"
+                options={repeatOptions}
+                value={repeatOptions.filter(
+                  (option) => option.value === formData.repeat_count
+                )}
+                onChange={handleSelectBox}
+                isDisabled={!isRepeatChecked}
+              />
+              <span className="px-2">/</span>
+              <Dropdown
+                name="repeat_interval"
+                className="min-w-24"
+                options={repeatInterval}
+                value={repeatInterval.filter(
+                  (option) => option.value === formData.repeat_interval
+                )}
+                onChange={handleSelectBox}
+                isDisabled={!isRepeatChecked || formData.repeat_count === 1}
+              />
+            </div>
+          </div>
         </div>
 
-        <div className="form-group">
+        {/* <div className="form-group">
           <label className="form-label">반복 설정</label>
           <div className="form-input-group gap-2">
             <label className="input-label">
@@ -551,7 +617,7 @@ const handleEditRegister = async () => {
                 }}
               />
             </label>
-            <Select
+            <Dropdown
               name="repeat_count"
               className="min-w-24"
               options={repeatOptions}
@@ -562,7 +628,7 @@ const handleEditRegister = async () => {
               isDisabled={!isRepeatChecked}
             />
             <span className="px-2">/</span>
-            <Select
+            <Dropdown
               name="repeat_interval"
               className="min-w-24"
               options={repeatInterval}
@@ -573,7 +639,7 @@ const handleEditRegister = async () => {
               isDisabled={!isRepeatChecked || formData.repeat_count === 1}
             />
           </div>
-        </div>
+        </div> */}
 
         {/* 방송 파일 업로드 */}
         <div className="form-group">

@@ -6,6 +6,7 @@ import Tooltip from "../../components/tooltip/Tooltip";
 import Pagination from "../../components/pagination/Pagination";
 import { RiFileExcel2Line } from "react-icons/ri";
 import Tab from "../../components/tab/Tab";
+import Dropdown from "../../components/dropdown/Dropdown";
 
 const dummyAD = [
   {
@@ -69,7 +70,7 @@ const AdStatusPage = () => {
       <div className="flex mb-5 gap-1">
         <div className="flex justify-between w-full">
           <div className="flex flex-wrap items-center gap-1.5">
-            <Select
+            <Dropdown
               options={[
                 { value: "1", label: "주식회사 노스글로벌" },
                 { value: "2", label: "농심" },
@@ -80,7 +81,7 @@ const AdStatusPage = () => {
               placeholder="모든 광고업체"
             />
 
-            <Select
+            <Dropdown
               options={[
                 { value: "1", label: "일반" },
                 { value: "2", label: "스탠다드" },
@@ -90,7 +91,7 @@ const AdStatusPage = () => {
               isClearable
               placeholder="모든 광고타입"
             />
-            <Select
+            <Dropdown
               options={[
                 { value: "0", label: "이마트 킨텍스점" },
                 { value: "1", label: "이마트 성남분당점" },

@@ -1,15 +1,19 @@
-import React, { useMemo, useState } from 'react'
-import { toast } from 'react-toastify';
-import { postAdCompany } from '../../../api/advertisement/advertisement';
+import React, { useMemo, useState } from "react";
+import { toast } from "react-toastify";
+import { postAdCompany } from "../../../api/advertisement/advertisement";
+import { getErrorMessage } from "../../../utils/constant/messages";
 
 const useAddCompanyForm = () => {
-  const initialFormData = useMemo(() => ({
-    business_name: "",
-    business_number: "",
-    brand_code: "",
-    comment: "",
-    use_yn: "Y",
-  }), []);
+  const initialFormData = useMemo(
+    () => ({
+      business_name: "",
+      business_number: "",
+      brand_code: "",
+      comment: "",
+      use_yn: "Y",
+    }),
+    []
+  );
 
   const [formData, setFormData] = useState(initialFormData);
 
@@ -32,14 +36,8 @@ const useAddCompanyForm = () => {
     const { label, value } = option;
     const { name } = option2;
 
-    if (name === "level" && value !== "ADMIN") {
-      setFormData(prev => ({ ...prev, [name]: value, brand_code: [], store_code: null }));
-    } else if (name === "level" && value === "ADMIN") {
-      setFormData(prev => ({ ...prev, [name]: value, brand_code: ["EM", "ED"], store_code: null }));
-    } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
-    }
-  }
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handlePostCompany = async () => {
     const body = {
@@ -49,18 +47,19 @@ const useAddCompanyForm = () => {
       comment: formData.comment,
       use_yn: formData.use_yn,
       seq: 1,
-    }
+    };
     try {
       const response = await postAdCompany(body);
       const { status_code, data } = response.data;
       if (status_code === 200) {
         toast.success("업체 등록에 성공했습니다.");
       }
-    } catch (err) {      
-      toast.error("업체 등록에 실패했습니다.");
+    } catch (err) {
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
       throw err;
     }
-  }
+  };
   return {
     initialFormData,
     formData,
@@ -69,8 +68,8 @@ const useAddCompanyForm = () => {
     setBusinessNumber,
     handleInput,
     handleSelectBox,
-    handlePostCompany
-  }
-}
+    handlePostCompany,
+  };
+};
 
 export default useAddCompanyForm;

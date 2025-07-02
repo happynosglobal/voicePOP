@@ -5,6 +5,7 @@ import { toBusinessNumber } from "../../../../utils/customFormat";
 import { useEffect } from "react";
 import LoadingSpinner from "../../../../components/loading/LoadingSpinner";
 import useCodes from "../../../../stores/codes";
+import Dropdown from "../../../../components/dropdown/Dropdown";
 
 const AddCompanyModal = ({ modalRef, getCompanyList }) => {
   const { brandOptions } = useCodes();
@@ -82,7 +83,7 @@ const AddCompanyModal = ({ modalRef, getCompanyList }) => {
           </div>
           <div className="flex items-center justify-between">
             <label className="font-semibold w-1/4 shrink-0">브랜드</label>
-            <Select
+            <Dropdown
               name="brand_code"
               options={brandOptions}
               value={brandOptions.filter(option => formData.brand_code.includes(option.value))}

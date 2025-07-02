@@ -1,21 +1,16 @@
-import React, { useEffect, useState } from 'react'
-import LoadingSpinner from '../../../components/loading/LoadingSpinner'
-import EmptyState from '../../../components/emptyState/EmptyState'
-import Tooltip from '../../../components/tooltip/Tooltip'
-import ContractTable from './table/ContractTable'
-import AddContractModal from './modal/AddContractModal'
-import useHandleContract from '../hooks/useHandleContract'
-import { getAdContract } from '../../../api/advertisement/advertisement'
+import React, { useEffect, useState } from "react";
+import LoadingSpinner from "../../../components/loading/LoadingSpinner";
+import EmptyState from "../../../components/emptyState/EmptyState";
+import Tooltip from "../../../components/tooltip/Tooltip";
+import ContractTable from "./table/ContractTable";
+import AddContractModal from "./modal/AddContractModal";
+import useHandleContract from "../hooks/useHandleContract";
+import { getAdContract } from "../../../api/advertisement/advertisement";
+import { toast } from "react-toastify";
 
 const ContractList = ({ activeRow, contractModalRef }) => {
-  const {
-    limit,
-    page,
-    setPage,
-    total,
-    contractList,
-    getContractList
-  } = useHandleContract();
+  const { limit, page, setPage, total, contractList, getContractList } =
+    useHandleContract();
   const [mode, setMode] = useState("add");
   const [selectedContract, setSelectedContract] = useState(null);
   // 임시 광고계약 리스트 로드
@@ -25,7 +20,12 @@ const ContractList = ({ activeRow, contractModalRef }) => {
   }, [activeRow, page]);
 
   const handleOpenEditModal = (mode, rowData) => {
-    setMode(mode)
+    if (mode === "modify" && rowData.status !== "미등록") {
+      toast.error(`이미 ${rowData.status} 되었습니다`);
+      return;
+    }
+
+    setMode(mode);
     if (mode === "add") {
       setSelectedContract(null);
       contractModalRef.current.showModal();
@@ -33,7 +33,7 @@ const ContractList = ({ activeRow, contractModalRef }) => {
       setSelectedContract(rowData);
       contractModalRef.current.showModal();
     }
-  }
+  };
   return (
     <>
       <div className="relative flex-1 p-5 bg-sky-50 rounded-[10px] border border-blue-200">
@@ -64,7 +64,7 @@ const ContractList = ({ activeRow, contractModalRef }) => {
         setSelectedContract={setSelectedContract}
       />
     </>
-  )
-}
+  );
+};
 
-export default ContractList
+export default ContractList;

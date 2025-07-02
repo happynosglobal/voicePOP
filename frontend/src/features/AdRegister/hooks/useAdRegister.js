@@ -1,12 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { toDate } from "../../../utils/customFormat";
 import useUserStore from "../../../stores/user";
-import useCategoryCode from "../../../hooks/useCategoryCode";
 import {
   getAdCompanayList,
   getAdContractList,
 } from "../../../api/advertisement/advertisement";
 import { toast } from "react-toastify";
+import useCodes from "../../../stores/codes";
+import { getErrorMessage } from "../../../utils/constant/messages";
 
 const useAdRegister = () => {
   const { user } = useUserStore();
@@ -29,18 +30,15 @@ const useAdRegister = () => {
     [today]
   );
 
-  const { categoryOptions, getCategoryCodes } = useCategoryCode();
+  const { categoryOptions } = useCodes();
 
   const [formData, setFormData] = useState(initialFormData);
   const [selectedStore, setSelectedStore] = useState([]);
   const [audioFile, setAudioFile] = useState(null);
   const [duration, setDuration] = useState(null);
+  const [audioPreviewUrl, setAudioPreviewUrl] = useState(null);
   const [companyOptions, setCompanyOptions] = useState([]);
   const [contractOptions, setContractOptions] = useState([]);
-
-  useEffect(() => {
-    getCategoryCodes(user?.brand_code);
-  }, [user]);
 
   const getCompanyOption = (brand_code) => {
     const params = {
@@ -62,8 +60,9 @@ const useAdRegister = () => {
         }
       })
       .catch((err) => {
-        toast.error("업체 정보를 불러오는데 실패했습니다.");
         console.error(err);
+        const errMsg = getErrorMessage(err?.response?.data?.message);
+        toast.error(errMsg);
       });
   };
 
@@ -90,8 +89,9 @@ const useAdRegister = () => {
         }
       })
       .catch((err) => {
-        toast.error("업체 정보를 불러오는데 실패했습니다.");
         console.error(err);
+        const errMsg = getErrorMessage(err?.response?.data?.message);
+        toast.error(errMsg);
       });
   };
 
@@ -103,7 +103,7 @@ const useAdRegister = () => {
   const handleSelectBox = (option, meta) => {
     const { label, value } = option;
     const { name } = meta;
-    
+
     if (name === "repeat_count" && value === 1) {
       setFormData((prev) => ({
         ...prev,
@@ -180,6 +180,8 @@ const useAdRegister = () => {
     setAudioFile,
     duration,
     setDuration,
+    audioPreviewUrl,
+    setAudioPreviewUrl,
     categoryOptions,
     companyOptions,
     setCompanyOptions,

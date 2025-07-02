@@ -3,6 +3,8 @@ import Select from "react-select";
 import Tooltip from "../../../components/tooltip/Tooltip";
 import { toDateTime } from "../../../utils/customFormat";
 import Tab from "../../../components/tab/Tab";
+import EmptyState from "../../../components/emptyState/EmptyState";
+import Dropdown from "../../../components/dropdown/Dropdown";
 
 const DeviceManagementTable = ({
   searchParams,
@@ -74,7 +76,7 @@ const DeviceManagementTable = ({
               </td>
               <td>{toDateTime(item.device_latest_run_datetime)}</td>
               <td>
-                <Select
+                <Dropdown
                   options={statusOptions}
                   className="min-w-32"
                   value={
@@ -122,12 +124,14 @@ const DeviceManagementTable = ({
                   }}
                   className="input w-full cursor-pointer"
                 />
-                {/* <Tooltip place="bottom" id={1} content={item.comment} /> */}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      {deviceList.length === 0 && (
+        <EmptyState text="일치하는 검색 결과가 없습니다." />
+      )}
     </>
   );
 };

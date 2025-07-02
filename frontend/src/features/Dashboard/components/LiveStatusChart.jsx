@@ -10,9 +10,12 @@ import { URL_MAPPING } from "../../../utils/constant/urls";
 
 const LiveStatusChart = () => {
   const { user } = useUserStore();
-  const [series, setSeries] = useState([]);
-  const [categories, setCategories] = useState([]);
 
+  const [chartData, setChartData] = useState({
+    series: [],
+    options: {},
+  });
+  
   useEffect(() => {
     const getRunningRate = async () => {
       const today = dayjs();
@@ -66,14 +69,65 @@ const LiveStatusChart = () => {
             yData.push(null); // 선이 끊기게 하기 위해 null
           }
         }
-
-        setCategories(xAxis);
-        setSeries([
-          {
-            name: "장비가동률",
-            data: yData,
+        setChartData({
+          series: [
+            {
+              name: "장비가동률",
+              data: yData,
+            },
+          ],
+          options: {
+            chart: {
+              type: "line",
+              toolbar: { show: false },
+            },
+            colors: ["#487DEE"],
+            stroke: {
+              curve: "straight",
+              width: 4,
+            },
+            fill: { type: "solid" },
+            dataLabels: { enabled: false },
+            legend: { show: false },
+            markers: {
+              size: 0,
+              hover: { sizeOffset: 6 },
+            },
+            xaxis: {
+              categories: xAxis,
+              labels: {
+                style: {
+                  fontFamily: "Pretendard",
+                  fontSize: "12px",
+                  fontWeight: 500,
+                  colors: ["#6B7280"],
+                },
+              },
+            },
+            yaxis: {
+              labels: {
+                formatter: (val) => `${val}%`,
+                style: {
+                  fontFamily: "Pretendard",
+                  fontSize: "12px",
+                  fontWeight: 500,
+                  colors: ["#6B7280"],
+                },
+              },
+            },
+            tooltip: {
+              x: { formatter: (val) => `${val}일` },
+              y: { formatter: (val) => `${val}%` },
+              style: {
+                fontSize: "14px",
+                fontFamily: "Pretendard",
+              },
+            },
+            grid: {
+              borderColor: "#E5E7EB",
+            },
           },
-        ]);
+        });
       } catch (err) {
         console.error("실시간 송출 현황 로딩 실패", err);
       }
@@ -81,58 +135,6 @@ const LiveStatusChart = () => {
 
     getRunningRate();
   }, [user?.brand_code]);
-
-  const chartOptions = {
-    chart: {
-      type: "line",
-      toolbar: { show: false },
-    },
-    colors: ["#487DEE"],
-    stroke: {
-      curve: "straight",
-      width: 4,
-    },
-    fill: { type: "solid" },
-    dataLabels: { enabled: false },
-    legend: { show: false },
-    markers: {
-      size: 0,
-      hover: { sizeOffset: 6 },
-    },
-    xaxis: {
-      categories,
-      labels: {
-        style: {
-          fontFamily: "Pretendard",
-          fontSize: "12px",
-          fontWeight: 500,
-          colors: ["#6B7280"],
-        },
-      },
-    },
-    yaxis: {
-      labels: {
-        formatter: (val) => `${val}%`,
-        style: {
-          fontFamily: "Pretendard",
-          fontSize: "12px",
-          fontWeight: 500,
-          colors: ["#6B7280"],
-        },
-      },
-    },
-    tooltip: {
-      x: { formatter: (val) => `${val}일` },
-      y: { formatter: (val) => `${val}%` },
-      style: {
-        fontSize: "14px",
-        fontFamily: "Pretendard",
-      },
-    },
-    grid: {
-      borderColor: "#E5E7EB",
-    },
-  };
 
   return (
     <div className="p-3.5 rounded-[20px] w-4/5 relative border border-sky-base-300 shrink-0">
@@ -146,7 +148,12 @@ const LiveStatusChart = () => {
         <ChartLegend label="장비가동률" color="#487DEE" />
       </div>
       <div className="rounded-[20px] bg-white pr-5">
-        <ReactApexChart options={chartOptions} series={series} height={230} />
+        <ReactApexChart
+          options={chartData.options}
+          series={chartData.series}
+          type="line"
+          height={230}
+        />
       </div>
     </div>
   );

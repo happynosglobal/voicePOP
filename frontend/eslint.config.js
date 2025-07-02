@@ -26,7 +26,7 @@ export default [
       react,
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
-      'import': eslintPluginImport // 추가
+      'import': eslintPluginImport
     },
     rules: {
       ...js.configs.recommended.rules,
@@ -40,7 +40,7 @@ export default [
         { allowConstantExport: true },
       ],
       "react/prop-types": "off",
-      'import/no-unresolved': 'error' // 🚨 추가: 파일명 대소문자 오류 감지
+      'import/no-unresolved': 'error' // 파일명 대소문자 오류 감지
     }
   },
 ]

@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { URL_MAPPING } from "../../utils/constant/urls";
 import { changePassword } from "../../api/user/user";
 import { toast } from "react-toastify";
-import { commonErrorMessage } from "../../utils/constant/messages";
+import { getErrorMessage } from "../../utils/constant/messages";
 import Input from "../../components/input/Input";
 import { passwordRegex } from "../../utils/validation";
 
@@ -63,7 +63,8 @@ const ChangePassword = () => {
         navigate(URL_MAPPING.login);
       }
     } catch (err) {
-      toast.error(err.response.data.message || commonErrorMessage);
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
       console.error(err);
     }
   };

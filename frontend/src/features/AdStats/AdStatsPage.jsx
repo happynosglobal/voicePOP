@@ -5,6 +5,7 @@ import CustomDatePicker from "../../components/customDatePicker/CustomDatePicker
 import Tooltip from "../../components/tooltip/Tooltip";
 import Pagination from "../../components/pagination/Pagination";
 import AdStatsTable from "./components/AdStatsTable";
+import Dropdown from "../../components/dropdown/Dropdown";
 
 const dummyAD = [
   {
@@ -93,7 +94,7 @@ const AdStatsPage = () => {
       <div className="flex mb-5 gap-1">
         <div className="flex justify-between w-full">
           <div className="flex flex-wrap items-center gap-1.5">
-            <Select
+            <Dropdown
               options={[
                 { value: "1", label: "주식회사 노스글로벌" },
                 { value: "2", label: "농심" },
@@ -104,7 +105,7 @@ const AdStatsPage = () => {
               placeholder="모든 광고업체"
             />
 
-            <Select
+            <Dropdown
               options={[
                 { value: "1", label: "일반" },
                 { value: "2", label: "스탠다드" },
@@ -114,7 +115,7 @@ const AdStatsPage = () => {
               isClearable
               placeholder="모든 광고타입"
             />
-            <Select
+            <Dropdown
               options={[
                 { value: "0", label: "이마트 킨텍스점" },
                 { value: "1", label: "이마트 성남분당점" },

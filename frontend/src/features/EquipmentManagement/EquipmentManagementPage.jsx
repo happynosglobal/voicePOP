@@ -10,6 +10,9 @@ import { toast } from "react-toastify";
 import { getDeviceList, postDeviceStatus } from "../../api/device/device";
 import LoadingSpinner from "../../components/loading/LoadingSpinner";
 import { exportDataToExcel } from "../../utils/exportExcel/exportExcel";
+import { removeEmptyString } from "../../utils/customFormat";
+import { getErrorMessage } from "../../utils/constant/messages";
+import Dropdown from "../../components/dropdown/Dropdown";
 
 const EquipmentManagementPage = () => {
   const { user } = useUserStore();
@@ -31,8 +34,9 @@ const EquipmentManagementPage = () => {
   };
 
   const handleGetDeviceList = async () => {
-    const params = searchParams;
-    params.brand_code = user?.brand_code;
+    const tempParams = searchParams;
+    tempParams.brand_code = user?.brand_code;
+    const params = removeEmptyString(tempParams);
     try {
       const response = await getDeviceList(params);
       const { status, data } = response;
@@ -40,7 +44,8 @@ const EquipmentManagementPage = () => {
         setDeviceList(data.data);
       }
     } catch (err) {
-      toast.error("장비 조회에 실패했습니다.");
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
       console.error(err);
     }
   };
@@ -60,7 +65,8 @@ const EquipmentManagementPage = () => {
         handleGetDeviceList();
       }
     } catch (err) {
-      toast.error("장비 상태 변경에 실패했습니다.");
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
       console.error(err);
     }
   };
@@ -70,10 +76,11 @@ const EquipmentManagementPage = () => {
       const response = await getDeviceList({ brand_code: user?.brand_code });
       const { status, data } = response;
       if (status === 200) {
-         exportDataToExcel(data.data, "deviceManagement", "장비관리");
+        exportDataToExcel(data.data, "deviceManagement", "장비관리");
       }
     } catch (err) {
-      toast.error("다운로드에 실패했습니다.");
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
       console.error(err);
     }
   };
@@ -82,7 +89,7 @@ const EquipmentManagementPage = () => {
       <div className="flex mb-5 gap-1">
         <div className="flex justify-between w-full">
           <div className="flex flex-wrap items-center gap-1.5">
-            <Select
+            <Dropdown
               name="str_code"
               options={storeOptions}
               className="min-w-64"

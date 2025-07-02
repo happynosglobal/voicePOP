@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import { URL_MAPPING } from "../utils/constant/urls";
 import Login from "../features/Login/Login";
 import SignUp from "../features/SignUp/SignUp";
@@ -8,6 +8,8 @@ import EquipmentSettingPage from "../features/EquipmentSetting/EquipmentSettingP
 import NotFoundPage from "../features/NotFound/NotFoundPage";
 import ForgotPassword from "../features/ForgotPassword/ForgotPassword";
 import ChangePassword from "../features/ChangePassword/ChangePassword";
+import { useEffect } from "react";
+import useUserStore from "../stores/user";
 
 //route/index.jsx
 
@@ -31,6 +33,23 @@ import ChangePassword from "../features/ChangePassword/ChangePassword";
  */
 function Root() {
   const { routes } = useLayout();
+  const navigate = useNavigate();
+  const { user, logout } = useUserStore();
+
+  useEffect(() => {
+    const publicPaths = [
+      URL_MAPPING.login,
+      URL_MAPPING.signUp,
+      URL_MAPPING.resetPw,
+      URL_MAPPING.changePw,
+      URL_MAPPING.equipmentSetting,
+    ];
+    const currentPath = window.location.pathname;
+
+    if (!user && !publicPaths.includes(currentPath)) {
+      navigate("/login");
+    }
+  }, [user, navigate]);
 
   return (
     <Routes>

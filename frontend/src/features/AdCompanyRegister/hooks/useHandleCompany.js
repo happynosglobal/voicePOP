@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { dummyCompanyList } from '../dummy/data';
 import { getAdCompanayList } from '../../../api/advertisement/advertisement';
+import { removeEmptyString } from '../../../utils/customFormat';
 
 const useHandleCompany = () => {
   const [limit, setLimit] = useState(10);
@@ -17,7 +17,6 @@ const useHandleCompany = () => {
   const [companyList, setCompanyList] = useState([]);
 
   const getCompanyList = async (pageNumber = page) => {
-    /* 예상 광고회사 검색 api */
     const tempParams = {
       brand_code: searchParams.brand_code,
       use_yn: searchParams.use_yn,
@@ -30,9 +29,9 @@ const useHandleCompany = () => {
     } else if (searchParams.keyword_type === "name") {
       tempParams.business_name = searchParams.keyword;
     }
-
+    const params = removeEmptyString(tempParams)
     try {
-      const response = await getAdCompanayList(tempParams)
+      const response = await getAdCompanayList(params)
       const { status_code, data } = response.data;
       if (status_code === 200) {
         setCompanyList(data.items);

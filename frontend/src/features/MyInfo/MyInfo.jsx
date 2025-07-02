@@ -8,7 +8,8 @@ import PwChangeModal from "../../components/modal/PwChangeModal";
 import { changePassword, patchUser } from "../../api/user/user";
 import { toast } from "react-toastify";
 import useCodes from "../../stores/codes";
-import { commonErrorMessage } from "../../utils/constant/messages";
+import { getErrorMessage } from "../../utils/constant/messages";
+import Dropdown from "../../components/dropdown/Dropdown";
 
 const MyInfo = ({ modalRef, closeModal, isOpen, setIsOpen }) => {
   const { user, modifyUser } = useUserStore();
@@ -42,7 +43,8 @@ const MyInfo = ({ modalRef, closeModal, isOpen, setIsOpen }) => {
         toast.success("사용자 수정에 성공했습니다.");
       }
     } catch (err) {
-      toast.error(err.response.data.message || commonErrorMessage);
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
     }
   };
 
@@ -59,9 +61,8 @@ const MyInfo = ({ modalRef, closeModal, isOpen, setIsOpen }) => {
         pwChangeModalRef.current.close();
       }
     } catch (err) {
-      toast.error(
-        err.response.data.message || commonErrorMessage
-      );
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
       console.error(err);
     }
   };
@@ -173,7 +174,7 @@ const MyInfo = ({ modalRef, closeModal, isOpen, setIsOpen }) => {
             </div>
             <div className="flex justify-between">
               <label className="py-2 font-semibold w-1/4 shrink-0">권한</label>
-              <Select
+              <Dropdown
                 name="level"
                 options={levelOptions}
                 className="w-full"
@@ -189,7 +190,7 @@ const MyInfo = ({ modalRef, closeModal, isOpen, setIsOpen }) => {
                 관리브랜드
               </label>
               {formData.level !== "STORE" ? (
-                <Select
+                <Dropdown
                   isMulti
                   name="brand_code"
                   options={brandOptions}
@@ -202,7 +203,7 @@ const MyInfo = ({ modalRef, closeModal, isOpen, setIsOpen }) => {
                   isDisabled={true}
                 />
               ) : (
-                <Select
+                <Dropdown
                   name="brand_code"
                   options={brandOptions}
                   value={brandOptions.filter(
@@ -220,7 +221,7 @@ const MyInfo = ({ modalRef, closeModal, isOpen, setIsOpen }) => {
               <label className="py-2 font-semibold w-1/4 shrink-0">
                 관리점포
               </label>
-              <Select
+              <Dropdown
                 name="store_code"
                 options={storeByBrandCode}
                 value={storeByBrandCode.filter(
@@ -276,6 +277,7 @@ const MyInfo = ({ modalRef, closeModal, isOpen, setIsOpen }) => {
       <PwChangeModal
         modalRef={pwChangeModalRef}
         handleSubmitChangePw={handleSubmitChangePw}
+        hasResetButton={false}
       />
     </>
   );

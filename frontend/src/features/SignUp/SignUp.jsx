@@ -1,14 +1,15 @@
 import Input from "../../components/input/Input";
-import Select from "react-select";
-import { emailRegex, userIdRegex } from "../../utils/validation";
+import { emailRegex } from "../../utils/validation";
 import useSignUpForm from "./hooks/useSignUpForm";
 import { levelOptions } from "../../utils/constant/options";
-import useBrandCode from "../../hooks/useBrandCode";
-import Logo from "../../components/logo/Logo";
 import { useEffect } from "react";
+import Dropdown from "../../components/dropdown/Dropdown";
 
 const SignUp = () => {
   const {
+    brandOptions,
+    getBrandCodes,
+    companyOptions,
     formData,
     errors,
     isIdChecked,
@@ -23,8 +24,6 @@ const SignUp = () => {
     handleError,
     handleRequestUser,
   } = useSignUpForm();
-
-  const { brandOptions, getBrandCodes } = useBrandCode();
 
   useEffect(() => {
     getBrandCodes();
@@ -83,9 +82,7 @@ const SignUp = () => {
             </button>
           </div>
           {!isIdChecked ? (
-            <p className="mt-2 text-error text-sm">
-              {errors.user_id}
-            </p>
+            <p className="mt-2 text-error text-sm">{errors.user_id}</p>
           ) : (
             <p className="mt-2 text-sm text-gray-500 text-primary">
               사용 가능한 ID 입니다.
@@ -101,24 +98,40 @@ const SignUp = () => {
           <label className="label">
             <span className="label-text font-semibold">회사명</span>
           </label>
-          <Input
-            type="text"
-            name="company_id"
-            placeholder="회사명을 입력하세요."
-            className="input input-bordered w-full"
-            value={formData.company_id}
-            onChange={handleInput}
-            errorMessage={errors.company_id}
-            handleError={handleError}
+          <Dropdown
+            name="company_code"
+            options={companyOptions}
+            value={companyOptions.filter((option) =>
+              formData.company_code.includes(option.value)
+            )}
+            className="w-full"
+            classNamePrefix="select"
+            onChange={handleSelectBox}
+            placeholder="회사를 선택하세요"
           />
         </div>
+
+        {formData.company_code === "etc" && (
+          <div className="form-control mt-4">
+            <Input
+              type="text"
+              name="company_id"
+              placeholder="회사명을 직접 입력하세요."
+              className="input input-bordered w-full"
+              value={formData.company_id}
+              onChange={handleInput}
+              errorMessage={errors.company_id}
+              handleError={handleError}
+            />
+          </div>
+        )}
 
         <div className="form-control mt-4">
           <label className="label">
             <span className="label-text font-semibold">요청 권한</span>
           </label>
           <div className="flex gap-4">
-            <Select
+            <Dropdown
               name="required_level"
               options={levelOptions}
               className="w-full"
@@ -136,7 +149,7 @@ const SignUp = () => {
           </label>
           <div className="flex gap-4">
             {formData.required_level !== "STORE" ? (
-              <Select
+              <Dropdown
                 isMulti
                 name="brand_code"
                 options={brandOptions}
@@ -150,7 +163,7 @@ const SignUp = () => {
                 isDisabled={formData.required_level === "ADMIN" ? true : false} // 전체관리자는 disabled
               />
             ) : (
-              <Select
+              <Dropdown
                 name="brand_code"
                 options={brandOptions}
                 value={brandOptions.filter(
@@ -160,7 +173,12 @@ const SignUp = () => {
                 classNamePrefix="select"
                 onChange={(option) => handleClickBrand(option.value)}
                 placeholder="브랜드를 선택하세요"
-                isDisabled={formData.required_level === "ADMIN" ? true : false} // 전체관리자는 disabled
+                isDisabled={
+                  formData.required_level === "ADMIN" ||
+                  (formData.required_level === "STORE" && formData.company_code !== "etc")
+                    ? true
+                    : false
+                } // 전체관리자 or 회사명을 선택 후 점포관리자를 선택했을 때 disabled
               />
             )}
           </div>
@@ -170,7 +188,7 @@ const SignUp = () => {
           <label className="label">
             <span className="label-text font-semibold">관리 점포</span>
           </label>
-          <Select
+          <Dropdown
             name="store_code"
             options={storeList}
             value={storeList.filter(
