@@ -3,6 +3,8 @@ import Pagination from "../../../components/pagination/Pagination";
 import { toDate } from "../../../utils/customFormat";
 import EmptyState from "../../../components/emptyState/EmptyState";
 import useCodes from "../../../stores/codes";
+import { MdKeyboardArrowUp, MdKeyboardArrowDown } from "react-icons/md";
+import { useState } from "react";
 
 const UserTable = ({
   setUserId,
@@ -16,12 +18,20 @@ const UserTable = ({
   const allStores = useCodes((state) => state.allStoreCode);
 
   const getRowNumber = (index) => limit * (page - 1) + index + 1;
-  
+
   const getStoreNameByCode = (store_code) => {
     if (!store_code) return "";
     const match = allStores.find((store) => store.id === store_code);
     return match?.name || "";
   };
+
+  const [isDesc, setIsDesc] = useState(true); // 최종접속 최신순(내림차순) 임시 스테이트
+
+  const toggleSort = () => {
+    // 토글
+    setIsDesc((prev) => !prev);
+  };
+
   return (
     <div className="overflow-x-auto">
       <table className="table">
@@ -34,7 +44,15 @@ const UserTable = ({
             <th>브랜드</th>
             <th>점포</th>
             <th>상태</th>
-            <th>최종접속</th>
+            <th>
+              <button
+                className="inline-flex items-center gap-1 hover:underline"
+                onClick={toggleSort}
+              >
+                최종접속
+                {isDesc ? <MdKeyboardArrowUp /> : <MdKeyboardArrowDown />}
+              </button>
+            </th>
             <th>승인/수정일</th>
           </tr>
         </thead>
