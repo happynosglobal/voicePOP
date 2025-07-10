@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import ContentLayout from "../../layout/ContentLayout";
-import Select from "react-select";
 import CustomDatePicker from "../../components/customDatePicker/CustomDatePicker";
 import CustomTimePicker from "../../components/customTimePicker/CustomTimePicker";
 import GroupSelectModal from "../../components/modal/GroupSelectModal";
@@ -36,26 +35,29 @@ import { useLocation, useNavigate } from "react-router-dom";
 import LoadingSpinner from "../../components/loading/LoadingSpinner";
 
 import { IoMdCloseCircle } from "react-icons/io";
-import { getStoreNameByCode } from "../../hooks/useStoreCode";
 import { getAdContract } from "../../api/advertisement/advertisement";
 import { getErrorMessage } from "../../utils/constant/messages";
 import Dropdown from "../../components/dropdown/Dropdown";
+import { URL_MAPPING } from "../../utils/constant/urls";
 
-const AdRegisterPage = () => {
+const AdRegisterPage = ({ mode, title }) => {
   const location = useLocation();
-  const { mode, bcId, broadcastData } = location?.state || {};
-
-  const START_TIME = import.meta.env.VITE_BROADCAST_TIME_DEFAULT_START;
-  const END_TIME = import.meta.env.VITE_BROADCAST_TIME_DEFAULT_END;
-  const today = useMemo(() => new Date(), []);
+  const { bcId, broadcastData } = location?.state || {};
 
   const { user } = useUserStore();
   const navigate = useNavigate();
   const { storeByBrandCode, isLoading } = useCodes();
 
   const {
+    today,
+    myStore,
+    initialFormData,
     formData,
     setFormData,
+    startTime,
+    setStartTime,
+    endTime,
+    setEndTime,
     selectedStore,
     setSelectedStore,
     audioFile,
@@ -80,8 +82,6 @@ const AdRegisterPage = () => {
   // 날짜, 시간 관련 상태
   const [selectedStartDate, setSelectedStartDate] = useState(today);
   const [selectedEndDate, setSelectedEndDate] = useState(today);
-  const [startTime, setStartTime] = useState(START_TIME);
-  const [endTime, setEndTime] = useState(END_TIME);
 
   // 반복, GAP 체크 상태
   const [isGapChecked, setIsGapChecked] = useState(true);
@@ -92,10 +92,17 @@ const AdRegisterPage = () => {
 
   // 수정 정보 세팅
   useEffect(() => {
-    if (mode && bcId) {
-      if (broadcastData) {
+    const init = async () => {
+      if (mode && bcId) {
+        if (!broadcastData) {
+          toast.error("방송정보를 불러오는데 실패했습니다.");
+          navigate(URL_MAPPING.broadcastManagement);
+          return;
+        }
+
         const stores = broadcastData?.stores;
         const media = broadcastData?.medias?.[0];
+
         // 대상점포 설정
         setSelectedStore(
           stores.map(({ store_code, store_name }) => ({
@@ -103,26 +110,26 @@ const AdRegisterPage = () => {
             store_name,
           }))
         );
+
         // 업체, 계약 설정
-        getAdContract(broadcastData.ad_contract_id)
-          .then((res) => {
-            const companyId = res.data.data.company_id;
-            setFormData((prev) => ({
-              ...prev,
-              company: companyId,
-              contract: broadcastData.ad_contract_id,
-            }));
-          })
-          .catch((err) => {
-            console.error("계약 조회 실패", err);
-          });
+        const contractId = broadcastData.ad_contract_id;
+        let companyId = null;
+
+        try {
+          const res = await getAdContract(contractId);
+          companyId = res.data.data.company_id;
+        } catch (err) {
+          console.error("계약 조회 실패", err);
+        }
+        getContractOption(companyId);
         // 기간설정
         setSelectedStartDate(broadcastData.start_date);
         setSelectedEndDate(broadcastData.end_date);
         // 시간설정
         setStartTime(toTimeFormat(broadcastData.start_time));
         setEndTime(toTimeFormat(broadcastData.end_time));
-        // GAP or 반복설정
+
+        // GAP 또는 반복 설정
         if (broadcastData.gap) {
           setIsRepeatChecked(false);
           setIsGapChecked(true);
@@ -133,6 +140,7 @@ const AdRegisterPage = () => {
           setIsGapChecked(false);
           setIsRepeatChecked(true);
         }
+
         // 방송파일 설정
         setDuration(media?.play_time_seconds);
         if (media?.media_filename) {
@@ -143,68 +151,41 @@ const AdRegisterPage = () => {
           Object.defineProperty(dummyFile, "size", {
             value: media?.media_file_size,
           });
-
           setAudioFile(dummyFile);
-          setDuration(media?.play_time_seconds);
         }
 
-        downloadBcMedia(media?.id)
-          .then((res) => {
-            const downloadUrl = res.data.data.media_file_url; // 미디어 파일 url
-            setAudioPreviewUrl(downloadUrl);
-          })
-          .catch((err) => {
-            console.error("미디어 파일 URL 조회 실패", err);
-          });
+        try {
+          const res = await downloadBcMedia(media?.id);
+          const downloadUrl = res.data.data.media_file_url;
+          setAudioPreviewUrl(downloadUrl);
+        } catch (err) {
+          console.error("미디어 파일 URL 조회 실패", err);
+        }
 
-        // Formdata 설정
+        // FormData 설정
         setFormData((prev) => ({
           ...prev,
           title: broadcastData.title,
           category_type_seq: broadcastData.category_type_seq,
           start_date: toDate(broadcastData.start_date),
           end_date: toDate(broadcastData.end_date),
-          start_time: broadcastData.start_time,
-          end_time: broadcastData.end_time,
           gap: broadcastData.gap || 3,
           repeat_count: broadcastData.repeat_count || 1,
           repeat_interval: broadcastData.repeat_interval || 1,
+          company: companyId,
+          contract: contractId,
         }));
-      } else {
-        navigate("/");
-        toast.error("방송정보를 불러오는데 실패했습니다.");
       }
-    }
+    };
+
+    init();
   }, [mode, bcId, broadcastData]);
 
   useEffect(() => {
     getCompanyOption(user?.brand_code);
   }, [user?.brand_code]);
 
-  useEffect(() => {
-    if (formData.company) {
-      getContractOption(formData.company);
-    }
-  }, [formData.company]);
-
-  // 계약기간 시작일보다 종료일이 빠르면 시작일로 초기화
-  useEffect(() => {
-    if (selectedStartDate > selectedEndDate) {
-      setSelectedEndDate(selectedStartDate);
-      setFormData((prev) => ({ ...prev, end_date: toDate(selectedStartDate) }));
-    }
-  }, [selectedStartDate, selectedEndDate]);
-
-  // 타임피커 value ":" 제거 후 formData에 세팅
-  useEffect(() => {
-    setFormData((prev) => ({
-      ...prev,
-      start_time: startTime.replace(":", ""),
-      end_time: endTime.replace(":", ""),
-    }));
-  }, [startTime, endTime]);
-
-  // 시간선택 handler
+  // 시간 선택 핸들러
   const handleTimePicker = (time, name) => {
     if (name === "start") {
       setStartTime(time);
@@ -225,11 +206,12 @@ const AdRegisterPage = () => {
 
   // 대상 점포 제거 핸들러
   const handleRemoveStore = (store) => {
+    if (user?.level === "STORE") return;
     setSelectedStore((prev) =>
       prev.filter((item) => item.store_code !== store.store_code)
     );
   };
-  // 방송 등록 handler
+  // 방송 등록 핸들러
   const handleNewRegister = async () => {
     let masterBroadcastId = null;
     try {
@@ -238,8 +220,8 @@ const AdRegisterPage = () => {
         title: formData.title,
         category_type_seq: formData.category_type_seq,
         ad_contract_id: formData.contract,
-        start_time: formData.start_time,
-        end_time: formData.end_time,
+        start_time: startTime.replace(":", ""),
+        end_time: endTime.replace(":", ""),
         start_date: formData.start_date,
         end_date: formData.end_date,
         user_id: user?.user_id,
@@ -262,15 +244,7 @@ const AdRegisterPage = () => {
 
       masterBroadcastId = broadcastRes.data.data.id;
 
-      const storeList =
-        user?.level === "STORE"
-          ? [
-              {
-                store_code: user?.store_code,
-                store_name: getStoreNameByCode(user?.store_code),
-              },
-            ]
-          : selectedStore; // 점포관리자면 본인의 점포만 대상으로 요청
+      const storeList = user?.level === "STORE" ? [myStore] : selectedStore; // 점포관리자면 본인의 점포만 대상으로 요청
 
       // 방송 대상 점포 등록
       const targetStoreRes = await postBcTargetStore({
@@ -317,17 +291,19 @@ const AdRegisterPage = () => {
       await postBcTimeTable(masterBroadcastId);
 
       toast.success("방송 등록이 완료되었습니다");
-      navigate("/");
+      navigate(URL_MAPPING.broadcastManagement);
     } catch (err) {
-      console.error("방송 등록 중 오류 발생:", err);
       const errMsg = getErrorMessage(err?.response?.data?.message);
       toast.error(errMsg);
+      console.error("방송 등록 중 오류 발생:", err);
       // 방송등록 실패시 등록정보 삭제
       if (masterBroadcastId) {
-        await deleteBcMaster(masterBroadcastId);
-        await deleteBcTargetStore(masterBroadcastId);
-        await deleteAudioMapping(masterBroadcastId);
-        await deleteBcTimeTable(masterBroadcastId);
+        Promise.allSettled([
+          deleteBcMaster(masterBroadcastId),
+          deleteBcTargetStore(masterBroadcastId),
+          deleteAudioMapping(masterBroadcastId),
+          deleteBcTimeTable(masterBroadcastId),
+        ]);
       }
     }
   };
@@ -342,31 +318,28 @@ const AdRegisterPage = () => {
         title: formData.title,
         category_type_seq: formData.category_type_seq,
         ad_contract_id: formData.contract,
-        start_time: formData.start_time,
-        end_time: formData.end_time,
+        start_time: startTime.replace(":", ""),
+        end_time: endTime.replace(":", ""),
         start_date: formData.start_date,
         end_date: formData.end_date,
         user_id: user?.user_id,
         brand_code: user?.brand_code,
       };
 
-      if (isGapChecked) body.gap = formData.gap;
+      if (isGapChecked) {
+        body.gap = formData.gap;
+        body.repeat_count = 0;
+        body.repeat_interval = 0;
+      }
       if (isRepeatChecked) {
+        body.gap = 0;
         body.repeat_count = formData.repeat_count;
         body.repeat_interval = formData.repeat_interval;
       }
 
       await patchBcMaster(masterId, body);
 
-      const storeList =
-        user?.level === "STORE"
-          ? [
-              {
-                store_code: user?.store_code,
-                store_name: getStoreNameByCode(user?.store_code),
-              },
-            ]
-          : selectedStore;
+      const storeList = user?.level === "STORE" ? [myStore] : selectedStore;
 
       await putBcTargetStore(masterId, {
         brand_code: user?.brand_code,
@@ -393,7 +366,7 @@ const AdRegisterPage = () => {
       }
       await postBcTimeTable(masterId);
       toast.success("방송 수정 완료");
-      navigate("/");
+      navigate(URL_MAPPING.broadcastManagement);
     } catch (err) {
       const errMsg = getErrorMessage(err?.response?.data?.message);
       toast.error(errMsg);
@@ -405,8 +378,8 @@ const AdRegisterPage = () => {
   const handleSubmit = async () => {
     // 방송 시간 범위안에 voice 파일의 반복이 가능한지 계산
     const isValid = isWithinTimeRange({
-      startTimeStr: formData.start_time,
-      endTimeStr: formData.end_time,
+      startTimeStr: startTime.replace(":", ""),
+      endTimeStr: endTime.replace(":", ""),
       duration: Number(duration),
       gap: formData.gap,
       repeatCount: formData.repeat_count,
@@ -427,7 +400,7 @@ const AdRegisterPage = () => {
   };
 
   return (
-    <ContentLayout>
+    <ContentLayout title={title}>
       <div className="form-container">
         <div className="form-group">
           <label className="form-label">광고명</label>
@@ -458,10 +431,10 @@ const AdRegisterPage = () => {
             ))}
           </div>
         </div>
-        {user.level !== "STORE" && (
-          <div className="form-group">
-            <label className="form-label">적용점포</label>
-            <div className="w-full">
+        <div className="form-group">
+          <label className="form-label">적용점포</label>
+          <div className="w-full">
+            {user?.level !== "STORE" && (
               <div className="mb-2 flex justify-between items-center gap-2">
                 <div className="space-x-2">
                   <button
@@ -492,7 +465,7 @@ const AdRegisterPage = () => {
                       handleStoreGroup("", []);
                     }}
                   >
-                    초기화
+                    전체삭제
                   </button>
                 </div>
                 <p className="text-gray-500 text-right leading-tight">
@@ -500,27 +473,29 @@ const AdRegisterPage = () => {
                   <b className="text-gray-900">{selectedStore.length}</b>개
                 </p>
               </div>
-              {selectedStore.length !== 0 && (
-                <div className="p-2 border rounded-[10px] max-h-48 min-h-16 overflow-y-auto">
-                  <div className="grid grid-cols-7 gap-2">
-                    {selectedStore.map((store, index) => (
-                      <button
-                        key={index}
-                        className="flex items-center justify-between gap-1 bg-gray-200 text-gray-700 px-2.5 py-0.5 rounded text-sm hover:bg-gray-300 text-left"
-                      >
-                        {store.store_name}
+            )}
+            {selectedStore.length !== 0 && (
+              <div className="p-2 border rounded-[10px] max-h-48 min-h-16 overflow-y-auto">
+                <div className="grid grid-cols-7 gap-2">
+                  {selectedStore.map((store, index) => (
+                    <button
+                      key={index}
+                      className="flex items-center justify-between gap-1 bg-gray-200 text-gray-700 px-2.5 py-0.5 rounded text-sm hover:bg-gray-300 text-left"
+                    >
+                      {store.store_name}
+                      {user?.level !== "STORE" && (
                         <IoMdCloseCircle
                           className="flex-shrink-0"
                           onClick={() => handleRemoveStore(store)}
                         />
-                      </button>
-                    ))}
-                  </div>
+                      )}
+                    </button>
+                  ))}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
-        )}
+        </div>
 
         <div className="form-group">
           <label className="form-label">광고 업체</label>
@@ -615,44 +590,42 @@ const AdRegisterPage = () => {
               isDisabled={!isGapChecked}
             />
           </div>
-        </div>
-
-        <div className="form-group">
-          <label className="form-label">반복 설정</label>
-          <div className="form-input-group gap-2">
-            <label className="input-label">
-              <CheckBox
+          <div className="form-input-group gap-2 ml-10">
+            <div className="form-input-group gap-2">
+              <label className="input-label">
+                <CheckBox
+                  name="repeat_count"
+                  className="checkbox"
+                  label="횟수 / 간격"
+                  checked={isRepeatChecked}
+                  onChange={() => {
+                    setIsRepeatChecked(true);
+                    setIsGapChecked(false);
+                  }}
+                />
+              </label>
+              <Dropdown
                 name="repeat_count"
-                className="checkbox"
-                label="횟수 / 간격"
-                checked={isRepeatChecked}
-                onChange={() => {
-                  setIsRepeatChecked(true);
-                  setIsGapChecked(false);
-                }}
+                className="min-w-24"
+                options={repeatOptions}
+                value={repeatOptions.filter(
+                  (option) => option.value === formData.repeat_count
+                )}
+                onChange={handleSelectBox}
+                isDisabled={!isRepeatChecked}
               />
-            </label>
-            <Dropdown
-              name="repeat_count"
-              className="min-w-24"
-              options={repeatOptions}
-              value={repeatOptions.filter(
-                (option) => option.value === formData.repeat_count
-              )}
-              onChange={handleSelectBox}
-              isDisabled={!isRepeatChecked}
-            />
-            <span className="px-2">/</span>
-            <Dropdown
-              name="repeat_interval"
-              className="min-w-24"
-              options={repeatInterval}
-              value={repeatInterval.filter(
-                (option) => option.value === formData.repeat_interval
-              )}
-              onChange={handleSelectBox}
-              isDisabled={!isRepeatChecked || formData.repeat_count === 1}
-            />
+              <span className="px-2">/</span>
+              <Dropdown
+                name="repeat_interval"
+                className="min-w-24"
+                options={repeatInterval}
+                value={repeatInterval.filter(
+                  (option) => option.value === formData.repeat_interval
+                )}
+                onChange={handleSelectBox}
+                isDisabled={!isRepeatChecked || formData.repeat_count === 1}
+              />
+            </div>
           </div>
         </div>
 
@@ -673,7 +646,10 @@ const AdRegisterPage = () => {
         </div>
 
         <div className="flex w-full items-center justify-center gap-2.5 mt-12">
-          <button className="btn min-w-24" onClick={() => navigate("/")}>
+          <button
+            className="btn min-w-24"
+            onClick={() => navigate(URL_MAPPING.broadcastManagement)}
+          >
             취소
           </button>
           <button
@@ -682,13 +658,13 @@ const AdRegisterPage = () => {
             onClick={handleSubmit}
             disabled={!isFormValid(isGapChecked)}
           >
-            등록
+            {mode === "edit" ? "수정" : "등록"}
           </button>
         </div>
       </div>
       <GroupSelectModal
         modalRef={storeModalRef}
-        label={"점포 생성"}
+        label={"점포선택"}
         mode={"add"}
         handleSubmit={handleStoreGroup}
         // initialChosenStores={tempSelectedStores}

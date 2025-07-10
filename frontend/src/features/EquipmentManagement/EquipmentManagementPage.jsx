@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from "react";
 import ContentLayout from "../../layout/ContentLayout";
-import Select from "react-select";
-import { RiFileExcel2Line } from "react-icons/ri";
-import useCategoryCode from "../../hooks/useCategoryCode";
 import useUserStore from "../../stores/user";
 import DeviceManagementTable from "./components/DeviceManagementTable";
 import useCodes from "../../stores/codes";
@@ -12,36 +9,75 @@ import LoadingSpinner from "../../components/loading/LoadingSpinner";
 import { exportDataToExcel } from "../../utils/exportExcel/exportExcel";
 import { removeEmptyString } from "../../utils/customFormat";
 import { getErrorMessage } from "../../utils/constant/messages";
-import Dropdown from "../../components/dropdown/Dropdown";
+import SearchBar from "./components/SearchBar";
 
-const EquipmentManagementPage = () => {
+const EquipmentManagementPage = ({ title }) => {
   const { user } = useUserStore();
   const { storeByBrandCode, isLoading } = useCodes();
-  const storeOptions = [{ value: "", label: "모든 점포" }, ...storeByBrandCode];
+  const storeOptions =
+    user?.level === "STORE"
+      ? [{ value: user?.store_code, label: user?.store_name }]
+      : [...storeByBrandCode];
+
+  const bcStatusOptions = [
+    { value: "running", label: "송출" },
+    { value: "stop", label: "미송출" },
+  ];
+
+  const deviceStatusOptions = [
+    { value: "normal", label: "정상" },
+    { value: "as", label: "A/S" },
+    { value: "unconfirmed", label: "미확인" },
+    { value: "broken", label: "고장" },
+  ];
+
+  const limit = 10;
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
 
   const [searchParams, setSearchParams] = useState({
     str_code: user?.store_code || "",
     category_code: "",
+    status: "",
+    status_process: "",
   });
 
   const [deviceList, setDeviceList] = useState([]);
 
-  const handleSelectBox = (option, meta) => {
-    const { label, value } = option;
-    const { name } = meta;
+  const handleSort = (sortBy, sortOrder) => {
+    const newParams = {
+      ...searchParams,
+      sort_by: sortBy,
+      sort_order: sortOrder,
+    };
+    setSearchParams(newParams);
+    // handleGetDeviceList(newParams, 1);
+  };
 
+  const handleSelectBox = (option, meta) => {
+    const { name } = meta;
+    const value = option ? option.value : "";
     setSearchParams((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleGetDeviceList = async () => {
-    const tempParams = searchParams;
-    tempParams.brand_code = user?.brand_code;
-    const params = removeEmptyString(tempParams);
+  const handleGetDeviceList = async (
+    params = searchParams,
+    pageNumber = page
+  ) => {
+    const tempParams = {
+      ...params,
+      brand_code: user?.brand_code,
+      page: pageNumber,
+      page_size: limit,
+    };
+    const newParams = removeEmptyString(tempParams);
     try {
-      const response = await getDeviceList(params);
+      const response = await getDeviceList(newParams);
       const { status, data } = response;
       if (status === 200) {
-        setDeviceList(data.data);
+        setDeviceList(data?.data?.items);
+        setTotal(data?.data?.count);
+        setPage(data?.data?.page);
       }
     } catch (err) {
       const errMsg = getErrorMessage(err?.response?.data?.message);
@@ -85,34 +121,27 @@ const EquipmentManagementPage = () => {
     }
   };
   return (
-    <ContentLayout>
-      <div className="flex mb-5 gap-1">
-        <div className="flex justify-between w-full">
-          <div className="flex flex-wrap items-center gap-1.5">
-            <Dropdown
-              name="str_code"
-              options={storeOptions}
-              className="min-w-64"
-              value={storeOptions.find(
-                (opt) => opt.value === searchParams.str_code
-              )}
-              onChange={(option, meta) => {
-                if (user?.level !== "STORE") handleSelectBox(option, meta);
-              }}
-              isDisabled={user?.level === "STORE"}
-            />
-          </div>
-          <button className="btn btn-sm btn-success" onClick={exportToExcel}>
-            <RiFileExcel2Line className="text-xl" /> 엑셀다운로드
-          </button>
-        </div>
-      </div>
+    <ContentLayout title={title}>
+      <SearchBar
+        searchParams={searchParams}
+        storeOptions={storeOptions}
+        bcStatusOptions={bcStatusOptions}
+        deviceStatusOptions={deviceStatusOptions}
+        handleSelectBox={handleSelectBox}
+        exportToExcel={exportToExcel}
+      />
 
       <DeviceManagementTable
+        limit={limit}
+        page={page}
+        setPage={setPage}
+        total={total}
         searchParams={searchParams}
         setSearchParams={setSearchParams}
+        deviceStatusOptions={deviceStatusOptions}
         handleGetDeviceList={handleGetDeviceList}
         handleModifyDeviceStatus={handleModifyDeviceStatus}
+        handleSort={handleSort}
         deviceList={deviceList}
         setDeviceList={setDeviceList}
       />

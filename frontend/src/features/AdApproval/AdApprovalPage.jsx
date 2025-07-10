@@ -14,7 +14,7 @@ import {
 } from "../../utils/customFormat";
 import EmptyState from "../../components/emptyState/EmptyState";
 
-const AdApprovalPage = () => {
+const AdApprovalPage = ({ title }) => {
   const [contractList, setContractList] = useState([]);
   const getContractList = async () => {
     const tempParams = {
@@ -58,7 +58,7 @@ const AdApprovalPage = () => {
   }, []);
 
   return (
-    <ContentLayout>
+    <ContentLayout title={title}>
       <div className="mb-10">
         <h3 className="mb-2 text-gray-800 text-xl font-semibold">
           승인대기 ({contractList.length})

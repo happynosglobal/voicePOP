@@ -82,7 +82,7 @@ const BroadcastIssueChart = () => {
           options: {
             chart: {
               toolbar: { show: false },
-              stacked: false,
+              stacked: true,
             },
             colors: ["#06B6D4", "#7DC600", "#F87171", "#484C56"],
             plotOptions: {
@@ -122,6 +122,8 @@ const BroadcastIssueChart = () => {
               },
             },
             tooltip: {
+              shared: true, // 모든 시리즈 툴팁 표시
+              intersect: false, // 모든 시리즈 툴팁 표시
               x: {
                 formatter: (val) => `${val}일`,
               },

@@ -15,18 +15,23 @@ import { getErrorMessage } from "../../../utils/constant/messages";
 
 const useAddUser = () => {
   const { brandCodes, brandOptions } = useCodes();
+
+  const companyOptions = [...brandOptions, { value: "etc", label: "기타" }]; // 회사명 드롭박스 옵션
+
   const initialFormData = {
     user_id: "",
     user_name: "",
+    company_code: brandCodes?.[0] || "",
     company_id: "",
     level: "ADMIN",
-    brand_code: brandCodes,
+    brand_code: brandCodes || [],
     password: "",
     confirm_password: "",
     store_code: null,
     email: "",
   };
   const [userInfo, setUserInfo] = useState(null);
+  const [isInit, setIsInit] = useState(false);
 
   const [formData, setFormData] = useState(initialFormData);
   const [storeList, setStoreList] = useState([]);
@@ -90,23 +95,7 @@ const useAddUser = () => {
     const { label, value } = option;
     const { name } = option2;
 
-    if (name === "level" && value !== "ADMIN") {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-        brand_code: [],
-        store_code: null,
-      }));
-    } else if (name === "level" && value === "ADMIN") {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-        brand_code: brandCodes,
-        store_code: null,
-      }));
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   /* MultiSelectBox handler */
@@ -167,7 +156,7 @@ const useAddUser = () => {
         formData.user_id &&
         isIdChecked && // ID 중복체크 확인
         formData.password && // add 모드일 때 password 필수
-        formData.company_id &&
+        (formData.company_id || formData.company_code) &&
         isPasswordMatched && // 비밀번호 일치 확인
         (formData.level === "ADMIN" || formData.brand_code.length > 0) && // 전체관리자이거나 브랜드코드가 골라져야 함
         (formData.level !== "STORE" || formData.store_code) && // 점포관리자가 아니거나 점포가 골라져야 함
@@ -177,7 +166,7 @@ const useAddUser = () => {
       isValid =
         formData.user_name &&
         formData.user_id &&
-        formData.company_id &&
+        (formData.company_id || formData.company_code) &&
         isPasswordMatched && // 비밀번호 일치 확인
         (formData.level === "ADMIN" || formData.brand_code.length > 0) && // 전체관리자이거나 브랜드코드가 골라져야 함
         (formData.level !== "STORE" || formData.store_code) && // 점포관리자가 아니거나 점포가 골라져야 함
@@ -189,19 +178,23 @@ const useAddUser = () => {
     return isValid;
   };
 
-  const handleGetUserInfo = async (id) => {
+  const handleGetUserInfo = async (data) => {
     useLoadingStore.getState().setLoading(true);
     try {
-      const response = await getUser(id);
-      const { status_code, data } = response.data;
-      if (status_code === 200) {
+      if (data) {
         if (data.level === "STORE" && data.brand_code.length !== 0) {
           await handleClickBrand(data.brand_code[0]);
         }
-        setUserInfo(data);
-        setFormData({
+
+        const matchedBrand = brandOptions.find(
+          (option) => option.label === data.company_id
+        );
+        const companyCode = matchedBrand ? matchedBrand.value : "etc";
+
+        const newForm = {
           user_id: data.user_id || "",
           user_name: data.user_name || "",
+          company_code: companyCode,
           company_id: data.company_id || "",
           level: data.level,
           brand_code: data.brand_code || [],
@@ -210,10 +203,13 @@ const useAddUser = () => {
           store_code: data.store_code || null,
           email: data.email || "",
           status: data.status || "미승인",
-        });
+        };
+
+        setUserInfo(data);
+        setFormData(newForm);
       }
     } catch (err) {
-      const errMsg = getErrorMessage(err?.response?.data?.message);
+      const errMsg = getErrorMessage("사용자 정보를 확인하지 못했습니다.");
       toast.error(errMsg);
       throw err;
     } finally {
@@ -221,11 +217,17 @@ const useAddUser = () => {
     }
   };
 
+  const getCompanyIdByCode = () => {
+    const { company_code, company_id } = formData;
+    const matched = brandOptions.find((opt) => opt.value === company_code);
+    return company_code === "etc" ? company_id : matched?.label || "";
+  };
+
   const handlePostUserInfo = async () => {
     const body = {
       user_id: formData.user_id,
       user_name: formData.user_name,
-      company_id: formData.company_id,
+      company_id: getCompanyIdByCode(),
       level: formData.level,
       brand_code: formData.brand_code,
       password: formData.password,
@@ -248,7 +250,7 @@ const useAddUser = () => {
     const body = {
       user_id: formData.user_id,
       user_name: formData.user_name,
-      company_id: formData.company_id,
+      company_id: getCompanyIdByCode(),
       level: formData.level,
       brand_code: formData.brand_code,
       store_code: formData.store_code,
@@ -279,13 +281,24 @@ const useAddUser = () => {
       toast.error(errMsg);
     }
   };
+
+  useEffect(() => {
+    if (userInfo) {
+      setIsInit(true);
+    }
+  }, [userInfo]);
+
   return {
+    brandCodes,
     brandOptions,
+    companyOptions,
     initialFormData,
     formData,
     setFormData,
     userInfo,
     setUserInfo,
+    isInit,
+    setIsInit,
     errors,
     setErrors,
     isIdChecked,

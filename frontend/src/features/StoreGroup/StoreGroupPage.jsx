@@ -18,7 +18,7 @@ import EmptyState from "../../components/emptyState/EmptyState";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 import { getErrorMessage } from "../../utils/constant/messages";
 
-const StoreGroupPage = () => {
+const StoreGroupPage = ({ title }) => {
   const { user } = useUserStore();
   const [expandedIndex, setExpandedIndex] = useState(null); // 점포 토글 스테이트
   const groupModalRef = useRef(null); // 점포 선택 모달 ref
@@ -125,7 +125,7 @@ const StoreGroupPage = () => {
     }
   };
   return (
-    <ContentLayout>
+    <ContentLayout title={title}>
       <div className="mb-4 flex items-center justify-end">
         <button
           className="btn btn-sm btn-primary"
@@ -215,10 +215,9 @@ const StoreGroupPage = () => {
       {/* 점포선택 모달 */}
       <GroupSelectModal
         modalRef={groupModalRef}
-        label={"그룹 생성"}
+        label={groupId ? "그룹수정" : "그룹생성"}
         handleSubmit={handleSubmit}
         handleDeleteGroup={handleDeleteGroup}
-        initialChosenStores={[]}
         mode={groupId ? "modify" : "add"}
         groupId={groupId}
         setGroupId={setGroupId}

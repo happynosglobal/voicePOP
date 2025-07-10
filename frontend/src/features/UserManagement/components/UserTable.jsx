@@ -1,21 +1,49 @@
-import { format } from "date-fns";
 import Pagination from "../../../components/pagination/Pagination";
 import { toDate } from "../../../utils/customFormat";
 import EmptyState from "../../../components/emptyState/EmptyState";
 import useCodes from "../../../stores/codes";
 import { MdKeyboardArrowUp, MdKeyboardArrowDown } from "react-icons/md";
+import {
+  TiArrowUnsorted,
+  TiArrowSortedUp,
+  TiArrowSortedDown,
+} from "react-icons/ti";
 import { useState } from "react";
+import { deleteUser } from "../../../api/user/user";
+import { toast } from "react-toastify";
+import { getErrorMessage } from "../../../utils/constant/messages";
 
 const UserTable = ({
   setUserId,
+  setUserData,
   userList,
   page,
   total,
   limit,
   setPage,
   openModal,
+  handleSort,
+  handleGetUsers,
 }) => {
   const allStores = useCodes((state) => state.allStoreCode);
+
+  const [sortOption, setSortOption] = useState({ sort: null, order: null });
+
+  const toggleSort = (sortBy) => {
+    if (sortOption.sort !== sortBy) {
+      // 다른 컬럼 클릭 시 → desc로 설정
+      setSortOption({ sort: sortBy, order: "desc" });
+      handleSort(sortBy, "desc");
+    } else if (sortOption.order === "desc") {
+      // desc → asc
+      setSortOption({ sort: sortBy, order: "asc" });
+      handleSort(sortBy, "asc");
+    } else if (sortOption.order === "asc") {
+      // asc → 정렬 초기화
+      setSortOption({ sort: null, order: null });
+      handleSort(null, null);
+    }
+  };
 
   const getRowNumber = (index) => limit * (page - 1) + index + 1;
 
@@ -25,13 +53,20 @@ const UserTable = ({
     return match?.name || "";
   };
 
-  const [isDesc, setIsDesc] = useState(true); // 최종접속 최신순(내림차순) 임시 스테이트
-
-  const toggleSort = () => {
-    // 토글
-    setIsDesc((prev) => !prev);
+  const handleDeletehUserInfo = async (id) => {
+    if (!confirm("정말 삭제하시겠습니까?")) return;
+    try {
+      const response = await deleteUser(id);
+      const { status } = response;
+      if (status === 200) {
+        handleGetUsers(1);
+        toast.success("사용자 삭제에 성공했습니다.");
+      }
+    } catch (err) {
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
+    }
   };
-
   return (
     <div className="overflow-x-auto">
       <table className="table">
@@ -47,13 +82,40 @@ const UserTable = ({
             <th>
               <button
                 className="inline-flex items-center gap-1 hover:underline"
-                onClick={toggleSort}
+                onClick={() => toggleSort("latest_login_at")}
               >
                 최종접속
-                {isDesc ? <MdKeyboardArrowUp /> : <MdKeyboardArrowDown />}
+                {sortOption.sort === "latest_login_at" ? (
+                  sortOption.order === "desc" ? (
+                    <TiArrowSortedDown />
+                  ) : sortOption.order === "asc" ? (
+                    <TiArrowSortedUp />
+                  ) : null
+                ) : (
+                  <TiArrowUnsorted />
+                )}
               </button>
             </th>
-            <th>승인/수정일</th>
+
+            <th>
+              <button
+                className="inline-flex items-center gap-1 hover:underline"
+                onClick={() => toggleSort("updated_at")}
+              >
+                승인/수정일
+                {sortOption.sort === "updated_at" ? (
+                  sortOption.order === "desc" ? (
+                    <TiArrowSortedDown />
+                  ) : sortOption.order === "asc" ? (
+                    <TiArrowSortedUp />
+                  ) : null
+                ) : (
+                  <TiArrowUnsorted />
+                )}
+              </button>
+            </th>
+
+            <th className="w-20">삭제</th>
           </tr>
         </thead>
         {userList.length > 0 && (
@@ -66,6 +128,7 @@ const UserTable = ({
                     className="hover:underline"
                     onClick={() => {
                       setUserId(item?.id);
+                      setUserData(item);
                       openModal();
                     }}
                   >
@@ -107,6 +170,16 @@ const UserTable = ({
                 </td>
                 <td>{toDate(item.latest_login_at)}</td>
                 <td>{toDate(item.updated_at)}</td>
+                <td>
+                  <button
+                    className="btn btn-xs btn-error"
+                    onClick={() => {
+                      handleDeletehUserInfo(item?.id);
+                    }}
+                  >
+                    삭제
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -121,3 +194,4 @@ const UserTable = ({
 };
 
 export default UserTable;
+("현재는 최종접속과 승인/수정일 정렬이 없을 때는 아이콘이 없고 누르면 desc, asc 로 토글만 가능한데 TiArrowSortedUp가 정렬이 가능한 columng에는 항상 떠있다가 해당 컬럼을 클릭하면 내림차순 오름차순 정렬해제 이런순서로 정렬되게 수정하고 싶어");

@@ -131,7 +131,15 @@ const useSignUpForm = () => {
   };
 
   const handleRequestUser = async () => {
-    const body = formData;
+    const { company_code, company_id } = formData;
+
+    const matched = brandOptions.find((opt) => opt.value === company_code);
+
+    const body = {
+      ...formData,
+      company_id: company_code === "etc" ? company_id : matched?.label || "",
+    };
+
     try {
       const response = await requestUser(body);
       const { status_code } = response.data;
@@ -159,9 +167,7 @@ const useSignUpForm = () => {
       formData.user_name &&
       formData.user_id &&
       isIdChecked && // ID 중복체크 확인
-      formData.company_id &&
-      // formData.password &&
-      // isPasswordMatched && // 비밀번호 일치 확인
+      (formData.company_id || formData.company_code) &&
       (formData.required_level === "ADMIN" || formData.brand_code.length > 0) && // 전체관리자이거나 브랜드코드가 골라져야 함
       (formData.required_level !== "STORE" || formData.store_code) && // 점포관리자가 아니거나 점포가 골라져야 함
       formData.email &&
@@ -187,14 +193,20 @@ const useSignUpForm = () => {
 
     if (!companyCode) return;
 
-    // etc인 경우는 무조건 초기화 후 종료
     if (companyCode === "etc") {
-      setFormData((prev) => ({
-        ...prev,
-        company_id: "",
-        brand_code: [],
-        store_code: null,
-      }));
+      if (level === "ADMIN") {
+        setFormData((prev) => ({
+          ...prev,
+          brand_code: brandCodes,
+          store_code: null,
+        }));
+      } else {
+        setFormData((prev) => ({
+          ...prev,
+          brand_code: [],
+          store_code: null,
+        }));
+      }
       return;
     }
 
@@ -204,14 +216,12 @@ const useSignUpForm = () => {
     if (level === "ADMIN") {
       setFormData((prev) => ({
         ...prev,
-        company_id: matched.label,
         brand_code: brandCodes,
         store_code: null,
       }));
     } else {
       setFormData((prev) => ({
         ...prev,
-        company_id: matched.label,
         brand_code: [companyCode],
         store_code: null,
       }));

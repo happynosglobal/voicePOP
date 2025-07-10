@@ -1,5 +1,4 @@
 import CustomDatePicker from "../../../../components/customDatePicker/CustomDatePicker";
-import Select from "react-select";
 import { useEffect, useMemo, useState } from "react";
 import useAddContractForm from "../../hooks/useAddContractForm";
 import { toDate } from "../../../../utils/customFormat";
@@ -38,16 +37,6 @@ const AddContractModal = ({ activeRow, modalRef, getContractList, mode, selected
     }
   }, [mode, selectedContract]);
 
-  /* 계약기간 시작일보다 종료일이 빠르면 시작일로 초기화*/
-  useEffect(() => {
-    if (selectedStartDate > selectedEndDate) {
-      setSelectedEndDate(selectedStartDate);
-      setFormData({
-        ...formData,
-        end_period: toDate(selectedStartDate)
-      });
-    }
-  }, [selectedStartDate, selectedEndDate]);
   /* 선택한 광고업체의 정보로 해당 브랜드의 광고타입 조회 */
   useEffect(() => {
     if (activeRow) {
@@ -119,6 +108,7 @@ const AddContractModal = ({ activeRow, modalRef, getContractList, mode, selected
               value={adTypes.filter(option => option.value === formData.ad_type)}
               onChange={handleSelectBox}
               className="w-full"
+              isSearchable={false}
               placeholder="광고타입을 선택하세요"
             />
           </div>

@@ -20,11 +20,14 @@ const AdScheduleToolbar = ({
 }) => {
   const { storeByBrandCode } = useCodes();
 
-  const storeOptions = [{ value: "", label: "모든 점포" }, ...storeByBrandCode];
+  const storeOptions =
+    user?.level === "STORE"
+      ? [{ value: user?.store_code, label: user?.store_name }]
+      : [...storeByBrandCode];
 
   const handleSelectBox = (option, meta) => {
-    const { label, value } = option;
     const { name } = meta;
+    const value = option ? option.value : "";
     setSearchParams((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -57,7 +60,9 @@ const AdScheduleToolbar = ({
             onChange={(option, meta) => {
               if (user?.level !== "STORE") handleSelectBox(option, meta);
             }}
+            isClearable={true}
             isDisabled={user?.level === "STORE"}
+            placeholder={"점포 검색"}
           />
         </div>
       </div>

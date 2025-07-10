@@ -2,18 +2,13 @@ import Select from "react-select";
 import Radio from "../../../components/input/Radio";
 import useAddUser from "../hooks/useAddUser";
 import Input from "../../../components/input/Input";
-import {
-  emailRegex,
-  passwordRegex,
-  userIdRegex,
-} from "../../../utils/validation";
+import { emailRegex, passwordRegex } from "../../../utils/validation";
 import { useEffect, useRef, useState } from "react";
 import { levelOptions } from "../../../utils/constant/options";
 import LoadingSpinner from "../../../components/loading/LoadingSpinner";
 import PwChangeModal from "../../../components/modal/PwChangeModal";
 import { patchUser, resetPassword } from "../../../api/user/user";
 import { toast } from "react-toastify";
-import { useLoadingStore } from "../../../stores/loading";
 import { getErrorMessage } from "../../../utils/constant/messages";
 import Dropdown from "../../../components/dropdown/Dropdown";
 
@@ -22,16 +17,22 @@ const AddUserModal = ({
   closeModal,
   userId,
   setUserId,
+  userData,
+  setUserData,
   handleGetUsers,
   mode,
 }) => {
   const {
+    brandCodes,
     brandOptions,
+    companyOptions,
     initialFormData,
     formData,
     setFormData,
     userInfo,
     setUserInfo,
+    isInit,
+    setIsInit,
     errors,
     setErrors,
     isIdChecked,
@@ -51,14 +52,14 @@ const AddUserModal = ({
     setStoreList,
     handleError,
   } = useAddUser();
-  const isLoading = useLoadingStore((state) => state.isLoading);
+
   const pwChangeModalRef = useRef(null);
 
   useEffect(() => {
-    if (mode === "modify" && userId) {
-      handleGetUserInfo(userId);
+    if (mode === "modify" && userData) {
+      handleGetUserInfo(userData);
     }
-  }, [mode, userId]);
+  }, [mode, userData]);
 
   const handleSubmitPost = async () => {
     try {
@@ -129,6 +130,54 @@ const AddUserModal = ({
     }
   };
 
+  useEffect(() => {
+    const level = formData.level;
+    const companyCode = formData.company_code;
+
+    if (!companyCode) return;
+
+    // 수정 모드일 경우 초기 데이터 세팅이 끝나야 적용
+    if (mode === "modify" && !isInit) return;
+
+    if (companyCode === "etc") {
+      if (level === "ADMIN") {
+        setFormData((prev) => ({
+          ...prev,
+          brand_code: brandCodes,
+          store_code: null,
+        }));
+      } else {
+        setFormData((prev) => ({
+          ...prev,
+          brand_code: [],
+          store_code: null,
+        }));
+      }
+      return;
+    }
+
+    const matched = brandOptions.find((option) => option.value === companyCode);
+    if (!matched) return;
+
+    if (level === "ADMIN") {
+      setFormData((prev) => ({
+        ...prev,
+        brand_code: brandCodes,
+        store_code: null,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        brand_code: [companyCode],
+        store_code: null,
+      }));
+
+      if (level === "STORE") {
+        handleClickBrand(companyCode);
+      }
+    }
+  }, [formData.company_code, formData.level]);
+
   /* 모달창 닫을 때 수행 할 로직 */
   useEffect(() => {
     const modal = modalRef?.current;
@@ -138,10 +187,12 @@ const AddUserModal = ({
       setFormData(initialFormData);
       setErrors({});
       setUserId(null);
+      setUserData(null);
       setUserInfo(null);
       setStoreList([]);
       setIsIdChecked(false);
       setIsEditingPassword(false);
+      setIsInit(false);
     };
 
     modal.addEventListener("close", handleClose);
@@ -264,18 +315,34 @@ const AddUserModal = ({
                 회사명
               </label>
               <div className="w-full">
-                <Input
-                  type="text"
-                  name="company_id"
-                  placeholder="회사명을 입력해주세요."
-                  className="input w-full"
-                  value={formData.company_id}
-                  onChange={handleInput}
-                  errorMessage={errors.company_id}
-                  handleError={handleError}
+                <Dropdown
+                  name="company_code"
+                  options={companyOptions}
+                  value={companyOptions.filter((option) =>
+                    formData.company_code.includes(option.value)
+                  )}
+                  className="w-full"
+                  classNamePrefix="select"
+                  onChange={handleSelectBox}
+                  placeholder="회사를 선택하세요"
                 />
+                {formData.company_code === "etc" && (
+                  <div className="form-control mt-4">
+                    <Input
+                      type="text"
+                      name="company_id"
+                      placeholder="회사명을 직접 입력하세요."
+                      className="input w-full"
+                      value={formData.company_id}
+                      onChange={handleInput}
+                      errorMessage={errors.company_id}
+                      handleError={handleError}
+                    />
+                  </div>
+                )}
               </div>
             </div>
+
             <div className="flex justify-between">
               <label className="py-2 font-semibold w-1/4 shrink-0">권한</label>
               <Dropdown
@@ -318,7 +385,13 @@ const AddUserModal = ({
                   classNamePrefix="select"
                   onChange={(option) => handleClickBrand(option.value)}
                   placeholder="브랜드를 선택하세요"
-                  isDisabled={formData.level === "ADMIN" ? true : false} // 전체관리자는 disabled
+                  isDisabled={
+                    formData.level === "ADMIN" ||
+                    (formData.level === "STORE" &&
+                      formData.company_code !== "etc")
+                      ? true
+                      : false
+                  } // 전체관리자 or 회사명을 선택 후 점포관리자를 선택했을 때 disabled
                 />
               )}
             </div>

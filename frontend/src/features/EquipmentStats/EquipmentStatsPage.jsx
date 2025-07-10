@@ -8,7 +8,7 @@ import { getDeviceStat } from "../../api/device/device";
 import { toast } from "react-toastify";
 import { exportDataToExcel } from "../../utils/exportExcel/exportExcel";
 import { getErrorMessage } from "../../utils/constant/messages";
-const EquipmentStatsPage = () => {
+const EquipmentStatsPage = ({ title }) => {
   const { user } = useUserStore();
   const today = useMemo(() => new Date(), []);
 
@@ -52,7 +52,7 @@ const EquipmentStatsPage = () => {
   };
 
   return (
-    <ContentLayout>
+    <ContentLayout title={title}>
       <SearchBar
         searchParams={searchParams}
         setSearchParams={setSearchParams}

@@ -1,29 +1,50 @@
 import React, { useEffect, useMemo, useState } from "react";
-import Select from "react-select";
-import Tooltip from "../../../components/tooltip/Tooltip";
 import { toDateTime } from "../../../utils/customFormat";
 import Tab from "../../../components/tab/Tab";
+import { MdKeyboardArrowUp, MdKeyboardArrowDown } from "react-icons/md";
+import {
+  TiArrowUnsorted,
+  TiArrowSortedUp,
+  TiArrowSortedDown,
+} from "react-icons/ti";
 import EmptyState from "../../../components/emptyState/EmptyState";
 import Dropdown from "../../../components/dropdown/Dropdown";
+import Pagination from "../../../components/pagination/Pagination";
 
 const DeviceManagementTable = ({
+  limit,
+  page,
+  setPage,
+  total,
   searchParams,
   setSearchParams,
+  deviceStatusOptions,
   handleGetDeviceList,
   handleModifyDeviceStatus,
+  handleSort,
   deviceList,
   setDeviceList,
 }) => {
-  const statusOptions = [
-    { value: "normal", label: "정상" },
-    { value: "as", label: "A/S" },
-    { value: "unconfirmed", label: "미확인" },
-    { value: "broken", label: "고장" },
-  ];
   const [activeTab, setActiveTab] = useState("");
 
   const [originalComments, setOriginalComments] = useState({});
+  const [sortOption, setSortOption] = useState({ sort: null, order: null });
 
+  const toggleSort = (sortBy) => {
+    if (sortOption.sort !== sortBy) {
+      // 다른 컬럼 클릭 시 → desc로 설정
+      setSortOption({ sort: sortBy, order: "desc" });
+      handleSort(sortBy, "desc");
+    } else if (sortOption.order === "desc") {
+      // desc → asc
+      setSortOption({ sort: sortBy, order: "asc" });
+      handleSort(sortBy, "asc");
+    } else if (sortOption.order === "asc") {
+      // asc → 정렬 초기화
+      setSortOption({ sort: null, order: null });
+      handleSort(null, null);
+    }
+  };
   useEffect(() => {
     handleGetDeviceList();
   }, [searchParams]);
@@ -47,7 +68,24 @@ const DeviceManagementTable = ({
             <th className="w-2/12">점포명</th>
             <th className="w-1/12">MD</th>
             <th className="w-1/12">방송상태</th>
-            <th className="w-2/12">마지막 방송시간</th>
+            <th className="w-2/12">
+              {" "}
+              <button
+                className="inline-flex items-center gap-1 hover:underline"
+                onClick={() => toggleSort("latest_run_datetime")}
+              >
+                마지막 방송시간
+                {sortOption.sort === "latest_run_datetime" ? (
+                  sortOption.order === "desc" ? (
+                    <TiArrowSortedDown />
+                  ) : sortOption.order === "asc" ? (
+                    <TiArrowSortedUp />
+                  ) : null
+                ) : (
+                  <TiArrowUnsorted />
+                )}
+              </button>
+            </th>
             <th className="w-44">기기상태</th>
             <th>메모</th>
           </tr>
@@ -77,10 +115,10 @@ const DeviceManagementTable = ({
               <td>{toDateTime(item.device_latest_run_datetime)}</td>
               <td>
                 <Dropdown
-                  options={statusOptions}
+                  options={deviceStatusOptions}
                   className="min-w-32"
                   value={
-                    statusOptions.find(
+                    deviceStatusOptions.find(
                       (opt) => opt.value === item.status_process
                     ) || null
                   }
@@ -132,6 +170,7 @@ const DeviceManagementTable = ({
       {deviceList.length === 0 && (
         <EmptyState text="일치하는 검색 결과가 없습니다." />
       )}
+      <Pagination page={page} total={total} limit={limit} setPage={setPage} />
     </>
   );
 };

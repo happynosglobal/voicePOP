@@ -59,14 +59,14 @@ const dummyAD = [
   },
 ];
 
-const AdStatusPage = () => {
+const AdStatusPage = ({ title }) => {
   const [selectedStartDate, setSelectedStartDate] = useState(new Date()); //임시 날짜선택 STATE
   const [selectedEndDate, setSelectedEndDate] = useState(new Date()); //임시 날짜선택 STATE
 
   const tabs = ["업체별 현황", "점포별 현황"];
   const [activeTab, setActiveTab] = useState(tabs[0]); //임시 탭 STATE
   return (
-    <ContentLayout>
+    <ContentLayout title={title}>
       <div className="flex mb-5 gap-1">
         <div className="flex justify-between w-full">
           <div className="flex flex-wrap items-center gap-1.5">

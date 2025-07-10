@@ -7,16 +7,7 @@ const SearchBar = ({ searchParams, setSearchParams, handleGetDeviceStat, exportT
   const today = useMemo(() => new Date(), []);
   const [selectedStartDate, setSelectedStartDate] = useState(today);
   const [selectedEndDate, setSelectedEndDate] = useState(today);
-  /* 계약기간 시작일보다 종료일이 빠르면 시작일로 초기화*/
-  useEffect(() => {
-    if (selectedStartDate > selectedEndDate) {
-      setSelectedEndDate(selectedStartDate);
-      setSearchParams((prev) => ({
-        ...prev,
-        to_date: toDate(selectedStartDate),
-      }));
-    }
-  }, [selectedStartDate, selectedEndDate]);
+
   return (
     <div className="flex mb-5 gap-1">
       <div className="flex justify-between w-full">

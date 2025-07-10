@@ -5,10 +5,9 @@ import ReservationSummary from "./components/ReservationSummary";
 import BroadcastIssueChart from "./components/BroadcastIssueChart";
 import UserRequestSummary from "./components/UserRequestSummary";
 
-const DashboardPage = () => {
-
+const DashboardPage = ({ title }) => {
   return (
-    <ContentLayout>
+    <ContentLayout title={title}>
       {/* 방송장비 현황 */}
       <DeviceStatusSection />
 

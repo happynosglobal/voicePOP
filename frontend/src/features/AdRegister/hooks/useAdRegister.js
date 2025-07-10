@@ -11,6 +11,15 @@ import { getErrorMessage } from "../../../utils/constant/messages";
 
 const useAdRegister = () => {
   const { user } = useUserStore();
+
+  const START_TIME = import.meta.env.VITE_BROADCAST_TIME_DEFAULT_START;
+  const END_TIME = import.meta.env.VITE_BROADCAST_TIME_DEFAULT_END;
+
+  const myStore = {
+    store_code: user.store_code,
+    store_name: user.store_name,
+  };
+
   const today = useMemo(() => new Date(), []);
 
   const initialFormData = useMemo(
@@ -21,8 +30,6 @@ const useAdRegister = () => {
       contract: "",
       start_date: toDate(today),
       end_date: toDate(today),
-      start_time: "",
-      end_time: "",
       gap: 3, // 초단위
       repeat_count: 1,
       repeat_interval: 1, // 초단위
@@ -33,66 +40,74 @@ const useAdRegister = () => {
   const { categoryOptions } = useCodes();
 
   const [formData, setFormData] = useState(initialFormData);
-  const [selectedStore, setSelectedStore] = useState([]);
+  const [startTime, setStartTime] = useState(START_TIME);
+  const [endTime, setEndTime] = useState(END_TIME);
+
+  const [selectedStore, setSelectedStore] = useState(() => {
+    return user?.level === "STORE" ? [myStore] : [];
+  });
   const [audioFile, setAudioFile] = useState(null);
   const [duration, setDuration] = useState(null);
   const [audioPreviewUrl, setAudioPreviewUrl] = useState(null);
   const [companyOptions, setCompanyOptions] = useState([]);
   const [contractOptions, setContractOptions] = useState([]);
 
-  const getCompanyOption = (brand_code) => {
+  const getCompanyOption = async (brand_code) => {
     const params = {
       brand_code: brand_code,
       use_yn: "Y",
       page_size: 100,
     };
-    getAdCompanayList(params)
-      .then((res) => {
-        const { status_code, data } = res.data;
-        if (status_code === 200) {
-          const options = data.items.map((option) => ({
-            value: option.id,
-            label: option.business_name,
-          }));
-          setCompanyOptions(options);
-        } else {
-          setCompanyOptions([]);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        const errMsg = getErrorMessage(err?.response?.data?.message);
-        toast.error(errMsg);
-      });
+
+    try {
+      const res = await getAdCompanayList(params);
+      const { status_code, data } = res.data;
+
+      if (status_code === 200) {
+        const options = data.items.map((option) => ({
+          value: option.id,
+          label: option.business_name,
+        }));
+        setCompanyOptions(options);
+      } else {
+        setCompanyOptions([]);
+      }
+    } catch (err) {
+      console.error(err);
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
+    }
   };
 
-  const getContractOption = (company_id) => {
+  const getContractOption = async (company_id) => {
     setFormData((prev) => ({ ...prev, contract: "" }));
+
     const params = {
       company_id: company_id,
       use_yn: "Y",
       page_size: 100,
     };
-    getAdContractList(params)
-      .then((res) => {
-        const { status_code, data } = res.data;
-        if (status_code === 200) {
-          const options = data.items.map((option) => ({
-            value: option.id,
-            label: `${option.ad_type_name} / ${toDate(
-              option.contract_from
-            )} ~ ${toDate(option.contract_to)}`,
-          }));
-          setContractOptions(options);
-        } else {
-          setContractOptions([]);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        const errMsg = getErrorMessage(err?.response?.data?.message);
-        toast.error(errMsg);
-      });
+
+    try {
+      const res = await getAdContractList(params);
+      const { status_code, data } = res.data;
+
+      if (status_code === 200) {
+        const options = data.items.map((option) => ({
+          value: option.id,
+          label: `${option.ad_type_name} / ${toDate(
+            option.contract_from
+          )} ~ ${toDate(option.contract_to)}`,
+        }));
+        setContractOptions(options);
+      } else {
+        setContractOptions([]);
+      }
+    } catch (err) {
+      console.error(err);
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
+    }
   };
 
   const handleInput = (e) => {
@@ -103,7 +118,9 @@ const useAdRegister = () => {
   const handleSelectBox = (option, meta) => {
     const { label, value } = option;
     const { name } = meta;
-
+    if (name === "company") {
+      getContractOption(value);
+    }
     if (name === "repeat_count" && value === 1) {
       setFormData((prev) => ({
         ...prev,
@@ -127,8 +144,8 @@ const useAdRegister = () => {
       formData.contract &&
       formData.start_date &&
       formData.end_date &&
-      formData.start_time &&
-      formData.end_time &&
+      startTime &&
+      endTime &&
       audioFile;
 
     const hasGapField = isGapChecked && formData.gap;
@@ -172,8 +189,15 @@ const useAdRegister = () => {
   };
 
   return {
+    today,
+    myStore,
+    initialFormData,
     formData,
     setFormData,
+    startTime,
+    setStartTime,
+    endTime,
+    setEndTime,
     selectedStore,
     setSelectedStore,
     audioFile,

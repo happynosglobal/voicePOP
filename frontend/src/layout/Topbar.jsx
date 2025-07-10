@@ -35,17 +35,16 @@ const Topbar = () => {
   const getUserLevelInfo = () => {
     const level = user?.level || "";
     const brand = user?.brand_code || "";
-    const store = getStoreNameByCode(user?.store_code) || "";
+    const storeName = user?.store_name || "";
     const levelName = getLevelName(user?.level);
 
-    if (level === "STORE" && !getStoreNameByCode(user?.store_code)) return;
-
     if (level === "STORE") {
-      return `(${store})`;
+      return `(${storeName})`;
     } else {
       return `(${brand} ${levelName})`;
     }
   };
+
   const openModal = () => {
     setIsOpen(true);
   };
@@ -70,7 +69,7 @@ const Topbar = () => {
             <button className="hover:underline" onClick={openModal}>
               {user?.user_name}
               <span className="text-gray-800 text-sm leading-none">
-                {getUserLevelInfo()}
+                {` ${getUserLevelInfo()}`}
               </span>
             </button>
           </p>
@@ -85,7 +84,6 @@ const Topbar = () => {
         </button>
       </div>
 
-      {/* 모달은 필요할 때만 렌더링 */}
       {isOpen && (
         <MyInfo
           modalRef={modalRef}

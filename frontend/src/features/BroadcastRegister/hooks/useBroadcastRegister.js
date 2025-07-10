@@ -2,25 +2,25 @@ import React, { useEffect, useMemo, useState } from "react";
 import { toDate } from "../../../utils/customFormat";
 import useUserStore from "../../../stores/user";
 import useCodes from "../../../stores/codes";
-import { getStoreNameByCode } from "../../../hooks/useStoreCode";
 
 const useBroadcastRegister = () => {
   const { user } = useUserStore();
+
+  const START_TIME = import.meta.env.VITE_BROADCAST_TIME_DEFAULT_START;
+  const END_TIME = import.meta.env.VITE_BROADCAST_TIME_DEFAULT_END;
+
   const myStore = {
     store_code: user.store_code,
-    store_name: getStoreNameByCode(user.store_code),
+    store_name: user.store_name,
   };
 
   const today = useMemo(() => new Date(), []);
-
   const initialFormData = useMemo(
     () => ({
       title: "",
       category_type_seq: "",
       start_date: toDate(today),
       end_date: toDate(today),
-      start_time: "",
-      end_time: "",
       gap: 3, // 초단위
       repeat_count: 1,
       repeat_interval: 1, // 초단위
@@ -31,6 +31,9 @@ const useBroadcastRegister = () => {
   const { categoryOptions } = useCodes();
 
   const [formData, setFormData] = useState(initialFormData);
+  const [startTime, setStartTime] = useState(START_TIME);
+  const [endTime, setEndTime] = useState(END_TIME);
+
   const [selectedStore, setSelectedStore] = useState(() => {
     return user?.level === "STORE" ? [myStore] : [];
   });
@@ -60,7 +63,7 @@ const useBroadcastRegister = () => {
       }));
     }
   };
-
+  
   const isFormValid = (isGapChecked) => {
     const isStoreManager = user?.level === "STORE";
     const hasCommonFields =
@@ -69,8 +72,8 @@ const useBroadcastRegister = () => {
       (isStoreManager || selectedStore.length !== 0) &&
       formData.start_date &&
       formData.end_date &&
-      formData.start_time &&
-      formData.end_time &&
+      startTime &&
+      endTime &&
       audioFile;
 
     const hasGapField = isGapChecked && formData.gap;
@@ -119,6 +122,10 @@ const useBroadcastRegister = () => {
     initialFormData,
     formData,
     setFormData,
+    startTime,
+    setStartTime,
+    endTime,
+    setEndTime,
     selectedStore,
     setSelectedStore,
     audioFile,

@@ -5,6 +5,13 @@ export const levelOptions = [
   { value: "BROADCAST_ADMIN", label: "방송 관리자" },
   { value: "STORE", label: "점포 관리자" },
 ];
+// 유저 상태 옵션
+export const userStatusOptions = [
+  { value: "normal", label: "승인" },
+  { value: "require", label: "미승인" },
+  { value: "banned", label: "정지" },
+  { value: "removed", label: "이용중지" },
+];
 
 // 방송 Gap
 export const gapOptions = [

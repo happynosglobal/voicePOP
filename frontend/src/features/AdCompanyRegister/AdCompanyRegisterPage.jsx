@@ -2,12 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import ContentLayout from "../../layout/ContentLayout";
 import AdCompanyList from "./components/AdCompanyList";
 import AdContractList from "./components/AdContractList";
-import {
-  getAdCompanay,
-  getAdContract,
-} from "../../api/advertisement/advertisement";
 
-const AdCompanyRegisterPage = () => {
+const AdCompanyRegisterPage = ({ title }) => {
   const companyModalRef = useRef(null); // 업체 등록 모달 ref
   const contractModalRef = useRef(null); // 계약 등록 모달 ref
 
@@ -18,7 +14,7 @@ const AdCompanyRegisterPage = () => {
   };
 
   return (
-    <ContentLayout>
+    <ContentLayout title={title}>
       <div className=" flex gap-6">
         {/* 광고업체 */}
         <AdCompanyList
@@ -32,10 +28,6 @@ const AdCompanyRegisterPage = () => {
           contractModalRef={contractModalRef}
         />
       </div>
-      {/* 업체등록 모달 */}
-      {/* <AddCompanyModal modalRef={companyModalRef} /> */}
-      {/* 계약추가 모달 */}
-      {/* <AddContractModal modalRef={contractModalRef} /> */}
     </ContentLayout>
   );
 };

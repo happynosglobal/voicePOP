@@ -135,17 +135,19 @@ const EquipmentStatusTable = ({
       />
 
       <div className="flex flex-col gap-5">
-        {sortedTableOrder.map((status) =>
-          renderTable(
-            status,
-            categorizedDevices[status],
-            status === "미등록"
-              ? "badge-error"
-              : status === "미송출"
-              ? "badge-ghost"
-              : "badge-success"
-          )
-        )}
+        {sortedTableOrder.map((status) => (
+          <React.Fragment key={status}>
+            {renderTable(
+              status,
+              categorizedDevices[status],
+              status === "미등록"
+                ? "badge-error"
+                : status === "미송출"
+                ? "badge-ghost"
+                : "badge-success"
+            )}
+          </React.Fragment>
+        ))}
       </div>
     </>
   );

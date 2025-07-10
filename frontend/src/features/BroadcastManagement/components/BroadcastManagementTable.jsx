@@ -6,11 +6,14 @@ import useCodes from "../../../stores/codes";
 import { downloadBcMedia } from "../../../api/broadcast/broadcast";
 import { toast } from "react-toastify";
 import { getErrorMessage } from "../../../utils/constant/messages";
+import CheckBox from "../../../components/input/CheckBox";
+import useUserStore from "../../../stores/user";
 
 const BroadcastManagementTable = ({
   title,
   data,
   checkedBc,
+  editableBcIds,
   handleCheckBox,
   handleAllCheckBox,
   navigateToEdit,
@@ -19,6 +22,8 @@ const BroadcastManagementTable = ({
   setPage,
   total,
 }) => {
+  const { user } = useUserStore();
+
   const allStoreCnt = useCodes((state) => state.storeByBrandCode)?.length;
 
   const getRowNumber = (index) => limit * (page - 1) + index + 1;
@@ -54,10 +59,16 @@ const BroadcastManagementTable = ({
         <thead>
           <tr>
             <th className="w-12">
-              <input
+              <CheckBox
                 type="checkbox"
                 className="checkbox"
-                checked={data.every((item) => checkedBc.includes(item.id))}
+                checked={
+                  user?.level === "STORE"
+                    ? data
+                        .filter((item) => editableBcIds?.includes(item?.id))
+                        .every((item) => checkedBc?.includes(item?.id))
+                    : data.every((item) => checkedBc?.includes(item?.id))
+                }
                 onChange={(e) => handleAllCheckBox(data, e.target.checked)}
               />
             </th>
@@ -79,11 +90,15 @@ const BroadcastManagementTable = ({
           {data.map((item, index) => (
             <tr key={index}>
               <td>
-                <input
+                <CheckBox
                   type="checkbox"
                   className="checkbox"
                   checked={checkedBc.includes(item.id)}
                   onChange={(e) => handleCheckBox(item.id, e.target.checked)}
+                  disabled={
+                    !(user?.level !== "STORE" ||
+                      editableBcIds?.includes(item?.id))
+                  }
                 />
               </td>
               <td>{getRowNumber(index)}</td>

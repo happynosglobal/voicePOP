@@ -83,14 +83,14 @@ const dummyAD = [
   },
 ];
 
-const AdStatsPage = () => {
+const AdStatsPage = ({ title }) => {
   const [selectedStartDate, setSelectedStartDate] = useState(new Date()); //임시 날짜선택 STATE
   const [selectedEndDate, setSelectedEndDate] = useState(new Date()); //임시 날짜선택 STATE
 
   const filterByMD = (mdName) => dummyAD.filter((item) => item.md === mdName); //임시더미데이터 처리
 
   return (
-    <ContentLayout>
+    <ContentLayout title={title}>
       <div className="flex mb-5 gap-1">
         <div className="flex justify-between w-full">
           <div className="flex flex-wrap items-center gap-1.5">

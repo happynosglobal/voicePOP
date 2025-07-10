@@ -13,7 +13,7 @@ const EquipmentSettingPage = () => {
   useEffect(() => {
     getBrandCodes();
   }, []);
-  
+
   const {
     formData,
     errors,
@@ -110,7 +110,7 @@ const EquipmentSettingPage = () => {
           </div>
         </div>
 
-        <div className="form-control mt-4">
+        {/*<div className="form-control mt-4">
           <label className="label">
             <span className="label-text font-semibold">장비 이름</span>
           </label>
@@ -145,7 +145,7 @@ const EquipmentSettingPage = () => {
             value={formData.memo}
             onChange={handleInput}
           />
-        </div>
+        </div> */}
 
         <div className="form-control mt-6">
           <button

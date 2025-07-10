@@ -16,6 +16,9 @@ const Dropdown = ({
   value,
   onChange,
   isDisabled,
+  isSearchable,
+  isClearable,
+  placeholder,
   ...rest
 }) => {
   return (
@@ -28,20 +31,10 @@ const Dropdown = ({
       isDisabled={isDisabled}
       styles={customStyles}
       getOptionLabel={(e) => e.label}
-      formatOptionLabel={(e) => (
-        <div
-          title={e.label}
-          style={{
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {e.label}
-        </div>
-      )}
       noOptionsMessage={() => "옵션이 없습니다"}
-      placeholder={"..."}
+      isSearchable={isSearchable}
+      isClearable={isClearable}
+      placeholder={placeholder}
       {...rest}
     />
   );

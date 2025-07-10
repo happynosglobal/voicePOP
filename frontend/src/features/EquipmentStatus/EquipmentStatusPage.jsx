@@ -11,10 +11,13 @@ import { removeEmptyString } from "../../utils/customFormat";
 import { getErrorMessage } from "../../utils/constant/messages";
 import Dropdown from "../../components/dropdown/Dropdown";
 
-const EquipmentStatusPage = () => {
+const EquipmentStatusPage = ({ title }) => {
   const { user } = useUserStore();
   const { storeByBrandCode, isLoading } = useCodes();
-  const storeOptions = [{ value: "", label: "모든 점포" }, ...storeByBrandCode];
+  const storeOptions =
+    user?.level === "STORE"
+      ? [{ value: user?.store_code, label: user?.store_name }]
+      : [...storeByBrandCode];
 
   const [searchParams, setSearchParams] = useState({
     str_code: user?.store_code || "",
@@ -25,9 +28,10 @@ const EquipmentStatusPage = () => {
   const [deviceList, setDeviceList] = useState([]);
 
   const handleSelectBox = (option, meta) => {
-    const { label, value } = option;
+    // const { label, value } = option;
     const { name } = meta;
 
+    const value = option ? option.value : "";
     setSearchParams((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -49,7 +53,7 @@ const EquipmentStatusPage = () => {
   };
 
   return (
-    <ContentLayout>
+    <ContentLayout title={title}>
       <div className="flex mb-5 gap-1">
         <div className="flex justify-between w-full">
           <div className="flex flex-wrap items-center gap-1.5">
@@ -63,7 +67,9 @@ const EquipmentStatusPage = () => {
               onChange={(option, meta) => {
                 if (user?.level !== "STORE") handleSelectBox(option, meta);
               }}
+              isClearable={true}
               isDisabled={user?.level === "STORE"}
+              placeholder={"점포 검색"}
             />
           </div>
         </div>

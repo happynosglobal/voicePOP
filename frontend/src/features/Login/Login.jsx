@@ -10,6 +10,7 @@ import { URL_MAPPING } from "../../utils/constant/urls";
 import useCategoryCode from "../../hooks/useCategoryCode";
 import { getAccessToken } from "../../hooks/useAuth";
 import Select from "react-select";
+import { getStoreCodes } from "../../api/storeGroup/storeGroup";
 
 const Login = () => {
   const { user, setUser } = useUserStore.getState();
@@ -87,7 +88,7 @@ const Login = () => {
       if (status_code === 200) {
         sessionStorage.setItem("access", data.token);
         sessionStorage.setItem("refresh", data.refresh_token);
-        // 가입 후 최초 로그인 시 비밀번호 변경 진행
+        // 가입 후 최초 or 초기화 후 로그인 시 비밀번호 변경 진행
         if (!data.last_changed_time) {
           return navigate(URL_MAPPING.changePw, {
             state: {
@@ -97,16 +98,17 @@ const Login = () => {
             },
           });
         }
-
+        data.store_name = "";
+        // 점포관리자일 경우 점포명 조회해서 유저 정보에 세팅
+        if (data.level === "STORE" && data.store_code) {
+          const params = { storeId: data.store_code };
+          const storeRes = await getStoreCodes(params);
+          data.store_name = storeRes?.data?.data?.[0].name;
+        }
         setUser(data, formData.brand_code); // 선택한 브랜드 세팅
         getBrandCodes(); // 브랜드 목록 조회
         getCategoryCodes(formData.brand_code); // MD 카테고리 조회
         fetchStores(formData.brand_code); // 선택한 브랜드의 점포목록
-        // if (data.level === "ADMIN") {
-        //   navigate(URL_MAPPING.dashboard);
-        // } else {
-        //   navigate("/");
-        // }
       }
     } catch (err) {
       setError("로그인에 실패했습니다.");

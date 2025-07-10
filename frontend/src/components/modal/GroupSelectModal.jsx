@@ -114,12 +114,6 @@ const GroupSelectModal = ({
   const handleMoveToChosenStores = () => {
     const selectedMap = new Map(chosenStores.map((s) => [s.value, s]));
 
-    // const extractLabel = (label) => {
-    //   if (typeof label === "string") return label;
-    //   if (label?.props?.children) return label.props.children;
-    //   return "그룹";
-    // };
-
     // type 그룹일경우 class 붙여서 label 생성
     const makeGroupLabel = (text) => (
       <span className="rct-chosen-title">{text}</span>
@@ -127,7 +121,7 @@ const GroupSelectModal = ({
 
     const addNode = (node) => {
       if (node.type === "wrapper") {
-        node.children?.forEach(addNode); // wrapper는 통과
+        node.children?.forEach(addNode);
         return;
       }
 
@@ -136,18 +130,26 @@ const GroupSelectModal = ({
         const allChildrenChecked = childValues.every((v) =>
           tempCheckedStores.includes(v)
         );
+        // 그룹이 펼쳐진상태인지 검사
+        const isGroupExpanded = expandedAllStores.includes(node.value);
 
         if (allChildrenChecked) {
-          const labelText = extractLabelText(node.label);
-          selectedMap.set(node.value, {
-            type: "group",
-            value: node.value,
-            label: makeGroupLabel(labelText),
-          });
+          if (isGroupExpanded) {
+            // 펼쳐져 있으면 개별 점포로 추가
+            node.children?.forEach(addNode);
+          } else {
+            // 접혀 있으면 그룹 노드로 추가
+            const labelText = extractLabelText(node.label);
+            selectedMap.set(node.value, {
+              type: "group",
+              value: node.value,
+              label: makeGroupLabel(labelText),
+            });
+          }
           return;
         }
 
-        // 자식들 중 일부만 체크된 상태 → store 단위만 추가
+        // 일부만 선택된 경우는 그대로 store만 개별 처리
         node.children?.forEach(addNode);
       }
 
@@ -177,6 +179,8 @@ const GroupSelectModal = ({
 
     setCheckedAllStores([]);
     setTempCheckedStores([]);
+    setSearchChosenKeyword("");
+    setIsSearchingChosen(false);
   };
 
   // 선택된 점포에서 제거
@@ -185,6 +189,11 @@ const GroupSelectModal = ({
       prev.filter((store) => !checkedChosenStores.includes(store.value))
     );
     setCheckedChosenStores([]);
+    // 1. 제거 후 검색된 목록을 최신화
+    // handleSearchChosen();
+    // 2. 제거 후 검색된 상태를 초기화
+    setSearchChosenKeyword("");
+    setIsSearchingChosen(false);
   };
   /* ---- GroupSelect Tree 컨트롤 End ----*/
 

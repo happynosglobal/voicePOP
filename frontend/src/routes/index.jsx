@@ -32,9 +32,9 @@ import useUserStore from "../stores/user";
  * [광고승인] - AdApprovalPage.jsx
  */
 function Root() {
-  const { routes } = useLayout();
+  const { routeElements } = useLayout();
   const navigate = useNavigate();
-  const { user, logout } = useUserStore();
+  const { user } = useUserStore();
 
   useEffect(() => {
     const publicPaths = [
@@ -60,9 +60,7 @@ function Root() {
       <Route path={URL_MAPPING.equipmentSetting} element={<EquipmentSettingPage />} />
       <Route path="*" element={<NotFoundPage />} />
       <Route path="/" element={<DefaultLayout />}>
-        {routes.map(({ path, element }) => (
-          <Route key={path} path={path} element={element} />
-        ))}
+        {routeElements}
       </Route>
     </Routes>
   );

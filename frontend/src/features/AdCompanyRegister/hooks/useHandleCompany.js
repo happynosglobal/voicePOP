@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
-import { getAdCompanayList } from '../../../api/advertisement/advertisement';
-import { removeEmptyString } from '../../../utils/customFormat';
+import React, { useEffect, useState } from "react";
+import { getAdCompanayList } from "../../../api/advertisement/advertisement";
+import { removeEmptyString } from "../../../utils/customFormat";
 
 const useHandleCompany = () => {
   const [limit, setLimit] = useState(10);
@@ -11,7 +11,7 @@ const useHandleCompany = () => {
     brand_code: "",
     keyword_type: "number",
     keyword: "",
-    use_yn: "Y"
+    use_yn: "Y",
   });
 
   const [companyList, setCompanyList] = useState([]);
@@ -21,7 +21,7 @@ const useHandleCompany = () => {
       brand_code: searchParams.brand_code,
       use_yn: searchParams.use_yn,
       page: pageNumber,
-      page_size: limit
+      page_size: limit,
     };
     // 선택한 keyword_type 값에 따라 동적으로 키 설정
     if (searchParams.keyword_type === "number") {
@@ -29,9 +29,9 @@ const useHandleCompany = () => {
     } else if (searchParams.keyword_type === "name") {
       tempParams.business_name = searchParams.keyword;
     }
-    const params = removeEmptyString(tempParams)
+    const params = removeEmptyString(tempParams);
     try {
-      const response = await getAdCompanayList(params)
+      const response = await getAdCompanayList(params);
       const { status_code, data } = response.data;
       if (status_code === 200) {
         setCompanyList(data.items);
@@ -43,21 +43,20 @@ const useHandleCompany = () => {
         setPage(1);
       }
     } catch (err) {
-      console.error("광고업체 조회 오류", err)
+      console.error("광고업체 조회 오류", err);
     }
-  }
+  };
 
   const handleInput = (e) => {
     const { name, value } = e.target;
     setSearchParams({ ...searchParams, [name]: value });
-  }
+  };
 
-  const handleSelectBox = (option, option2) => {
-    const { label, value } = option;
-    const { name } = option2;
+  const handleSelectBox = (option, meta) => {
+    const { name } = meta;
+    const value = option ? option.value : "";
     setSearchParams({ ...searchParams, [name]: value });
-  }
-
+  };
 
   return {
     limit,
@@ -70,8 +69,8 @@ const useHandleCompany = () => {
     companyList,
     getCompanyList,
     handleInput,
-    handleSelectBox
-  }
-}
+    handleSelectBox,
+  };
+};
 
 export default useHandleCompany;

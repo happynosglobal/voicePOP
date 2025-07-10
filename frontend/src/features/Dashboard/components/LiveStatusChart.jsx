@@ -105,6 +105,7 @@ const LiveStatusChart = () => {
               },
             },
             yaxis: {
+              max: 100,
               labels: {
                 formatter: (val) => `${val}%`,
                 style: {

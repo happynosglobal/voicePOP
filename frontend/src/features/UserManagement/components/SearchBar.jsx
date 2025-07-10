@@ -1,25 +1,37 @@
-import Select from "react-select";
 import Input from "../../../components/input/Input";
-import { RiFileExcel2Line } from "react-icons/ri";
-import { levelOptions } from "../../../utils/constant/options";
-import useBrandCode from "../../../hooks/useBrandCode";
+import {
+  levelOptions,
+  userStatusOptions,
+} from "../../../utils/constant/options";
 import useCodes from "../../../stores/codes";
 import Dropdown from "../../../components/dropdown/Dropdown";
 
 const SearchBar = ({
   setUserId,
-  userList,
-  page,
-  total,
-  limit,
   searchParams,
   setPage,
   openModal,
   handleInput,
   handleSelectBox,
+  handleMultiSelectBox,
   handleGetUsers,
 }) => {
   const { brandOptions } = useCodes();
+
+  const userLevelOptions = [
+    // { value: "", label: "모든 권한" },
+    ...levelOptions,
+  ];
+
+  const userBrandOptions = [
+    // { value: "", label: "모든 브랜드" },
+    ...brandOptions,
+  ];
+
+  const keywordOptions = [
+    { value: "user_id", label: "ID" },
+    { value: "name", label: "성명" },
+  ];
 
   const handleOnClick = () => {
     handleGetUsers(searchParams, 1);
@@ -32,46 +44,52 @@ const SearchBar = ({
         <div className="flex flex-wrap items-center gap-1.5">
           <Dropdown
             name="level"
-            options={[{ value: "", label: "모든 관리자" }, ...levelOptions]}
-            className="min-w-32"
+            className="min-w-44"
+            options={userLevelOptions}
+            value={userLevelOptions.find(
+              (opt) => opt.value === searchParams.level
+            )}
             onChange={handleSelectBox}
-            defaultValue={{ value: "", label: "모든 관리자" }}
+            isSearchable={false}
+            isClearable={true}
+            placeholder={"권한"}
           />
-
           <Dropdown
             name="brand_code"
-            options={[{ value: "", label: "모든 브랜드" }, ...brandOptions]}
-            className="min-w-32"
+            className="min-w-40"
+            options={userBrandOptions}
+            value={userBrandOptions.find(
+              (opt) => opt.value === searchParams.brand_code
+            )}
             onChange={handleSelectBox}
-            defaultValue={{ value: "", label: "모든 브랜드" }}
+            isSearchable={false}
+            isClearable={true}
+            placeholder={"브랜드"}
           />
           <Dropdown
+            isMulti
             name="status"
-            options={[
-              { value: "", label: "모든 상태" },
-              { value: "normal", label: "승인" },
-              { value: "require", label: "미승인" },
-              { value: "banned", label: "정지" },
-              { value: "removed", label: "이용중지" },
-            ]}
-            className="min-w-32"
-            onChange={handleSelectBox}
-            defaultValue={{ value: "", label: "모든 상태" }}
+            className="min-w-40"
+            options={userStatusOptions}
+            value={userStatusOptions.filter((opt) =>
+              searchParams.status.includes(opt.value)
+            )}
+            onChange={handleMultiSelectBox}
+            isSearchable={false}
+            isClearable={true}
+            placeholder={"상태"}
           />
-
           <div className="mx-5 h-5 w-px bg-gray-300"></div>
           <div className="flex items-center gap-2">
             <label className="font-semibold">검색 조건</label>
             <Dropdown
               name="keyword_type"
-              options={[
-                { value: "user_id", label: "ID" },
-                { value: "name", label: "성명" },
-              ]}
+              options={keywordOptions}
               isClearable={false}
               className="min-w-32"
               onChange={handleSelectBox}
-              defaultValue={{ value: "user_id", label: "ID" }}
+              isSearchable={false}
+              defaultValue={keywordOptions?.[0]}
             />
           </div>
           <div className="flex items-center gap-2">
@@ -82,19 +100,18 @@ const SearchBar = ({
               className="input input-bordered w-full focus:ring-0 focus:outline-none"
               value={searchParams.keyword}
               onChange={handleInput}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleOnClick();
+                }
+              }}
             />
           </div>
-
           <button className="btn btn-accent btn-sm" onClick={handleOnClick}>
             검색
           </button>
         </div>
-
-        {/* <!-- 사용자 등록 버튼 --> */}
         <div className="flex gap-2">
-          {/* <button className="btn btn-sm btn-success">
-            <RiFileExcel2Line className="text-xl" /> 엑셀다운로드
-          </button> */}
           <button
             className="btn btn-primary btn-sm"
             onClick={() => {

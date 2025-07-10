@@ -22,10 +22,12 @@ export const URL_MAPPING = {
 
   equipmentStatus: "/broadcast/device-status",
   broadcastRegister: "/broadcast/register",
+  broadcastEdit: "/broadcast/edit",
   broadcastManagement: "/broadcast/management",
   adSchedule: "/broadcast/schedule",
 
   adRegister: "/advertisement/register",
+  adEdit: "/advertisement/edit",
   adstatus: "/advertisement/status",
 
   dashboard: "/status",

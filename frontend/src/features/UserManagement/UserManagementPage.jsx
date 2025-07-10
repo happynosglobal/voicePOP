@@ -6,7 +6,7 @@ import ContentLayout from "../../layout/ContentLayout";
 import useHandleUserList from "./hooks/useHandleUserList";
 import LoadingSpinner from "../../components/loading/LoadingSpinner";
 
-const UserManagementPage = () => {
+const UserManagementPage = ({ title }) => {
   const modalRef = useRef();
 
   const {
@@ -17,11 +17,14 @@ const UserManagementPage = () => {
     limit,
     setPage,
     handleGetUsers,
+    handleMultiSelectBox,
     handleInput,
     handleSelectBox,
+    handleSort,
   } = useHandleUserList();
 
   const [userId, setUserId] = useState(null);
+  const [userData, setUserData] = useState(null);
 
   const openModal = () => {
     if (modalRef.current) {
@@ -36,25 +39,23 @@ const UserManagementPage = () => {
   };
 
   return (
-    <ContentLayout>
+    <ContentLayout title={title}>
       {/* <!-- 사용자 검색바 --> */}
       <SearchBar
         setUserId={setUserId}
-        userList={userList}
         searchParams={searchParams}
-        page={page}
-        total={total}
-        limit={limit}
         setPage={setPage}
         openModal={openModal}
         handleInput={handleInput}
         handleSelectBox={handleSelectBox}
+        handleMultiSelectBox={handleMultiSelectBox}
         handleGetUsers={handleGetUsers}
       />
 
       {/* <!-- 사용자 목록 테이블 --> */}
       <UserTable
         setUserId={setUserId}
+        setUserData={setUserData}
         userList={userList}
         page={page}
         total={total}
@@ -62,6 +63,8 @@ const UserManagementPage = () => {
         setPage={setPage}
         openModal={openModal}
         closeModal={closeModal}
+        handleSort={handleSort}
+        handleGetUsers={handleGetUsers}
       />
 
       <AddUserModal
@@ -69,6 +72,8 @@ const UserManagementPage = () => {
         closeModal={closeModal}
         userId={userId}
         setUserId={setUserId}
+        userData={userData}
+        setUserData={setUserData}
         handleGetUsers={handleGetUsers}
         mode={userId ? "modify" : "add"}
       />

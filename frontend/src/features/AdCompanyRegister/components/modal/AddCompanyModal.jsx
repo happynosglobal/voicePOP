@@ -90,6 +90,7 @@ const AddCompanyModal = ({ modalRef, getCompanyList }) => {
               className="w-full"
               onChange={handleSelectBox}
               classNamePrefix="select"
+              isSearchable={false}
               placeholder="브랜드를 선택하세요"
             />
           </div>

@@ -135,7 +135,7 @@ const convertItemsToEvents = (items, selectedDate) => {
   return allEvents;
 };
 
-const AdSchedulePage = () => {
+const AdSchedulePage = ({ title }) => {
   const MIN_TIME = import.meta.env.VITE_BROADCAST_TIME_MIN;
   const MAX_TIME = import.meta.env.VITE_BROADCAST_TIME_MAX;
 
@@ -292,7 +292,7 @@ const AdSchedulePage = () => {
   }, []);
 
   return (
-    <ContentLayout>
+    <ContentLayout title={title}>
       <div ref={calendarRef}>
         <Calendar
           localizer={localizer}

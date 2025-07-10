@@ -1,11 +1,11 @@
 import ContentLayout from "../../layout/ContentLayout";
 import BroadcastManagementTable from "./components/BroadcastManagementTable";
 import Tab from "../../components/tab/Tab";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Dropdown from "../../components/dropdown/Dropdown";
 import useBroadcastManagement from "./hooks/useBroadcastManagement";
 
-const BroadcastManagementPage = () => {
+const BroadcastManagementPage = ({ title }) => {
   const {
     user,
     today,
@@ -27,6 +27,7 @@ const BroadcastManagementPage = () => {
     setLiveBroadcasts,
     scheduledBroadcasts,
     setScheduledBroadcasts,
+    editableBcIds,
     handleSelectBox,
     handleCheckBox,
     handleAllCheckBox,
@@ -56,7 +57,7 @@ const BroadcastManagementPage = () => {
   }, [liveBroadcasts, scheduledBroadcasts]);
 
   return (
-    <ContentLayout>
+    <ContentLayout title={title}>
       <div className="flex mb-5 gap-1">
         <div className="flex justify-between w-full">
           <div className="flex flex-wrap items-center gap-1.5">
@@ -70,7 +71,9 @@ const BroadcastManagementPage = () => {
               onChange={(option, meta) => {
                 if (user?.level !== "STORE") handleSelectBox(option, meta);
               }}
+              isClearable={true}
               isDisabled={user?.level === "STORE"}
+              placeholder={"점포 검색"}
             />
           </div>
           <div className="flex items-start gap-2">
@@ -108,6 +111,7 @@ const BroadcastManagementPage = () => {
           title="방송중"
           data={liveBroadcasts}
           checkedBc={checkedBc}
+          editableBcIds={editableBcIds}
           handleCheckBox={handleCheckBox}
           handleAllCheckBox={handleAllCheckBox}
           navigateToEdit={navigateToEdit}
@@ -120,6 +124,7 @@ const BroadcastManagementPage = () => {
           title="예약완료"
           data={scheduledBroadcasts}
           checkedBc={checkedBc}
+          editableBcIds={editableBcIds}
           handleCheckBox={handleCheckBox}
           handleAllCheckBox={handleAllCheckBox}
           navigateToEdit={navigateToEdit}
