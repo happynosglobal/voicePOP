@@ -2,16 +2,11 @@ import Pagination from "../../../components/pagination/Pagination";
 import { toDate } from "../../../utils/customFormat";
 import EmptyState from "../../../components/emptyState/EmptyState";
 import useCodes from "../../../stores/codes";
-import { MdKeyboardArrowUp, MdKeyboardArrowDown } from "react-icons/md";
-import {
-  TiArrowUnsorted,
-  TiArrowSortedUp,
-  TiArrowSortedDown,
-} from "react-icons/ti";
-import { useState } from "react";
 import { deleteUser } from "../../../api/user/user";
 import { toast } from "react-toastify";
 import { getErrorMessage } from "../../../utils/constant/messages";
+import useSort from "../../../hooks/useSort";
+import SortableHeader from "../../../components/sortableHeader/SortableHeader";
 
 const UserTable = ({
   setUserId,
@@ -26,24 +21,7 @@ const UserTable = ({
   handleGetUsers,
 }) => {
   const allStores = useCodes((state) => state.allStoreCode);
-
-  const [sortOption, setSortOption] = useState({ sort: null, order: null });
-
-  const toggleSort = (sortBy) => {
-    if (sortOption.sort !== sortBy) {
-      // 다른 컬럼 클릭 시 → desc로 설정
-      setSortOption({ sort: sortBy, order: "desc" });
-      handleSort(sortBy, "desc");
-    } else if (sortOption.order === "desc") {
-      // desc → asc
-      setSortOption({ sort: sortBy, order: "asc" });
-      handleSort(sortBy, "asc");
-    } else if (sortOption.order === "asc") {
-      // asc → 정렬 초기화
-      setSortOption({ sort: null, order: null });
-      handleSort(null, null);
-    }
-  };
+  const { sortOption, toggleSort } = useSort(handleSort);
 
   const getRowNumber = (index) => limit * (page - 1) + index + 1;
 
@@ -80,41 +58,23 @@ const UserTable = ({
             <th>점포</th>
             <th>상태</th>
             <th>
-              <button
+              <SortableHeader
                 className="inline-flex items-center gap-1 hover:underline"
-                onClick={() => toggleSort("latest_login_at")}
-              >
-                최종접속
-                {sortOption.sort === "latest_login_at" ? (
-                  sortOption.order === "desc" ? (
-                    <TiArrowSortedDown />
-                  ) : sortOption.order === "asc" ? (
-                    <TiArrowSortedUp />
-                  ) : null
-                ) : (
-                  <TiArrowUnsorted />
-                )}
-              </button>
+                label="최종접속"
+                sortKey="latest_login_at"
+                sortOption={sortOption}
+                toggleSort={toggleSort}
+              />
             </th>
-
             <th>
-              <button
+              <SortableHeader
                 className="inline-flex items-center gap-1 hover:underline"
-                onClick={() => toggleSort("updated_at")}
-              >
-                승인/수정일
-                {sortOption.sort === "updated_at" ? (
-                  sortOption.order === "desc" ? (
-                    <TiArrowSortedDown />
-                  ) : sortOption.order === "asc" ? (
-                    <TiArrowSortedUp />
-                  ) : null
-                ) : (
-                  <TiArrowUnsorted />
-                )}
-              </button>
+                label="승인/수정일"
+                sortKey="updated_at"
+                sortOption={sortOption}
+                toggleSort={toggleSort}
+              />
             </th>
-
             <th className="w-20">삭제</th>
           </tr>
         </thead>

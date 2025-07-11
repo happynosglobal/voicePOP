@@ -86,6 +86,10 @@ const EquipmentManagementPage = ({ title }) => {
     }
   };
 
+  useEffect(() => {
+    handleGetDeviceList();
+  }, [searchParams]);
+
   const handleModifyDeviceStatus = async (data) => {
     if (!data) return;
     const body = {

@@ -1,15 +1,11 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useState } from "react";
 import { toDateTime } from "../../../utils/customFormat";
 import Tab from "../../../components/tab/Tab";
-import { MdKeyboardArrowUp, MdKeyboardArrowDown } from "react-icons/md";
-import {
-  TiArrowUnsorted,
-  TiArrowSortedUp,
-  TiArrowSortedDown,
-} from "react-icons/ti";
 import EmptyState from "../../../components/emptyState/EmptyState";
 import Dropdown from "../../../components/dropdown/Dropdown";
 import Pagination from "../../../components/pagination/Pagination";
+import useSort from "../../../hooks/useSort";
+import SortableHeader from "../../../components/sortableHeader/SortableHeader";
 
 const DeviceManagementTable = ({
   limit,
@@ -25,29 +21,11 @@ const DeviceManagementTable = ({
   deviceList,
   setDeviceList,
 }) => {
+  const { sortOption, toggleSort } = useSort(handleSort);
+
   const [activeTab, setActiveTab] = useState("");
 
   const [originalComments, setOriginalComments] = useState({});
-  const [sortOption, setSortOption] = useState({ sort: null, order: null });
-
-  const toggleSort = (sortBy) => {
-    if (sortOption.sort !== sortBy) {
-      // 다른 컬럼 클릭 시 → desc로 설정
-      setSortOption({ sort: sortBy, order: "desc" });
-      handleSort(sortBy, "desc");
-    } else if (sortOption.order === "desc") {
-      // desc → asc
-      setSortOption({ sort: sortBy, order: "asc" });
-      handleSort(sortBy, "asc");
-    } else if (sortOption.order === "asc") {
-      // asc → 정렬 초기화
-      setSortOption({ sort: null, order: null });
-      handleSort(null, null);
-    }
-  };
-  useEffect(() => {
-    handleGetDeviceList();
-  }, [searchParams]);
 
   return (
     <>
@@ -69,22 +47,13 @@ const DeviceManagementTable = ({
             <th className="w-1/12">MD</th>
             <th className="w-1/12">방송상태</th>
             <th className="w-2/12">
-              {" "}
-              <button
+              <SortableHeader
                 className="inline-flex items-center gap-1 hover:underline"
-                onClick={() => toggleSort("latest_run_datetime")}
-              >
-                마지막 방송시간
-                {sortOption.sort === "latest_run_datetime" ? (
-                  sortOption.order === "desc" ? (
-                    <TiArrowSortedDown />
-                  ) : sortOption.order === "asc" ? (
-                    <TiArrowSortedUp />
-                  ) : null
-                ) : (
-                  <TiArrowUnsorted />
-                )}
-              </button>
+                label="마지막 방송시간"
+                sortKey="device_latest_run_datetime"
+                sortOption={sortOption}
+                toggleSort={toggleSort}
+              />
             </th>
             <th className="w-44">기기상태</th>
             <th>메모</th>

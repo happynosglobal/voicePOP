@@ -11,12 +11,12 @@ const DefaultLayout = () => {
   const { allStoreCode, isLoading, fetchStores, resetStores } = useCodes();
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    // 로그인 후 점포코드가 없을 때 다시 점포코드 조회
-    if (user && isLoading && allStoreCode.length === 0) {
-      fetchStores(user?.brand_code);
-    }
-  }, [user, isLoading, allStoreCode]);
+  // useEffect(() => {
+  //   // 로그인 후 점포코드가 없을 때 다시 점포코드 조회
+  //   if (user && isLoading && allStoreCode.length === 0) {
+  //     fetchStores(user?.brand_code);
+  //   }
+  // }, [user, isLoading, allStoreCode]);
 
   useEffect(() => {
     const token = getAccessToken();

@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import ContentLayout from "../../layout/ContentLayout";
-import Tooltip from "../../components/tooltip/Tooltip";
 import Pagination from "../../components/pagination/Pagination";
 import GroupSelectModal from "../../components/modal/GroupSelectModal";
 import useUserStore from "../../stores/user";
@@ -14,23 +13,27 @@ import useHandleStoreGroup from "./hooks/useHandleStoreGroup";
 import { toDate } from "../../utils/customFormat";
 import { toast } from "react-toastify";
 import EmptyState from "../../components/emptyState/EmptyState";
-
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 import { getErrorMessage } from "../../utils/constant/messages";
+import useSort from "../../hooks/useSort";
+import SortableHeader from "../../components/sortableHeader/SortableHeader";
 
 const StoreGroupPage = ({ title }) => {
   const { user } = useUserStore();
   const [expandedIndex, setExpandedIndex] = useState(null); // 점포 토글 스테이트
   const groupModalRef = useRef(null); // 점포 선택 모달 ref
 
-  const { page, setPage, total, limit, storeGroupList, getStoreGroupList } =
-    useHandleStoreGroup();
-
+  const {
+    page,
+    setPage,
+    total,
+    limit,
+    storeGroupList,
+    getStoreGroupList,
+    handleSort,
+  } = useHandleStoreGroup();
+  const { sortOption, toggleSort } = useSort(handleSort);
   const [groupId, setGroupId] = useState(null); //선택된 그룹 ID
-
-  useEffect(() => {
-    getStoreGroupList();
-  }, [page]);
 
   const getRowNumber = (index) => limit * (page - 1) + index + 1;
 
@@ -144,7 +147,15 @@ const StoreGroupPage = ({ title }) => {
             <th className="w-2/12">그룹명</th>
             <th className="w-1/12">점포수</th>
             <th>점포</th>
-            <th className=" wide:w-1/12">생성일</th>
+            <th className=" wide:w-1/12">
+              <SortableHeader
+                className="inline-flex items-center gap-1 hover:underline"
+                label="생성일"
+                sortKey="created_at"
+                sortOption={sortOption}
+                toggleSort={toggleSort}
+              />
+            </th>
             <th className="w-1/12">생성자</th>
             <th className="w-20">삭제</th>
           </tr>

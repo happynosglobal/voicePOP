@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist, devtools, createJSONStorage } from "zustand/middleware";
 import { getAllStores } from "../hooks/useStoreCode";
+import { toast } from "react-toastify";
 
 const useCodes = create(
   persist(
@@ -31,7 +32,7 @@ const useCodes = create(
         // 점포 데이터 fetch
         fetchStores: async (brandCode) => {
           if (!brandCode) {
-            console.error("브랜드 코드가 전달되지 않았습니다.");
+            toast.error("업태 정보가 없어 점포 정보를 불러올 수 없습니다");
             return;
           }
 
@@ -51,6 +52,7 @@ const useCodes = create(
             });
           } catch (err) {
             console.error("점포데이터 조회 오류:", err);
+            toast.error("점포 정보를 불러올 수 없습니다");
             set({ isLoading: false });
           }
         },
