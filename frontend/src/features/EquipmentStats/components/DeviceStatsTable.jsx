@@ -13,7 +13,7 @@ const groupByDate = (list) => {
     if (!map[date]) map[date] = [];
     map[date].push(item);
   });
-  
+
   // op_date별 장비 정보 합산
   return Object.entries(map).map(([date, items]) => {
     const summary = items.reduce(
@@ -117,8 +117,8 @@ const DeviceStatsTable = ({
             <th>미운영합계</th>
             <th>미운영(정지)</th>
             <th>미운영(A/S)</th>
-            <th>미운영(미확인)</th>
             <th>미운영(고장)</th>
+            <th>미운영(미확인)</th>
             <th>정상</th>
             <th>가동률</th>
           </tr>
@@ -150,13 +150,19 @@ const DeviceStatsTable = ({
                   </td>
                   <td>전체({details.length})</td>
                   <td>{summary.device_count}</td>
-                  <td>{summary.running}</td>
-                  <td>{summary.not_running_total}</td>
+                  <td className=" !border-l-2 !border-l-black">
+                    {summary.running}
+                  </td>
+                  <td className="!border-l-2 !border-l-black">
+                    {summary.not_running_total}
+                  </td>
                   <td>{summary.stop}</td>
                   <td>{summary.as}</td>
-                  <td>{summary.unconfirmed}</td>
                   <td>{summary.broken}</td>
-                  <td>{summary.normal}</td>
+                  <td>{summary.unconfirmed}</td>
+                  <td className=" !border-l-2 !border-l-black !border-r-2 !border-r-black">
+                    {summary.normal}
+                  </td>
                   <td>
                     <div className="relative w-full flex gap-1 items-center justify-between">
                       <progress
@@ -180,13 +186,19 @@ const DeviceStatsTable = ({
                       <td></td>
                       <td>{item.category_name}</td>
                       <td>{item.device_count}</td>
-                      <td>{item.running}</td>
-                      <td>{item.not_running_total}</td>
-                      <td>{item.stop}</td>
-                      <td>{item.as}</td>
-                      <td>{item.unconfirmed}</td>
-                      <td>{item.broken}</td>
-                      <td>{item.normal}</td>
+                      <td className=" !border-l-2 !border-l-black">
+                        {item.running}
+                      </td>
+                      <td className="!border-l-2 !border-l-black">
+                        {item.not_running_total}
+                      </td>
+                      <td className="">{item.stop}</td>
+                      <td className="">{item.as}</td>
+                      <td className="">{item.broken}</td>
+                      <td className="">{item.unconfirmed}</td>
+                      <td className="!border-l-2 !border-l-black !border-r-2 !border-r-black">
+                        {item.normal}
+                      </td>
                       <td>
                         <div className="relative w-full flex gap-1 items-center justify-between">
                           <progress

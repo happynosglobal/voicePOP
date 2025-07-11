@@ -42,8 +42,8 @@ body {min-width:1400px;}
   .table.no-row-bg tr:not(.child-row) td {@apply bg-gray-50}
   .table.no-row-bg tr:hover td {@apply bg-lime-50;}
   .table tr.parent-row td {@apply font-medium text-gray-500;}
-  .table tr.parent-row.active-row td {@apply bg-sky-50 text-gray-950 font-semibold;}
-
+  .table tr.parent-row.active-row td {@apply text-gray-950 font-semibold bg-sky-50;}
+  .table tr.child-row td {@apply text-sm;}
   
   /** 기본 작성 폼 **/
   .form-container {@apply bg-white;}
