@@ -52,7 +52,11 @@ const ReservationSummary = () => {
   return (
     <div className="p-3.5 rounded-[20px] bg-gray-100 flex-1 overflow-hidden">
       <div className="h-full flex flex-col overflow-hidden">
-        <ChartTitle label="예약 내역" iconSrc="/asset/ico_resv.svg" url={URL_MAPPING.broadcastManagement}/>
+        <ChartTitle
+          label="예약 내역"
+          iconSrc="/asset/ico_resv.svg"
+          url={URL_MAPPING.broadcastManagement}
+        />
         <div className="flex-1 bg-white p-5 pr-3 rounded-[20px] overflow-hidden">
           <ul className="flex flex-1 flex-col h-full overflow-y-auto">
             {categoryOptions.map((cat, index) => {
@@ -65,7 +69,12 @@ const ReservationSummary = () => {
                   className="flex gap-2.5 py-3 border-b border-b-gray-100 last:border-b-0 items-center justify-between"
                 >
                   <span className="text-gray-500 font-semibold truncate max-w-4/6">
-                    <Tooltip id={index} content={cat.name} place="left" />
+                    <Tooltip
+                      id={index}
+                      label={cat.name}
+                      content={cat.name}
+                      place="left"
+                    />
                   </span>
                   <span className="font-bold text-gray-900 shrink-0 pr-2">
                     {count} 건

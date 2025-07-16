@@ -96,8 +96,10 @@ const BroadcastManagementTable = ({
                   checked={checkedBc.includes(item.id)}
                   onChange={(e) => handleCheckBox(item.id, e.target.checked)}
                   disabled={
-                    !(user?.level !== "STORE" ||
-                      editableBcIds?.includes(item?.id))
+                    !(
+                      user?.level !== "STORE" ||
+                      editableBcIds?.includes(item?.id)
+                    )
                   }
                 />
               </td>
@@ -107,7 +109,11 @@ const BroadcastManagementTable = ({
                   className="truncate hover:underline cursor-pointer w-full"
                   onClick={() => navigateToEdit(item)}
                 >
-                  <Tooltip id={item.id} content={item.title} />
+                  <Tooltip
+                    id={item.id}
+                    label={item.title}
+                    content={item.title}
+                  />
                 </div>
               </td>
               <td>

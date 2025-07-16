@@ -12,7 +12,7 @@ const CompanyTable = ({
   getCompanyList,
   companyList,
   activeRow,
-  handleRowClick
+  handleRowClick,
 }) => {
   return (
     <>
@@ -31,8 +31,9 @@ const CompanyTable = ({
             {companyList.map((item, index) => (
               <tr
                 key={index}
-                className={`cursor-pointer ${activeRow?.id === item.id ? "active" : ""
-                  }`}
+                className={`cursor-pointer ${
+                  activeRow?.id === item.id ? "active" : ""
+                }`}
                 onClick={() => handleRowClick(item)}
               >
                 <td>{index + 1}</td>
@@ -40,7 +41,11 @@ const CompanyTable = ({
                 <td>{toBusinessNumber(item.business_number)}</td>
                 <td>{item.brand_code}</td>
                 <td>
-                  <Tooltip id={item.id} content={item.comment} />
+                  <Tooltip
+                    id={item.id}
+                    label={item.comment}
+                    content={item.comment}
+                  />
                 </td>
               </tr>
             ))}
@@ -51,12 +56,7 @@ const CompanyTable = ({
         <EmptyState text="일치하는 검색 결과가 없습니다." />
       )}
       {/* <EmptyState text="등록된 리스트가 없습니다." /> */}
-      <Pagination
-        limit={limit}
-        page={page}
-        setPage={setPage}
-        total={total}
-      />
+      <Pagination limit={limit} page={page} setPage={setPage} total={total} />
     </>
   );
 };

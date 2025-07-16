@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import useUserStore from "../../../stores/user";
 import { getDeviceStatus } from "../../../api/device/device";
 import ChartTitle from "./ChartTitle";
+import { URL_MAPPING } from "../../../utils/constant/urls";
 
 const DeviceStatusSection = () => {
   const { user } = useUserStore();
@@ -76,6 +77,7 @@ const DeviceStatusSection = () => {
           iconSrc="/asset/ico_broadcast.svg"
           size="lg"
           bgColor="#484C56"
+          url={URL_MAPPING.equipmentStatus}
         />
         <StatusInfo
           value={statusData.broadcasted}
@@ -90,6 +92,7 @@ const DeviceStatusSection = () => {
           iconSrc="/asset/ico_unbroadcast.svg"
           size="lg"
           bgColor="#6EABF7"
+          url={URL_MAPPING.equipmentStatus}
         />
         <StatusInfo
           value={statusData.not_broadcasted}
@@ -104,6 +107,7 @@ const DeviceStatusSection = () => {
           iconSrc="/asset/ico_unregistered.svg"
           size="lg"
           bgColor="#7DC600"
+          url={URL_MAPPING.equipmentStatus}
         />
         <StatusInfo
           value={statusData.unregistered}

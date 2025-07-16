@@ -26,7 +26,7 @@ const UserRequestSummary = () => {
   return (
     <div className="p-3.5 rounded-[20px] bg-gray-100 flex-1 overflow-hidden">
       <div className="h-full flex flex-col">
-        <ChartTitle label="사용자 관리" iconSrc="/asset/ico_user.svg" />
+        <ChartTitle label="사용자 관리" iconSrc="/asset/ico_user.svg" url={URL_MAPPING.userManagement}/>
         <div className="flex-1 bg-white rounded-[20px] flex items-center justify-center flex-col text-center gap-2.5">
           <span className="text-gray-400 text-sm font-semibold">
             사용자 등록요청 건수

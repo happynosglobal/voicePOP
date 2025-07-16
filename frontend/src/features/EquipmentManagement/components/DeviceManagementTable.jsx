@@ -6,6 +6,7 @@ import Dropdown from "../../../components/dropdown/Dropdown";
 import Pagination from "../../../components/pagination/Pagination";
 import useSort from "../../../hooks/useSort";
 import SortableHeader from "../../../components/sortableHeader/SortableHeader";
+import Tooltip from "../../../components/tooltip/Tooltip";
 
 const DeviceManagementTable = ({
   limit,
@@ -62,7 +63,14 @@ const DeviceManagementTable = ({
         <tbody>
           {deviceList.map((item, index) => (
             <tr key={index}>
-              <td>{item.str_name}</td>
+              <td className="truncate">
+                <Tooltip
+                  place="bottom"
+                  id={item.id}
+                  label={item.str_name}
+                  content={`장비ID: ${item.id}`}
+                />
+              </td>
               <td>{item.category_name}</td>
               <td>
                 <span

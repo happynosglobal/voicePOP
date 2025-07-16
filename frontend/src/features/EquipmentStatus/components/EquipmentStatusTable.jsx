@@ -77,13 +77,21 @@ const EquipmentStatusTable = ({
             <tbody>
               {list.map((device, index) => (
                 <tr key={index}>
-                  <td>{device.str_name}</td>
+                  <td className="truncate">
+                    <Tooltip
+                      place="bottom"
+                      id={device.id}
+                      label={device.str_name}
+                      content={`장비ID: ${device.id}`}
+                    />
+                  </td>
                   <td>{device.category_name}</td>
                   <td>{toDateTime(device.latest_run_datetime)}</td>
                   <td className="truncate">
                     <Tooltip
                       place="bottom"
-                      id={`tooltip-${device.id}`}
+                      id={device.id}
+                      label={device.memo}
                       content={device.memo}
                     />
                   </td>

@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import Tooltip from "../../../../components/tooltip/Tooltip";
-import useHandleContract from "../../hooks/useHandleContract";
 import EmptyState from "../../../../components/emptyState/EmptyState";
 import {
   toBusinessNumber,
@@ -75,7 +74,7 @@ const ContractTable = ({
                   </span>
                 </td>
                 <td className="truncate">
-                  <Tooltip id={1} content={item.comment} />
+                  <Tooltip id={1} label={item.comment} content={item.comment} />
                 </td>
               </tr>
             ))}

@@ -79,7 +79,11 @@ const AdApprovalPage = ({ title }) => {
             {contractList.map((item, index) => (
               <tr key={index}>
                 <td className="truncate">
-                  <Tooltip id={index} content={item.business_name} />
+                  <Tooltip
+                    id={item.id}
+                    label={item.business_name}
+                    content={item.business_name}
+                  />
                 </td>
                 <td>{toBusinessNumber(item.business_number)}</td>
                 <td>{item.ad_type_name}</td>

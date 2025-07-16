@@ -94,6 +94,7 @@ const DeviceStatsTable = ({
   useEffect(() => {
     setOpenRows({});
   }, [deviceList]);
+
   return (
     <>
       <Tab
@@ -117,8 +118,8 @@ const DeviceStatsTable = ({
             <th>미운영합계</th>
             <th>미운영(정지)</th>
             <th>미운영(A/S)</th>
-            <th>미운영(고장)</th>
             <th>미운영(미확인)</th>
+            <th>미운영(고장)</th>
             <th>정상</th>
             <th>가동률</th>
           </tr>
@@ -158,8 +159,8 @@ const DeviceStatsTable = ({
                   </td>
                   <td>{summary.stop}</td>
                   <td>{summary.as}</td>
-                  <td>{summary.broken}</td>
                   <td>{summary.unconfirmed}</td>
+                  <td>{summary.broken}</td>
                   <td className=" !border-l-2 !border-l-black !border-r-2 !border-r-black">
                     {summary.normal}
                   </td>
@@ -194,8 +195,8 @@ const DeviceStatsTable = ({
                       </td>
                       <td className="">{item.stop}</td>
                       <td className="">{item.as}</td>
-                      <td className="">{item.broken}</td>
                       <td className="">{item.unconfirmed}</td>
+                      <td className="">{item.broken}</td>
                       <td className="!border-l-2 !border-l-black !border-r-2 !border-r-black">
                         {item.normal}
                       </td>

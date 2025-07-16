@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import dayjs from "dayjs";
 import ReactApexChart from "react-apexcharts";
 import useUserStore from "../../../stores/user";
@@ -11,11 +11,15 @@ import { URL_MAPPING } from "../../../utils/constant/urls";
 const LiveStatusChart = () => {
   const { user } = useUserStore();
 
+  const rateMapRef = useRef({});
+  const deviceCountMapRef = useRef({});
+  const runningMapRef = useRef({});
+
   const [chartData, setChartData] = useState({
     series: [],
     options: {},
   });
-  
+
   useEffect(() => {
     const getRunningRate = async () => {
       const today = dayjs();
@@ -34,41 +38,51 @@ const LiveStatusChart = () => {
 
         const raw = response.data?.data || [];
 
-        // 날짜별(op_date) 평균 running_rate 계산
         const rateByDate = {};
-        // 날짜별로 running_rate 취합
+        const deviceCountMap = {};
+        const runningMap = {};
+
         raw.forEach((item) => {
           const dateKey = toDate(item.op_date);
           if (!rateByDate[dateKey]) rateByDate[dateKey] = [];
           rateByDate[dateKey].push(item.running_rate);
+
+          deviceCountMap[dateKey] = item.device_count;
+          runningMap[dateKey] = item.running;
         });
 
-        const lastDataDate = Object.keys(rateByDate).sort().pop(); // 실제 데이터가 존재하는 가장 최근 날짜
+        rateMapRef.current = {};
+        deviceCountMapRef.current = deviceCountMap;
+        runningMapRef.current = runningMap;
 
-        const lastDataDay = dayjs(lastDataDate).date(); // 가동율이 기록된 가장 마지막 일자
+        const lastDataDate = Object.keys(rateByDate).sort().pop();
+        const lastDataDay = dayjs(lastDataDate).date();
 
         const xAxis = [];
         const yData = [];
 
-        const totalDays = endOfMonth.date(); // 이번달의 마지막 일자(day)
+        const totalDays = endOfMonth.date();
 
         for (let day = 1; day <= totalDays; day++) {
           const date = startOfMonth.date(day).format("YYYY-MM-DD");
-          const label = String(day); // x축 표시해줄 날짜 label
-          xAxis.push(label);
+          xAxis.push(String(day));
 
           if (day <= lastDataDay) {
             if (rateByDate[date]) {
               const rates = rateByDate[date];
               const avg = rates.reduce((sum, r) => sum + r, 0) / rates.length;
               yData.push(Number(avg.toFixed(1)));
+              rateMapRef.current[date] = Number(avg.toFixed(1));
             } else {
-              yData.push(0); // 데이터 없는 날은 0%
+              yData.push(0);
+              rateMapRef.current[date] = 0;
             }
           } else {
-            yData.push(null); // 선이 끊기게 하기 위해 null
+            yData.push(null);
+            rateMapRef.current[date] = null;
           }
         }
+
         setChartData({
           series: [
             {
@@ -95,6 +109,9 @@ const LiveStatusChart = () => {
             },
             xaxis: {
               categories: xAxis,
+              tooltip: {
+                enabled: false,
+              },
               labels: {
                 style: {
                   fontFamily: "Pretendard",
@@ -117,8 +134,24 @@ const LiveStatusChart = () => {
               },
             },
             tooltip: {
-              x: { formatter: (val) => `${val}일` },
-              y: { formatter: (val) => `${val}%` },
+              x: {
+                formatter: (val) => {
+                  const dayIndex = parseInt(val, 10) - 1;
+                  const dateKey = dayjs()
+                    .startOf("month")
+                    .add(dayIndex, "day")
+                    .format("YYYY-MM-DD");
+
+                  const deviceCount = deviceCountMapRef.current[dateKey] ?? "-";
+                  const running = runningMapRef.current[dateKey] ?? "-";
+
+                  return `${val}일 (전체장비: ${deviceCount} / 운영장비:${running})`;
+                },
+              },
+              y: {
+                formatter: (val) =>
+                  val === null || val === undefined ? "-" : `${val}%`,
+              },
               style: {
                 fontSize: "14px",
                 fontFamily: "Pretendard",

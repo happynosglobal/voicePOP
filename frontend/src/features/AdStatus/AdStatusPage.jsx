@@ -194,11 +194,19 @@ const AdStatusPage = ({ title }) => {
               {dummyAD.map((item, index) => (
                 <tr key={item.id}>
                   <td className="truncate">
-                    <Tooltip id={item.id} content={item.company} />
+                    <Tooltip
+                      id={item.id}
+                      label={item.company}
+                      content={item.company}
+                    />
                   </td>
                   <td>{item.adType}</td>
                   <td className="truncate">
-                    <Tooltip id={item.id} content={item.adName} />
+                    <Tooltip
+                      id={item.id}
+                      label={item.adName}
+                      content={item.adName}
+                    />
                   </td>
                   <td className="wide:text-base text-sm">
                     {item.contractPeriod}

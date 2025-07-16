@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ChartTitle from "./ChartTitle";
 import ChartLegend from "./ChartLegend";
 import ReactApexChart from "react-apexcharts";
@@ -9,6 +9,7 @@ import { URL_MAPPING } from "../../../utils/constant/urls";
 
 const BroadcastIssueChart = () => {
   const { user } = useUserStore();
+  const groupedRef = useRef({});
 
   const [chartData, setChartData] = useState({
     series: [],
@@ -33,20 +34,27 @@ const BroadcastIssueChart = () => {
 
         const items = response.data?.data || [];
 
-        // 날짜별 이슈 데이터 그룹화
         const grouped = {};
         items.forEach((item) => {
           const dateKey = dayjs(item.op_date).format("YYYY-MM-DD");
           if (!grouped[dateKey]) {
-            grouped[dateKey] = { unconfirmed: 0, as: 0, stop: 0, broken: 0 };
+            grouped[dateKey] = {
+              unconfirmed: 0,
+              as: 0,
+              stop: 0,
+              broken: 0,
+              device_count: 0,
+            };
           }
           grouped[dateKey].unconfirmed += item.unconfirmed;
           grouped[dateKey].as += item.as;
           grouped[dateKey].stop += item.stop;
           grouped[dateKey].broken += item.broken;
+          grouped[dateKey].device_count = item.device_count;
         });
 
-        // 이번 달 날짜별 데이터 구성
+        groupedRef.current = grouped;
+
         const xAxis = [];
         const unconfirmedData = [];
         const asData = [];
@@ -74,9 +82,9 @@ const BroadcastIssueChart = () => {
 
         setChartData({
           series: [
-            { name: "미확인", data: unconfirmedData },
-            { name: "AS접수", data: asData },
             { name: "정지", data: stopData },
+            { name: "AS접수", data: asData },
+            { name: "미확인", data: unconfirmedData },
             { name: "고장", data: brokenData },
           ],
           options: {
@@ -122,10 +130,26 @@ const BroadcastIssueChart = () => {
               },
             },
             tooltip: {
-              shared: true, // 모든 시리즈 툴팁 표시
-              intersect: false, // 모든 시리즈 툴팁 표시
+              shared: true,
+              intersect: false,
               x: {
-                formatter: (val) => `${val}일`,
+                formatter: (val) => {
+                  const dayIndex = parseInt(val, 10) - 1;
+                  const dateKey = dayjs().startOf("month").add(dayIndex, "day").format("YYYY-MM-DD");
+                  const g = groupedRef.current[dateKey];
+
+                  if (g && g.device_count != null) {
+                    const total = g.device_count;
+                    const sum =
+                      (g.unconfirmed || 0) +
+                      (g.as || 0) +
+                      (g.stop || 0) +
+                      (g.broken || 0);
+                    return `${val}일 (전체장비: ${total} / 미운영장비: ${sum})`;
+                  }
+
+                  return `${val}일`;
+                },
               },
               y: {
                 formatter: (val) =>
@@ -158,9 +182,9 @@ const BroadcastIssueChart = () => {
         url={URL_MAPPING.equipmentStats}
       />
       <div className="absolute top-3.5 right-5 px-2.5 h-9 flex gap-5 items-center rounded-[40px] bg-gray-100">
-        <ChartLegend label="미확인" color="#06B6D4" />
+        <ChartLegend label="정지" color="#06B6D4" />
         <ChartLegend label="AS접수" color="#7DC600" />
-        <ChartLegend label="정지" color="#F87171" />
+        <ChartLegend label="미확인" color="#F87171" />
         <ChartLegend label="고장" color="#484C56" />
       </div>
       <div className="rounded-[20px] bg-white pr-3">
