@@ -1,142 +1,239 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import ContentLayout from "../../layout/ContentLayout";
-import Title from "../../components/title/Title";
-import Tooltip from "../../components/tooltip/Tooltip";
 import Pagination from "../../components/pagination/Pagination";
+import GroupSelectModal from "../../components/modal/GroupSelectModal";
+import useUserStore from "../../stores/user";
+import {
+  deleteGroupDetail,
+  patchGroup,
+  postGroup,
+  postGroupDetail,
+} from "../../api/storeGroup/storeGroup";
+import useHandleStoreGroup from "./hooks/useHandleStoreGroup";
+import { toDate } from "../../utils/customFormat";
+import { toast } from "react-toastify";
+import EmptyState from "../../components/emptyState/EmptyState";
+import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
+import { getErrorMessage } from "../../utils/constant/messages";
+import useSort from "../../hooks/useSort";
+import SortableHeader from "../../components/sortableHeader/SortableHeader";
 
-const dummyGroup = [
-  {
-    id: 1,
-    group_name: "1권역 (제주 제외)",
-    groups: ["용산", "왕십리", "월계", "일산"],
-    createdDate: "2024-12-01",
-    creator: "홍길동",
-    creatorID: "nicetoday1",
-  },
-  {
-    id: 2,
-    group_name: "수도권 전체",
-    groups: [
-      "가든5",
-      "구로",
-      "김포한강",
-      "동탄",
-      "마포",
-      "목동",
-      "미아",
-      "산본",
-      "서울(가든5)",
-      "서울(구로)",
-      "서울(목동)",
-      "서울(미아)",
-      "서울(성수)",
-      "서울(왕십리)",
-      "서울(월계)",
-      "서울(은평)",
-      "서울(자양)",
-      "서울(창동)",
-      "성남",
-      "성수",
-      "송파",
-      "수원",
-      "수지",
-      "시화",
-      "신도림",
-      "안산",
-      "안성",
-      "양재",
-      "여의도",
-      "용인",
-      "의정부",
-      "이수",
-      "일산",
-      "점포없음",
-      "창동",
-      "천호",
-      "청계천",
-      "킨텍스",
-      "파주",
-      "평촌",
-      "하남",
-      "화정",
-    ],
-    createdDate: "2025-01-21",
-    creator: "강현국",
-    creatorID: "hyunguk11",
-  },
-  {
-    id: 3,
-    group_name: "에브리데이 충청권",
-    groups: [
-      "대전(둔산)",
-      "대전(관저)",
-      "대전(중리)",
-      "천안(불당)",
-      "천안(쌍용)",
-      "천안(신부)",
-      "세종(고운)",
-      "세종(나성)",
-      "청주(율량)",
-      "청주(가경)",
-      "충주",
-      "아산(탕정)",
-      "아산(배방)",
-    ],
-    createdDate: "2025-03-03",
-    creator: "홍연숙",
-    creatorID: "ghddustnr",
-  },
-  {
-    id: 4,
-    group_name: "수도권 외",
-    groups: ["청주", "원주", "강릉"],
-    createdDate: "2025-02-22",
-    creator: "황수연",
-    creatorID: "heysunny612",
-  },
-];
+const StoreGroupPage = ({ title }) => {
+  const { user } = useUserStore();
+  const [expandedIndex, setExpandedIndex] = useState(null); // 점포 토글 스테이트
+  const groupModalRef = useRef(null); // 점포 선택 모달 ref
 
-const StoreGroupPage = () => {
+  const {
+    page,
+    setPage,
+    total,
+    limit,
+    storeGroupList,
+    getStoreGroupList,
+    handleSort,
+  } = useHandleStoreGroup();
+  const { sortOption, toggleSort } = useSort(handleSort);
+  const [groupId, setGroupId] = useState(null); //선택된 그룹 ID
+
+  const getRowNumber = (index) => limit * (page - 1) + index + 1;
+
+  const handleSubmit = async (name, stores, id) => {
+    const groupBody = {
+      brand_code: user?.brand_code,
+      name: name,
+    };
+    if (id) {
+      groupBody.use_yn = "Y";
+    }
+    // 선택된 점포 parsing
+    const groupedStores = stores.map(({ value, label }) => ({
+      store_code: value,
+      store_name: label,
+    }));
+
+    try {
+      let groupRes = null;
+      if (!id) {
+        // 그룹 생성
+        groupRes = await postGroup(groupBody);
+      } else if (id) {
+        // 그룹명 수정
+        groupRes = await patchGroup(id, groupBody);
+      }
+
+      // if (groupRes.data.status_code !== 200) {
+      //   throw new Error("그룹 등록 실패");
+      // }
+
+      const groupId = groupRes.data.data.id;
+
+      if (id) {
+        try {
+          groupRes = await deleteGroupDetail(id);
+        } catch (err) {
+          // 서버에서 등록된 점포들이 없을 경우 406 오류는 무시하고 계속 진행
+          if (err?.response?.status === 406) {
+            console.warn("삭제할 그룹 점포가 없음");
+          } else {
+            throw err;
+          }
+        }
+      }
+
+      // if (groupRes.data.status_code !== 200) {
+      //   throw new Error("그룹 내 점포 삭제 실패");
+      // }
+
+      //그룹 내에 선택된 점포들 등록
+      const groupedStoresRes = await postGroupDetail(groupId, {
+        brand_code: user?.brand_code,
+        user_id: user?.user_id,
+        item: groupedStores,
+      });
+
+      if (groupedStoresRes.data.status_code !== 200) {
+        throw new Error("그룹 내 점포 등록 실패");
+      }
+      getStoreGroupList(1);
+      toast.success("그룹 생성이 완료되었습니다");
+      groupModalRef.current.close();
+    } catch (err) {
+      const errMsg = getErrorMessage(err.response.data.message);
+      toast.error(errMsg);
+      console.error("그룹 생성 중 오류 발생:", err);
+    }
+  };
+
+  const handleDeleteGroup = async (id) => {
+    if (!confirm("정말 삭제하시겠습니까?")) return;
+    const groupBody = {
+      brand_code: user?.brand_code,
+      use_yn: "N",
+    };
+
+    try {
+      const groupRes = await patchGroup(id, groupBody);
+
+      if (groupRes.data.status_code !== 200) {
+        throw new Error("그룹 삭제 실패");
+      }
+
+      getStoreGroupList(1);
+      toast.success("그룹 삭제가 완료되었습니다");
+      groupModalRef.current.close();
+    } catch (err) {
+      const errMsg = getErrorMessage(err.response.data.message);
+      toast.error(errMsg);
+      console.error("그룹 삭제 중 오류 발생:", err);
+    }
+  };
   return (
-    <ContentLayout>
-      <div className="flex items-center justify-between">
-        <Title text="점포 그룹 관리" />
-
-        <button className="btn btn-sm btn-primary">그룹 생성</button>
+    <ContentLayout title={title}>
+      <div className="mb-4 flex items-center justify-end">
+        <button
+          className="btn btn-sm btn-primary"
+          onClick={() => {
+            setGroupId(null);
+            groupModalRef.current.showModal();
+          }}
+        >
+          그룹 생성
+        </button>
       </div>
-      <table>
+      <table className="table">
         <thead>
           <tr>
             <th className="w-14">순서</th>
             <th className="w-2/12">그룹명</th>
             <th className="w-1/12">점포수</th>
             <th>점포</th>
-            <th className="w-2/12">생성일</th>
-            <th className="w-2/12">생성자</th>
+            <th className=" wide:w-1/12">
+              <SortableHeader
+                className="inline-flex items-center gap-1 hover:underline"
+                label="생성일"
+                sortKey="created_at"
+                sortOption={sortOption}
+                toggleSort={toggleSort}
+              />
+            </th>
+            <th className="w-1/12">생성자</th>
+            <th className="w-20">삭제</th>
           </tr>
         </thead>
-        {dummyGroup.length > 0 && (
+        {storeGroupList.length > 0 && (
           <tbody>
-            {dummyGroup.map((item, index) => (
-              <tr key={item.id} onClick={() => handleRowClick(item.id)}>
-                <td>{dummyGroup.length - index}</td>
-                <td>{item.group_name}</td>
-                <td>{item.groups.length}</td>
-                <td className="truncate">
-                  <Tooltip id={item.id} content={item.groups} place="bottom" />
-                </td>
-                <td>{item.createdDate}</td>
+            {storeGroupList.map((item, index) => (
+              <tr key={index}>
+                <td>{getRowNumber(index)}</td>
                 <td>
-                  {item.creator} ({item.creatorID})
+                  <button
+                    className="hover:underline"
+                    onClick={() => {
+                      setGroupId(item?.id);
+                      groupModalRef.current.showModal();
+                    }}
+                  >
+                    {item.name}
+                  </button>
+                </td>
+                <td>{item.count}</td>
+                <td>
+                  {item.count > 0 && (
+                    <div
+                      className="flex cursor-pointer gap-2"
+                      onClick={() =>
+                        setExpandedIndex(expandedIndex === index ? null : index)
+                      }
+                    >
+                      <div
+                        className={`flex-1 text-left break-keep max-h-40 overflow-y-auto  ${
+                          expandedIndex === index
+                            ? "p-2 border bg-white"
+                            : "truncate "
+                        }`}
+                      >
+                        {item.store_names.join(", ")}
+                      </div>
+                      {expandedIndex === index ? (
+                        <IoIosArrowUp className="text-2xl" />
+                      ) : (
+                        <IoIosArrowDown className="text-2xl" />
+                      )}
+                    </div>
+                  )}
+                </td>
+                <td>{toDate(item.created_at)}</td>
+                <td>{item.creater}</td>
+                <td>
+                  <button
+                    className="btn btn-xs btn-error"
+                    onClick={() => {
+                      handleDeleteGroup(item.id);
+                    }}
+                  >
+                    삭제
+                  </button>
                 </td>
               </tr>
             ))}
           </tbody>
         )}
       </table>
-      {/* <EmptyState text="일치하는 검색 결과가 없습니다." /> */}
-      {/* <EmptyState text="등록된 리스트가 없습니다." />  */}
-      <Pagination />
+      {storeGroupList.length === 0 && (
+        <EmptyState text="등록된 그룹 리스트가 없습니다." />
+      )}
+      <Pagination page={page} total={total} limit={limit} setPage={setPage} />
+      {/* 점포선택 모달 */}
+      <GroupSelectModal
+        modalRef={groupModalRef}
+        label={groupId ? "그룹수정" : "그룹생성"}
+        handleSubmit={handleSubmit}
+        handleDeleteGroup={handleDeleteGroup}
+        mode={groupId ? "modify" : "add"}
+        groupId={groupId}
+        setGroupId={setGroupId}
+        addable
+      />
     </ContentLayout>
   );
 };

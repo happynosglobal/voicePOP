@@ -3,19 +3,30 @@ import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import { Outlet, useNavigate } from "react-router-dom";
 import useUserStore from "../stores/user";
+import useCodes from "../stores/codes";
+import { getAccessToken } from "../hooks/useAuth";
 
 const DefaultLayout = () => {
-  const navigate = useNavigate();
-  const { user, isAuthenticated } = useUserStore();
+  const { user, logout } = useUserStore();
+  const { allStoreCode, isLoading, fetchStores, resetStores } = useCodes();
   const [mounted, setMounted] = useState(false);
 
+  // useEffect(() => {
+  //   // 로그인 후 점포코드가 없을 때 다시 점포코드 조회
+  //   if (user && isLoading && allStoreCode.length === 0) {
+  //     fetchStores(user?.brand_code);
+  //   }
+  // }, [user, isLoading, allStoreCode]);
+
   useEffect(() => {
-    if (isAuthenticated && user) {
+    const token = getAccessToken();
+    if (!token) {
+      logout();
+      resetStores();
+    } else {
       setMounted(true);
-    } else if (!isAuthenticated && !user) {
-      navigate("/login");
     }
-  }, [isAuthenticated, user]);
+  }, []);
 
   return (
     <>

@@ -10,11 +10,11 @@ const ProtectedRoute = ({ children }) => {
     }
 
     // 유저가 접근 가능한 메뉴 URL 목록을 가져오기
-    const allowedPaths = user.menu.map(menuItem => menuItem.url);
+    const allowedPaths = user?.menu.map(menuItem => menuItem.url);
 
     // 현재 pathname이 허용되지 않았다면 "/"로 이동
     if (!allowedPaths.includes(location.pathname)) {
-        return <Navigate to={user.dashboard_url} />;
+        return <Navigate to={user?.dashboard_url} />;
     }
 
     return children;

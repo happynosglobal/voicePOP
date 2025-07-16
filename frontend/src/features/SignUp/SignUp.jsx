@@ -1,11 +1,15 @@
-import { useEffect, useState } from "react";
 import Input from "../../components/input/Input";
-import Select from "react-select";
-import { passwordRegex, userIdRegex } from "../../utils/validation";
-import useSignupForm from "./hooks/useSignupForm";
+import { emailRegex } from "../../utils/validation";
+import useSignUpForm from "./hooks/useSignUpForm";
+import { levelOptions } from "../../utils/constant/options";
+import { useEffect } from "react";
+import Dropdown from "../../components/dropdown/Dropdown";
 
 const SignUp = () => {
   const {
+    brandOptions,
+    getBrandCodes,
+    companyOptions,
     formData,
     errors,
     isIdChecked,
@@ -14,14 +18,30 @@ const SignUp = () => {
     handleInput,
     handleSelectBox,
     handleMultiSelectBox,
-    isFormValid
-  } = useSignupForm();
-console.log(formData)
+    isFormValid,
+    handleClickBrand,
+    storeList,
+    handleError,
+    handleRequestUser,
+  } = useSignUpForm();
+
+  useEffect(() => {
+    getBrandCodes();
+  }, []);
+
+  const handleSubmitPost = async () => {
+    try {
+      await handleRequestUser();
+    } catch (err) {
+      console.error("사용자 등록 실패:", err);
+    }
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen py-10 bg-gray-100">
-      <div className="card w-full max-w-md bg-white shadow-xl p-6">
+      <div className="card w-full max-w-lg bg-white shadow-xl p-6">
         <h2 className="text-2xl font-bold text-center mb-4">
-          Voice PoP 사용자 등록 신청
+          사용자 등록 신청
         </h2>
 
         <div className="form-control mt-4">
@@ -36,106 +56,131 @@ console.log(formData)
             value={formData.user_name}
             onChange={handleInput}
             errorMessage={errors.user_name}
-            required
+            handleError={handleError}
           />
         </div>
 
         <div className="form-control mt-4">
           <label className="label flex justify-between">
-            <span className="label-text font-semibold">신청 ID</span>
-            <button className="btn btn-sm btn-black" onClick={checkIdDuplicate}>ID 중복 확인</button>
+            <span className="label-text font-semibold">신청 ID (사번)</span>
           </label>
-          <Input
-            type="text"
-            name="user_id"
-            placeholder="아이디를 입력하세요."
-            className="input input-bordered w-full"
-            value={formData.user_id}
-            onChange={handleInput}
-            validation={userIdRegex}
-            errorMessage={!isIdChecked ? "ID 중복 확인 을 해주세요." : errors.user_id}
-            required
-          />
+          <div className="relative">
+            <Input
+              type="text"
+              name="user_id"
+              placeholder="아이디를 입력하세요."
+              className="input input-bordered w-[360px]"
+              value={formData.user_id}
+              onChange={handleInput}
+              maxLength={10}
+            />
+            <button
+              className="absolute top-0 right-0 btn btn-sm btn-accent"
+              onClick={checkIdDuplicate}
+            >
+              ID 중복 확인
+            </button>
+          </div>
+          {!isIdChecked ? (
+            <p className="mt-2 text-error text-sm">{errors.user_id}</p>
+          ) : (
+            <p className="mt-2 text-sm text-gray-500 text-primary">
+              사용 가능한 ID 입니다.
+            </p>
+          )}
           <p className="mt-2 text-sm text-gray-500">
-            * 사번 또는 영문 소문자와 숫자를 결합하여
-            <span className="text-primary font-semibold">6자~10자</span> 이내.
+            * 사번 또는 영문 소문자와 숫자를 포함하여
+            <span className="text-primary font-semibold"> 6자~10자</span> 이내.
           </p>
         </div>
 
         <div className="form-control mt-4">
           <label className="label">
-            <span className="label-text font-semibold">Password</span>
+            <span className="label-text font-semibold">회사명</span>
           </label>
-          <Input
-            type="password"
-            name="password"
-            placeholder="비밀번호 입력하세요."
-            className="input input-bordered w-full"
-            value={formData.password}
-            onChange={handleInput}
-            validation={passwordRegex}
+          <Dropdown
+            name="company_code"
+            options={companyOptions}
+            value={companyOptions.filter((option) =>
+              formData.company_code.includes(option.value)
+            )}
+            className="w-full"
+            classNamePrefix="select"
+            onChange={handleSelectBox}
+            placeholder="회사를 선택하세요"
           />
-          <p className="mt-2 text-sm text-gray-500">
-            * 영문 대/소문자와 특수문자, 숫자를 결합하여
-            <span className="text-primary font-semibold">6자~10자</span> 이내.
-          </p>
         </div>
 
-        <div className="form-control mt-4">
-          <label className="label">
-            <span className="label-text font-semibold">Password 확인</span>
-          </label>
-          <Input
-            type="password"
-            name="confirm_password"
-            placeholder="비밀번호를 다시한번 입력해주세요."
-            className="input input-bordered w-full"
-            value={formData.confirm_password}
-            onChange={handleInput}
-            errorMessage={!isPasswordMatched ? "비밀번호가 일치하지 않습니다." : ""}
-          />
-        </div>
+        {formData.company_code === "etc" && (
+          <div className="form-control mt-4">
+            <Input
+              type="text"
+              name="company_id"
+              placeholder="회사명을 직접 입력하세요."
+              className="input input-bordered w-full"
+              value={formData.company_id}
+              onChange={handleInput}
+              errorMessage={errors.company_id}
+              handleError={handleError}
+            />
+          </div>
+        )}
 
         <div className="form-control mt-4">
           <label className="label">
             <span className="label-text font-semibold">요청 권한</span>
           </label>
           <div className="flex gap-4">
-            <Select
-              name="level"
-              options={[
-                { value: "0", label: "전체 관리자" },
-                { value: "1", label: "브랜드 관리자" },
-                { value: "2", label: "광고 관리자" },
-                { value: "3", label: "점포 관리자" },
-              ]}
+            <Dropdown
+              name="required_level"
+              options={levelOptions}
               className="w-full"
-              // value={formData.level}
+              value={levelOptions.filter(
+                (option) => option.value === formData.required_level
+              )}
               onChange={handleSelectBox}
-              defaultValue={{ value: "0", label: "전체 관리자" }}
+              placeholder="권한을 선택하세요"
             />
           </div>
         </div>
-
         <div className="form-control mt-4">
           <label className="label">
             <span className="label-text font-semibold">관리 브랜드</span>
           </label>
           <div className="flex gap-4">
-            <Select
-              isMulti
-              name="colors"
-              options={[
-                { value: "EM", label: "이마트(EM)" },
-                { value: "ED", label: "에브리데이(ED)" },
-                { value: "TR", label: "트레이더스(TR)" },
-              ]}
-              className="w-full"
-              classNamePrefix="select"
-              onChange={handleMultiSelectBox}
-              placeholder="브랜드를 선택하세요"
-              isDisabled={formData.level === "0" ? true : false} // 전체관리자는 disabled
-            />
+            {formData.required_level !== "STORE" ? (
+              <Dropdown
+                isMulti
+                name="brand_code"
+                options={brandOptions}
+                value={brandOptions.filter((option) =>
+                  formData.brand_code.includes(option.value)
+                )}
+                className="w-full"
+                classNamePrefix="select"
+                onChange={handleMultiSelectBox}
+                placeholder="브랜드를 선택하세요"
+                isDisabled={formData.required_level === "ADMIN" ? true : false} // 전체관리자는 disabled
+              />
+            ) : (
+              <Dropdown
+                name="brand_code"
+                options={brandOptions}
+                value={brandOptions.filter(
+                  (option) => option.value === formData.brand_code[0]
+                )}
+                className="w-full"
+                classNamePrefix="select"
+                onChange={(option) => handleClickBrand(option.value)}
+                placeholder="브랜드를 선택하세요"
+                isDisabled={
+                  formData.required_level === "ADMIN" ||
+                  (formData.required_level === "STORE" && formData.company_code !== "etc")
+                    ? true
+                    : false
+                } // 전체관리자 or 회사명을 선택 후 점포관리자를 선택했을 때 disabled
+              />
+            )}
           </div>
         </div>
 
@@ -143,22 +188,18 @@ console.log(formData)
           <label className="label">
             <span className="label-text font-semibold">관리 점포</span>
           </label>
-          <Select
-            name="mart_code"
-            options={[
-              { value: "0", label: "행당점" },
-              { value: "1", label: "점포A" },
-              { value: "2", label: "점포B" },
-              { value: "3", label: "점포C" },
-              { value: "4", label: "점포D" },
-            ]}
+          <Dropdown
+            name="store_code"
+            options={storeList}
+            value={storeList.filter(
+              (option) => option.value === formData.store_code
+            )}
             className="w-full"
             onChange={handleSelectBox}
             placeholder="관리점포를 선택하세요"
-            isDisabled={formData.level === "3" ? false : true} // 점포관리자만 activated
+            isDisabled={formData.required_level === "STORE" ? false : true} // 점포관리자만 activated
           />
         </div>
-
         <div className="form-control mt-4">
           <label className="label">
             <span className="label-text font-semibold">이메일</span>
@@ -166,16 +207,24 @@ console.log(formData)
           <Input
             type="email"
             name="email"
-            placeholder="이메일 입력"
+            placeholder="이메일을 입력하세요."
             className="input input-bordered w-full"
             value={formData.email}
             onChange={handleInput}
-            required
+            validation={emailRegex}
+            errorMessage={errors.email}
+            handleError={handleError}
           />
         </div>
 
         <div className="form-control mt-6">
-          <button className="btn btn-primary w-full" disabled={!isFormValid()}>등록 신청</button>
+          <button
+            className="btn btn-primary w-full"
+            disabled={!isFormValid()}
+            onClick={handleSubmitPost}
+          >
+            등록 신청
+          </button>
         </div>
       </div>
     </div>

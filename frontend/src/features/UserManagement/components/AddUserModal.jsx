@@ -1,121 +1,534 @@
-import { IoClose } from "react-icons/io5";
 import Select from "react-select";
+import Radio from "../../../components/input/Radio";
+import useAddUser from "../hooks/useAddUser";
+import Input from "../../../components/input/Input";
+import { emailRegex, passwordRegex } from "../../../utils/validation";
+import { useEffect, useRef, useState } from "react";
+import { levelOptions } from "../../../utils/constant/options";
+import LoadingSpinner from "../../../components/loading/LoadingSpinner";
+import PwChangeModal from "../../../components/modal/PwChangeModal";
+import { patchUser, resetPassword } from "../../../api/user/user";
+import { toast } from "react-toastify";
+import { getErrorMessage } from "../../../utils/constant/messages";
+import Dropdown from "../../../components/dropdown/Dropdown";
 
-const AddUserModal = ({ modalRef }) => {
+const AddUserModal = ({
+  modalRef,
+  closeModal,
+  userId,
+  setUserId,
+  userData,
+  setUserData,
+  handleGetUsers,
+  mode,
+}) => {
+  const {
+    brandCodes,
+    brandOptions,
+    companyOptions,
+    initialFormData,
+    formData,
+    setFormData,
+    userInfo,
+    setUserInfo,
+    isInit,
+    setIsInit,
+    errors,
+    setErrors,
+    isIdChecked,
+    setIsIdChecked,
+    isPasswordMatched,
+    checkIdDuplicate,
+    handleInput,
+    handleSelectBox,
+    handleMultiSelectBox,
+    isFormValid,
+    handleGetUserInfo,
+    handlePostUserInfo,
+    handlePatchUserInfo,
+    handleDeletehUserInfo,
+    handleClickBrand,
+    storeList,
+    setStoreList,
+    handleError,
+  } = useAddUser();
+
+  const pwChangeModalRef = useRef(null);
+
+  useEffect(() => {
+    if (mode === "modify" && userData) {
+      handleGetUserInfo(userData);
+    }
+  }, [mode, userData]);
+
+  const handleSubmitPost = async () => {
+    try {
+      await handlePostUserInfo();
+      handleGetUsers(1);
+      closeModal();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleSubmitModify = async () => {
+    try {
+      await handlePatchUserInfo(userId);
+      handleGetUsers(1);
+      closeModal();
+    } catch (err) {
+      console.error("사용자 수정 실패:", err);
+    }
+  };
+
+  const handleSubmitDelete = async () => {
+    if (!confirm("정말 삭제하시겠습니까?")) return;
+    try {
+      await handleDeletehUserInfo(userId);
+      handleGetUsers(1);
+      closeModal();
+    } catch (err) {
+      console.error("사용자 수정 실패:", err);
+    }
+  };
+
+  const handleSubmitChangePw = async (pw) => {
+    const body = {
+      password: pw,
+    };
+    try {
+      const response = await patchUser(userId, body);
+      const { status_code, data } = response.data;
+      if (status_code === 200) {
+        pwChangeModalRef.current.close();
+        toast.success("암호가 성공적으로 변경되었습니다");
+      }
+    } catch (err) {
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
+      console.error(err);
+    }
+  };
+
+  const handleSubmitResetPw = async () => {
+    if (!confirm("초기화 하시겠습니까?")) return;
+    const body = {
+      user_id: formData.user_id,
+      name: formData.user_name,
+      email: formData.email,
+    };
+    try {
+      const response = await resetPassword(body);
+      const { status, data } = response;
+      if (status === 200 && data.status_code === 200) {
+        toast.success(data.message);
+      }
+    } catch (err) {
+      const errMsg = getErrorMessage(err?.response?.data?.message);
+      toast.error(errMsg);
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    const level = formData.level;
+    const companyCode = formData.company_code;
+
+    if (!companyCode) return;
+
+    // 수정 모드일 경우 초기 데이터 세팅이 끝나야 적용
+    if (mode === "modify" && !isInit) return;
+
+    if (companyCode === "etc") {
+      if (level === "ADMIN") {
+        setFormData((prev) => ({
+          ...prev,
+          brand_code: brandCodes,
+          store_code: null,
+        }));
+      } else {
+        setFormData((prev) => ({
+          ...prev,
+          brand_code: [],
+          store_code: null,
+        }));
+      }
+      return;
+    }
+
+    const matched = brandOptions.find((option) => option.value === companyCode);
+    if (!matched) return;
+
+    if (level === "ADMIN") {
+      setFormData((prev) => ({
+        ...prev,
+        brand_code: brandCodes,
+        store_code: null,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        brand_code: [companyCode],
+        store_code: null,
+      }));
+
+      if (level === "STORE") {
+        handleClickBrand(companyCode);
+      }
+    }
+  }, [formData.company_code, formData.level]);
+
+  /* 모달창 닫을 때 수행 할 로직 */
+  useEffect(() => {
+    const modal = modalRef?.current;
+    if (!modal) return;
+
+    const handleClose = () => {
+      setFormData(initialFormData);
+      setErrors({});
+      setUserId(null);
+      setUserData(null);
+      setUserInfo(null);
+      setStoreList([]);
+      setIsIdChecked(false);
+      setIsEditingPassword(false);
+      setIsInit(false);
+    };
+
+    modal.addEventListener("close", handleClose);
+
+    return () => {
+      modal.removeEventListener("close", handleClose);
+    };
+  }, [modalRef]);
+
+  const [isEditingPassword, setIsEditingPassword] = useState(false);
+
   return (
-    <dialog id="my_modal_1" className="modal" ref={modalRef}>
-      <div className="modal-box bg-white max-w-xl">
-        <h3 className="mb-6 pb-6 font-semibold text-lg border-b">
-          사용자 등록
-        </h3>
-        <form method="dialog">
+    <>
+      <dialog id="my_modal_1" className="modal" ref={modalRef}>
+        <div className="modal-box bg-white max-w-xl">
+          <h3 className="mb-6 pb-6 font-semibold text-lg border-b">
+            사용자 {mode === "add" ? "등록" : "수정"}
+          </h3>
           <div className="flex flex-col gap-6">
-            <div className="flex items-center justify-between">
+            <div className="flex justify-between">
               <label className="font-semibold w-1/4 shrink-0">성명</label>
-              <input
+              <Input
                 type="text"
-                class="input w-full"
-                value=""
-                placeholder="성명을 입력하세요"
+                name="user_name"
+                placeholder="성명을 입력하세요."
+                className="input w-full"
+                value={formData.user_name}
+                onChange={handleInput}
+                errorMessage={errors.user_name}
+                handleError={handleError}
               />
             </div>
-            <div className="flex items-center justify-between">
-              <label className="font-semibold w-1/4 shrink-0">아이디</label>
-              <input
-                type="text"
-                class="input w-full"
-                value=""
-                placeholder="아이디를 입력하세요"
-              />
+            <div className="flex justify-between">
+              <label className="py-2 font-semibold w-1/4 shrink-0">
+                아이디
+              </label>
+              <div className="w-full">
+                <Input
+                  type="text"
+                  name="user_id"
+                  placeholder="아이디를 입력하세요."
+                  className="input w-full"
+                  value={formData.user_id}
+                  onChange={handleInput}
+                  maxLength={10}
+                  disabled={mode === "modify" ? true : false}
+                />
+                {!isIdChecked ? (
+                  <p className="mt-2 text-error text-sm">{errors.user_id}</p>
+                ) : (
+                  <p className="mt-2 text-sm text-gray-500 text-primary">
+                    사용 가능한 ID 입니다.
+                  </p>
+                )}
+              </div>
+              {mode === "add" && (
+                <button
+                  className="btn btn-sm btn-accent ml-3"
+                  onClick={checkIdDuplicate}
+                  disabled={mode === "modify" ? true : false}
+                >
+                  ID 중복 확인
+                </button>
+              )}
             </div>
-            <div className="flex items-center justify-between">
-              <label className="font-semibold w-1/4 shrink-0">패스워드</label>
-              <input
-                type="text"
-                class="input w-full"
-                value=""
-                placeholder="패스워드를 입력하세요"
-              />
+            <div className="flex justify-between">
+              <label className="py-2 font-semibold w-1/4 shrink-0">
+                비밀번호
+              </label>
+              <div className="w-full">
+                <Input
+                  type="password"
+                  name="password"
+                  placeholder={
+                    mode === "add" ? "비밀번호 입력하세요." : "*****"
+                  }
+                  className="input w-full"
+                  value={formData.password}
+                  onChange={handleInput}
+                  validation={passwordRegex}
+                  errorMessage={errors.password}
+                  handleError={handleError}
+                  disabled={mode === "modify" && !isEditingPassword}
+                />
+              </div>
+              {mode === "modify" && (
+                <button
+                  type="button"
+                  className="btn btn-sm btn-accent ml-3"
+                  onClick={() => pwChangeModalRef.current.showModal()}
+                >
+                  비밀번호 변경
+                </button>
+              )}
             </div>
-            <div className="flex items-center justify-between">
-              <label className="font-semibold w-1/4 shrink-0">권한</label>
-              <Select
-                options={[
-                  { value: "0", label: "전체 관리자" },
-                  { value: "1", label: "브랜드 관리자" },
-                  { value: "2", label: "광고 관리자" },
-                  { value: "3", label: "점포 관리자" },
-                ]}
+            {mode === "add" && (
+              <div className="flex justify-between">
+                <label className="py-2 font-semibold w-1/4 shrink-0">
+                  비밀번호 확인
+                </label>
+                <div className="w-full">
+                  <Input
+                    type="password"
+                    name="confirm_password"
+                    placeholder="비밀번호를 다시한번 입력해주세요."
+                    className="input w-full"
+                    value={formData.confirm_password}
+                    onChange={handleInput}
+                    errorMessage={
+                      !isPasswordMatched ? "비밀번호가 일치하지 않습니다." : ""
+                    }
+                    handleError={handleError}
+                    disabled={mode === "modify" && !isEditingPassword}
+                  />
+                </div>
+              </div>
+            )}
+            <div className="flex justify-between">
+              <label className="py-2 font-semibold w-1/4 shrink-0">
+                회사명
+              </label>
+              <div className="w-full">
+                <Dropdown
+                  name="company_code"
+                  options={companyOptions}
+                  value={companyOptions.filter((option) =>
+                    formData.company_code.includes(option.value)
+                  )}
+                  className="w-full"
+                  classNamePrefix="select"
+                  onChange={handleSelectBox}
+                  placeholder="회사를 선택하세요"
+                />
+                {formData.company_code === "etc" && (
+                  <div className="form-control mt-4">
+                    <Input
+                      type="text"
+                      name="company_id"
+                      placeholder="회사명을 직접 입력하세요."
+                      className="input w-full"
+                      value={formData.company_id}
+                      onChange={handleInput}
+                      errorMessage={errors.company_id}
+                      handleError={handleError}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="flex justify-between">
+              <label className="py-2 font-semibold w-1/4 shrink-0">권한</label>
+              <Dropdown
+                name="level"
+                options={levelOptions}
                 className="w-full"
+                value={levelOptions.filter(
+                  (option) => option.value === formData.level
+                )}
+                onChange={handleSelectBox}
                 placeholder="권한을 선택하세요"
               />
             </div>
-            <div className="flex items-center justify-between">
-              <label className="font-semibold w-1/4 shrink-0">관리브랜드</label>
-              <Select
-                isMulti
-                name="colors"
-                options={[
-                  { value: "EM", label: "이마트(EM)" },
-                  { value: "ED", label: "에브리데이(ED)" },
-                  { value: "TR", label: "트레이더스(TR)" },
-                ]}
-                className="w-full"
-                classNamePrefix="select"
-                placeholder="브랜드를 선택하세요"
-              />
+            <div className="flex justify-between">
+              <label className="py-2 font-semibold w-1/4 shrink-0">
+                관리브랜드
+              </label>
+              {formData.level !== "STORE" ? (
+                <Dropdown
+                  isMulti
+                  name="brand_code"
+                  options={brandOptions}
+                  value={brandOptions.filter((option) =>
+                    formData.brand_code.includes(option.value)
+                  )}
+                  className="w-full"
+                  classNamePrefix="select"
+                  onChange={handleMultiSelectBox}
+                  placeholder="브랜드를 선택하세요"
+                  isDisabled={formData.level === "ADMIN" ? true : false} // 전체관리자는 disabled
+                />
+              ) : (
+                <Dropdown
+                  name="brand_code"
+                  options={brandOptions}
+                  value={brandOptions.filter(
+                    (option) => option.value === formData.brand_code[0]
+                  )}
+                  className="w-full"
+                  classNamePrefix="select"
+                  onChange={(option) => handleClickBrand(option.value)}
+                  placeholder="브랜드를 선택하세요"
+                  isDisabled={
+                    formData.level === "ADMIN" ||
+                    (formData.level === "STORE" &&
+                      formData.company_code !== "etc")
+                      ? true
+                      : false
+                  } // 전체관리자 or 회사명을 선택 후 점포관리자를 선택했을 때 disabled
+                />
+              )}
             </div>
-            <div className="flex items-center justify-between">
-              <label className="font-semibold w-1/4 shrink-0">관리점포</label>
-              <Select
-                options={[
-                  { value: "0", label: "행당점" },
-                  { value: "1", label: "점포A" },
-                  { value: "2", label: "점포B" },
-                  { value: "3", label: "점포C" },
-                  { value: "4", label: "점포D" },
-                ]}
+
+            <div className="flex justify-between">
+              <label className="py-2 font-semibold w-1/4 shrink-0">
+                관리점포
+              </label>
+              <Dropdown
+                name="store_code"
+                options={storeList}
+                value={storeList.filter(
+                  (option) => option.value === formData.store_code
+                )}
                 className="w-full"
+                onChange={handleSelectBox}
                 placeholder="관리점포를 선택하세요"
+                isDisabled={formData.level === "STORE" ? false : true}
               />
             </div>
-            <div className="flex items-center justify-between">
-              <label className="font-semibold w-1/4 shrink-0">이메일</label>
-              <input
-                type="email"
-                class="input w-full"
-                value=""
-                placeholder="이메일을 입력하세요"
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <label className="font-semibold w-1/4 shrink-0">상태</label>
-              <div className="flex gap-10 w-full">
-                <label className="flex items-center gap-2 cursor-pointer text-base">
-                  <input type="radio" name="status" className="radio" />
-                  미승인
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer text-base">
-                  <input type="radio" name="status" className="radio" checked />
-                  승인
-                </label>
+            <div className="flex justify-between">
+              <label className="py-2 font-semibold w-1/4 shrink-0">
+                이메일
+              </label>
+              <div className="w-full">
+                <Input
+                  type="email"
+                  name="email"
+                  placeholder="이메일을 입력하세요."
+                  className="input w-full"
+                  value={formData.email}
+                  onChange={handleInput}
+                  validation={emailRegex}
+                  errorMessage={errors.email}
+                  handleError={handleError}
+                />
               </div>
             </div>
+            {mode === "modify" && (
+              <div className="flex justify-between">
+                <label className="py-2 font-semibold w-1/4 shrink-0">
+                  상태
+                </label>
+                <div className="flex gap-6 w-full">
+                  <label
+                    htmlFor="reject"
+                    className="flex items-center gap-2 cursor-pointer text-base"
+                  >
+                    <Radio
+                      id="reject"
+                      name="status"
+                      className="radio"
+                      label="미승인"
+                      value={"require"}
+                      checked={formData.status === "require"}
+                      onChange={handleInput}
+                    />
+                  </label>
+                  <label
+                    htmlFor="approve"
+                    className="flex items-center gap-2 cursor-pointer text-base"
+                  >
+                    <Radio
+                      id="approve"
+                      name="status"
+                      className="radio"
+                      label="승인"
+                      value={"normal"}
+                      checked={formData.status === "normal"}
+                      onChange={handleInput}
+                    />
+                  </label>
+                  <label
+                    htmlFor="ban"
+                    className="flex items-center gap-2 cursor-pointer text-base"
+                  >
+                    <Radio
+                      id="ban"
+                      name="status"
+                      className="radio"
+                      label="정지"
+                      value={"banned"}
+                      checked={formData.status === "banned"}
+                      onChange={handleInput}
+                    />
+                  </label>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="flex w-full items-center justify-center gap-2.5 mt-12">
-            <button className="absolute right-3 top-4 w-10 h-10 text-2xl">
+            <button
+              className="absolute right-3 top-4 w-10 h-10 text-2xl"
+              onClick={closeModal}
+            >
               ✕
             </button>
-            <button className="btn min-w-24">취소</button>
-            {/* <button className="btn btn-error min-w-24">삭제</button> */}
-            <button type="submit" className="btn btn-primary min-w-24">
-              등록
+            <button className="btn min-w-24" onClick={closeModal}>
+              취소
             </button>
+            {mode === "add" ? (
+              <button
+                className="btn btn-primary min-w-24"
+                disabled={!isFormValid(mode)}
+                onClick={handleSubmitPost}
+              >
+                등록
+              </button>
+            ) : (
+              <>
+                <button
+                  className="btn btn-primary min-w-24"
+                  disabled={!isFormValid(mode)}
+                  onClick={handleSubmitModify}
+                >
+                  수정
+                </button>
+                <button
+                  className="btn btn-error min-w-24"
+                  onClick={handleSubmitDelete}
+                >
+                  삭제
+                </button>
+              </>
+            )}
           </div>
-        </form>
-      </div>
-    </dialog>
+        </div>
+        <LoadingSpinner includeCodesLoading={true} />
+      </dialog>
+      <PwChangeModal
+        modalRef={pwChangeModalRef}
+        handleSubmitChangePw={handleSubmitChangePw}
+        handleSubmitResetPw={handleSubmitResetPw}
+        hasResetButton={true}
+      />
+    </>
   );
 };
 

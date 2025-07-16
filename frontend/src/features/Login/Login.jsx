@@ -1,22 +1,23 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useUserStore from "../../stores/user";
 import { useNavigate } from "react-router-dom";
-import { userData } from "./dummy/data";
-import apiCall from "../../utils/axiosConfig";
-import { postLogin } from "../../api/user/user";
+import { postLogin, postUserBrand } from "../../api/user/user";
+import useCodes from "../../stores/codes";
+import Logo from "../../components/logo/Logo";
+import { toast } from "react-toastify";
+import useBrandCode from "../../hooks/useBrandCode";
+import { URL_MAPPING } from "../../utils/constant/urls";
+import useCategoryCode from "../../hooks/useCategoryCode";
+import { getAccessToken } from "../../hooks/useAuth";
+import Select from "react-select";
+import { getStoreCodes } from "../../api/storeGroup/storeGroup";
 
 const Login = () => {
-  const { logout, login, user, isAuthenticated } = useUserStore();
+  const { user, setUser } = useUserStore.getState();
+  const { fetchStores } = useCodes.getState();
+  const { getBrandCodes } = useBrandCode();
+  const { getCategoryCodes } = useCategoryCode();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
-  
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      navigate(user.dashboard_url);
-    } else {
-      setIsLoading(false);
-    }
-  }, [isAuthenticated, user]);
 
   const [formData, setFormData] = useState({
     user_id: "",
@@ -25,80 +26,206 @@ const Login = () => {
   });
 
   const [error, setError] = useState("");
+  const [isBrandFixed, setIsBrandFixed] = useState(false);
+  const [brandOptions, setBrandOptions] = useState([]);
 
+  const brandRef = useRef(null);
 
-  const handleLogin = async () => {
-    login(userData); // api 연결 전까지 임시로 store에 userData 저장
+  useEffect(() => {
+    const token = getAccessToken();
+    if (token && user) {
+      if (user.level === "ADMIN") {
+        navigate(URL_MAPPING.dashboard);
+      } else {
+        navigate("/");
+      }
+    }
+  }, [user]);
 
-    /* 추후 연동 예상 로그인 api */
-    // try {
-    //   const response = await postLogin(formData);
-    //   const { status_code, data } = response.data;
-    //   if (status_code === 200) {
-    //     login(data); //Zustand store에 저장
-    //     navigate(data.dashboard_url); // 응답데이터의 기본 url로 이동
-    //   } else {
-    //     setError("로그인 실패"); // 추후 로그인 실패 메시지 정해서 추가
-    //   }
-    // } catch (err) {
-    //   setError("로그인 요청 중 오류가 발생했습니다.");
-    // }
+  const handleGetBrandOptions = async () => {
+    if (!formData.user_id) return;
+    const response = await postUserBrand({ user_id: formData.user_id });
+    const { status, data } = response;
+    if (status === 200) {
+      if (data.status_code === 200) {
+        const options = data.data.brand_code.map((option) => ({
+          value: option,
+          label: option,
+        }));
 
+        setBrandOptions(options);
+        setFormData((prev) => ({
+          ...prev,
+          brand_code: options[0].value,
+        }));
+
+        if (options.length === 1) {
+          setIsBrandFixed(true);
+        } else {
+          setIsBrandFixed(false);
+          brandRef.current?.focus();
+        }
+      } else {
+        toast.error(data.message);
+      }
+    }
+  };
+  /* 로그인 폼 작성 검사 */
+  const isFormfilled = () => {
+    return (
+      formData.user_id?.trim() &&
+      formData.password?.trim() &&
+      formData.brand_code?.trim()
+    );
   };
 
+  const handleLogin = async () => {
+    if (!isFormfilled()) return;
+    try {
+      const response = await postLogin(formData);
+      const { status_code, data } = response.data;
+
+      if (status_code === 200) {
+        sessionStorage.setItem("access", data.token);
+        sessionStorage.setItem("refresh", data.refresh_token);
+        // 가입 후 최초 or 초기화 후 로그인 시 비밀번호 변경 진행
+        if (!data.last_changed_time) {
+          return navigate(URL_MAPPING.changePw, {
+            state: {
+              user_id: data.user_id,
+              user_name: data.user_name,
+              email: data.email,
+            },
+          });
+        }
+        data.store_name = "";
+        // 점포관리자일 경우 점포명 조회해서 유저 정보에 세팅
+        if (data.level === "STORE" && data.store_code) {
+          const params = { storeId: data.store_code };
+          const storeRes = await getStoreCodes(params);
+          data.store_name = storeRes?.data?.data?.[0].name;
+        }
+        setUser(data, formData.brand_code); // 선택한 브랜드 세팅
+        getBrandCodes(); // 브랜드 목록 조회
+        getCategoryCodes(formData.brand_code); // MD 카테고리 조회
+        fetchStores(formData.brand_code); // 선택한 브랜드의 점포목록
+      }
+    } catch (err) {
+      setError("로그인에 실패했습니다.");
+    }
+  };
   return (
     <>
-      {
-        !isLoading && (
-          < div className="flex items-center justify-center min-h-screen bg-gray-100" >
-            <div className="card w-96 bg-white shadow-xl p-6">
-              <h2 className="text-2xl font-bold text-center mb-4">Vocie PoP</h2>
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold">User ID</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="아이디를 입력해주세요."
-                  className="input input-bordered w-full"
-                />
-              </div>
-              <div className="form-control mt-4">
-                <label className="label">
-                  <span className="label-text font-semibold">Password</span>
-                </label>
-                <input
-                  type="password"
-                  placeholder="비밀번호를 입력해주세요."
-                  className="input input-bordered w-full"
-                />
-                <p className="mt-2 text-error text-sm">
-                  비밀번호가 일치하지 않습니다.
-                </p>
-              </div>
-              <div className="form-control mt-6">
-                <button
-                  className="btn btn-primary w-full"
-                  onClick={() => {
-                    handleLogin();
-                    navigate("/"); // api연동 전 임시 라우팅
-                  }}
-                >
-                  로그인
-                </button>
-              </div>
-              <div className="flex align-center justify-between mt-4 text-sm">
-                <a href="/signup" className="text-gray-500">
-                  사용자 등록 신청
-                </a>
-                <a href="#" className="text-gray-500">
-                  Password 분실
-                </a>
-              </div>
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <div className="card max-w-md bg-white shadow-xl px-6 py-10 w-full">
+          <h2 className="flex justify-center items-center text-3xl font-bold mb-6">
+            <a href={URL_MAPPING.login}>
+              <Logo />
+            </a>
+          </h2>
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text font-semibold">User ID</span>
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="아이디를 입력해주세요."
+                className="input input-bordered w-full"
+                onChange={(e) => {
+                  const newUserId = e.target.value;
+
+                  setFormData((prev) => ({
+                    ...prev,
+                    user_id: newUserId,
+                    brand_code: "",
+                  }));
+                  setIsBrandFixed(false);
+                  setBrandOptions([]);
+                }}
+                onBlur={handleGetBrandOptions}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleGetBrandOptions();
+                  }
+                }}
+              />
             </div>
-          </div >
-        )
-      }
+          </div>
+
+          <div className="form-control mt-4">
+            <label className="label">
+              <span className="label-text font-semibold">브랜드</span>
+            </label>
+            <Select
+              options={brandOptions}
+              className="min-w-56"
+              isDisabled={isBrandFixed}
+              ref={brandRef}
+              placeholder="브랜드를 선택해주세요."
+              value={
+                brandOptions.find((opt) => opt.value === formData.brand_code) ||
+                null
+              }
+              onChange={(selected) => {
+                setFormData((prev) => ({
+                  ...prev,
+                  brand_code: selected?.value || "",
+                }));
+              }}
+              isSearchable={false}
+            />
+          </div>
+
+          <div className="form-control mt-4">
+            <label className="label">
+              <span className="label-text font-semibold">Password</span>
+            </label>
+            <input
+              type="password"
+              placeholder="비밀번호를 입력해주세요."
+              className="input input-bordered w-full"
+              onChange={(e) => {
+                setFormData({
+                  ...formData,
+                  password: e.target.value,
+                });
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleLogin();
+                }
+              }}
+            />
+            {error && <p className="mt-2 text-error text-sm">{error}</p>}
+          </div>
+          <div className="form-control mt-6">
+            <button
+              className="btn btn-primary w-full"
+              onClick={() => {
+                handleLogin();
+              }}
+              disabled={!isFormfilled()}
+            >
+              로그인
+            </button>
+          </div>
+          <div className="flex align-center justify-between mt-4 text-sm">
+            <button
+              className="text-gray-500 hover:underline"
+              onClick={() => navigate(URL_MAPPING.signUp)}
+            >
+              사용자 등록 신청
+            </button>
+            <button
+              className="text-gray-500 hover:underline"
+              onClick={() => navigate(URL_MAPPING.resetPw)}
+            >
+              Password 분실
+            </button>
+          </div>
+        </div>
+      </div>
     </>
   );
 };

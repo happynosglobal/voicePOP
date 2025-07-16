@@ -1,18 +1,30 @@
 import { useEffect, useRef, useState } from "react";
-import { IoClose } from "react-icons/io5";
-import Pagination from "../../components/pagination/Pagination";
-import useUserStore from "../../stores/user";
-import LoadingSpinner from "../../components/loading/LoadingSpinner";
 import SearchBar from "./components/SearchBar";
 import UserTable from "./components/UserTable";
 import AddUserModal from "./components/AddUserModal";
 import ContentLayout from "../../layout/ContentLayout";
-import Title from "../../components/title/Title";
+import useHandleUserList from "./hooks/useHandleUserList";
+import LoadingSpinner from "../../components/loading/LoadingSpinner";
 
-const UserManagementPage = () => {
+const UserManagementPage = ({ title }) => {
   const modalRef = useRef();
-  const { user } = useUserStore();
-  const [isLoading, setIsLoading] = useState(false);
+
+  const {
+    searchParams,
+    userList,
+    page,
+    total,
+    limit,
+    setPage,
+    handleGetUsers,
+    handleMultiSelectBox,
+    handleInput,
+    handleSelectBox,
+    handleSort,
+  } = useHandleUserList();
+
+  const [userId, setUserId] = useState(null);
+  const [userData, setUserData] = useState(null);
 
   const openModal = () => {
     if (modalRef.current) {
@@ -20,21 +32,53 @@ const UserManagementPage = () => {
     }
   };
 
+  const closeModal = () => {
+    if (modalRef.current) {
+      modalRef.current.close();
+    }
+  };
+
   return (
-    <LoadingSpinner isLoading={isLoading}>
-      <ContentLayout>
-        <Title text="사용자 관리" />
+    <ContentLayout title={title}>
+      {/* <!-- 사용자 검색바 --> */}
+      <SearchBar
+        setUserId={setUserId}
+        searchParams={searchParams}
+        setPage={setPage}
+        openModal={openModal}
+        handleInput={handleInput}
+        handleSelectBox={handleSelectBox}
+        handleMultiSelectBox={handleMultiSelectBox}
+        handleGetUsers={handleGetUsers}
+      />
 
-        {/* <!-- 사용자 검색바 --> */}
-        <SearchBar openModal={openModal} />
+      {/* <!-- 사용자 목록 테이블 --> */}
+      <UserTable
+        setUserId={setUserId}
+        setUserData={setUserData}
+        userList={userList}
+        page={page}
+        total={total}
+        limit={limit}
+        setPage={setPage}
+        openModal={openModal}
+        closeModal={closeModal}
+        handleSort={handleSort}
+        handleGetUsers={handleGetUsers}
+      />
 
-        {/* <!-- 사용자 목록 테이블 --> */}
-        <UserTable openModal={openModal} />
-
-        {/* <!-- 모달 --> */}
-        <AddUserModal modalRef={modalRef} />
-      </ContentLayout>
-    </LoadingSpinner>
+      <AddUserModal
+        modalRef={modalRef}
+        closeModal={closeModal}
+        userId={userId}
+        setUserId={setUserId}
+        userData={userData}
+        setUserData={setUserData}
+        handleGetUsers={handleGetUsers}
+        mode={userId ? "modify" : "add"}
+      />
+      <LoadingSpinner includeCodesLoading={true} />
+    </ContentLayout>
   );
 };
 

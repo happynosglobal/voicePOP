@@ -1,4 +1,4 @@
-import React, { forwardRef, memo } from "react";
+import React, { forwardRef, memo, useEffect } from "react";
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { ko } from "date-fns/locale";
@@ -37,19 +37,30 @@ const CustomDatePicker = ({
   selectedDate,
   onChange,
   placeholder = "날짜 선택",
-}) => (
-  <DatePicker
-    selected={selectedDate}
-    onChange={onChange}
-    locale="ko"
-    dateFormat="yyyy-MM-dd"
-    showMonthDropdown
-    showYearDropdown
-    dropdownMode="select"
-    customInput={<CustomInput placeholder={placeholder} />}
-    dayClassName={getDayClassName}
-    placeholderText={placeholder}
-  />
-);
+  minDate,
+}) => {
+  // minDate보다 빠르면 minDate로 초기화
+  useEffect(() => {
+    if (minDate && selectedDate && selectedDate < minDate) {
+      onChange(minDate);
+    }
+  }, [selectedDate, minDate, onChange]);
+
+  return (
+    <DatePicker
+      selected={selectedDate}
+      onChange={onChange}
+      locale="ko"
+      dateFormat="yyyy-MM-dd"
+      showMonthDropdown
+      showYearDropdown
+      dropdownMode="select"
+      customInput={<CustomInput placeholder={placeholder} />}
+      dayClassName={getDayClassName}
+      placeholderText={placeholder}
+      minDate={minDate}
+    />
+  );
+};
 
 export default CustomDatePicker;
